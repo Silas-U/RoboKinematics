@@ -1,4 +1,4 @@
-'''DH TABLE FOR SAMPLE SCARA ROBOT ARM'''
+'''DH TABLE FOR SAMPLE SCARA ROBOT'''
 '''---------+-------------+--------------+---------------+--------------+
 |    Link   | Link Length |  Link Twist  |  Joint Offset |     Theta    |
 ------------+-------------+--------------+---------------+--------------+
@@ -13,9 +13,9 @@ from time import sleep
 
 
 #SCARA JOINT CONFIGURATIONS [Frame_name, Joint_type, link_length, link_twist, joint_offset, joint_variable] the joint_variables are initialized to 0.0 here]
-dh_params_link1 = ["frame0", "r", 0.0,  0.0,  0.4, 0.0] #Frame0 include the frame_name and joint_type
-dh_params_link2 = ["frame1", "r", 0.14, 180,  0.0, 0.0] #Frame1
-dh_params_link3 = ["frame2", "p", 0.0,  0.0,  0.0, 0.0] #Frame2
+dh_params_link1 = ["frame0", "r", 0.0,  0.0,  0.4, 0.0]
+dh_params_link2 = ["frame1", "r", 0.14, 180,  0.0, 0.0]
+dh_params_link3 = ["frame2", "p", 0.0,  0.0,  0.0, 0.0]
 
 
 dh_params = [
