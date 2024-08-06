@@ -11,6 +11,7 @@
 
 import math as m
 import functools  
+import numpy as np
 
 class CreateRobot():
 
@@ -31,7 +32,7 @@ class CreateRobot():
         self._homogeneous_t_matrix_ = []
 
     
-    def move_joints(self, joint_vars, speed=0, rads=False): #tlist=[0,0,0] ?selective distribution algorithm or array search algorithm.
+    def move_joints(self, joint_vars, speed=0, rads=False):
         try:
             self.dh_params_list = []
             for x in range(len(self.args)):
@@ -63,7 +64,7 @@ class CreateRobot():
                     dh_param_g_list[i][4] = float(joint_vars[i])
             self.dh_param_grouped_list = dh_param_g_list   
             self.generate_ht_matrix() #UPDATE ROBOT JOINT STATE       
-            return 0
+            return dh_param_g_list
          
         except ValueError as e:
             print(f"Error: {e}")
@@ -77,16 +78,13 @@ class CreateRobot():
         self.cumulative_list_row2_data = []
         self.cumulative_list_row3_data = []
         self.cumulative_list_row4_data = []
-
-        self.theta = (self.theta/180)*m.pi #converts to rads
-        self.link_twist = (self.link_twist/180)*m.pi #converts to rads
-
-        for col_index in range(len(self.dh_param_grouped_list)): #len(dh_param_grouped_list)
+             
+        for col_index in range(len(self.dh_param_grouped_list)):
 
             self.link_length  = float(self.dh_param_grouped_list[col_index][2])
-            self.link_twist   = float(self.dh_param_grouped_list[col_index][3])
+            self.link_twist   = (float(self.dh_param_grouped_list[col_index][3])/180)*m.pi
             self.joint_offset = float(self.dh_param_grouped_list[col_index][4])
-            self.theta        = float(self.dh_param_grouped_list[col_index][5])
+            self.theta        = (float(self.dh_param_grouped_list[col_index][5])/180)*m.pi
             
             #General Homogeneouse Transformation Matrix (Formular)
             self.row1 = [m.cos(self.theta), -m.sin(self.theta)*m.cos(self.link_twist),  m.sin(self.theta)*m.sin(self.link_twist), self.link_length*m.cos(self.theta)]
@@ -175,9 +173,9 @@ class CreateRobot():
 
     def get_tcp(self):
         displacement_vetor = []
-        m = self.get_transforms(3)
-        for i in range(3):
-            displacement_vetor.append(m[i][3])
+        m = self.get_transforms(self.n_links)
+        for i in range(self.n_links):
+            displacement_vetor.append(m[i][self.n_links])
         return displacement_vetor
 
     def get_j_origin(self, index):
