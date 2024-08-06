@@ -1,13 +1,22 @@
-'''-----------------------------------------------------------------------------------------------------#
-#                                                                                                       #
-# Program : Forward kinematics for an n_DOF robot arm                                                    #
-# Author  : Silas Udofia                                                                                #
-# Project : forward_kinematics                                                                          #                                                                      #
-# Date    : Aug 2, 2024                                                                                 #
-#                                                                                                       #   
-# (forward kinematics) CALCULATES THE FK FOR ROBOT WITH N_DOF                                           #
-#                                                                                                       #
------------------------------------------------------------------------------------------------------'''
+"""
+Author: Silas Udofia
+Date: 2024-08-02
+Description: This script performs kinematics analysis for an n_degree of freedom robot manipulator.
+
+GitHub: https://github.com/Silas-U/Robot-Kinematics-lib/tree/main
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+"""
 import math as m
 import functools  
 
@@ -16,16 +25,14 @@ class CreateRobot():
     def __init__(self, args, robot_name):
         self.args = args
         self.robot_name = robot_name
-        self.n_links = 0 #initialize to 0
+        self.n_links = 0
         self.n_dh_params = 6
         self.theta = 0
         self.link_twist = 0
         self.link_length = 0
         self.joint_offset = 0
-
         self.frame = ""
         self.joint_type = ""
-
         self.dh_param_grouped_list = [] 
         self._homogeneous_t_matrix_ = []
 
