@@ -8,10 +8,8 @@
 # (forward kinematics) CALCULATES THE FK FOR ROBOT WITH N_DOF                                           #
 #                                                                                                       #
 -----------------------------------------------------------------------------------------------------'''
-
 import math as m
 import functools  
-import numpy as np
 
 class CreateRobot():
 
@@ -69,8 +67,10 @@ class CreateRobot():
         except ValueError as e:
             print(f"Error: {e}")
 
+
     def get_pos(self):
         return self.dh_param_grouped_list
+    
     
        #HTMatrix is the homogeneous transformation matrix for each link
     def generate_ht_matrix(self):
