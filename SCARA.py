@@ -62,7 +62,7 @@ def exec_time(f):
 # set_joint_limit(joint,min,max)
 
 #Moves the robot revolute_joint_1 45 deg, revolute_joint_2 20 deg and prismatic_joint_3 0.2m
-scara_arm.move_joints([90,-90,0.2],rads=True)
+scara_arm.move_joints([1.5708, -1.5708, 0.2],rads=True)
 scara_arm.print_transforms(3)
 
 # The following code can make the SCARA arm swing left and right

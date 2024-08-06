@@ -35,9 +35,11 @@ class CreateRobot():
         self.joint_type = ""
         self.dh_param_grouped_list = [] 
         self._homogeneous_t_matrix_ = []
+        self.set_to_rads = False
 
     
     def move_joints(self, joint_vars, speed=0, rads=False):
+        self.set_to_rads = rads
         try:
             self.dh_params_list = []
             for x in range(len(self.args)):
@@ -89,10 +91,15 @@ class CreateRobot():
         for col_index in range(len(self.dh_param_grouped_list)):
 
             self.link_length  = float(self.dh_param_grouped_list[col_index][2])
-            self.link_twist   = (float(self.dh_param_grouped_list[col_index][3])/180)*m.pi
             self.joint_offset = float(self.dh_param_grouped_list[col_index][4])
-            self.theta        = (float(self.dh_param_grouped_list[col_index][5])/180)*m.pi
-            
+            # self.link_twist   = float(self.dh_param_grouped_list[col_index][3])
+            self.link_twist   = (float(self.dh_param_grouped_list[col_index][3])/180)*m.pi
+
+            if self.set_to_rads == True:
+                self.theta        = float(self.dh_param_grouped_list[col_index][5])
+            else:
+                self.theta        = (float(self.dh_param_grouped_list[col_index][5])/180)*m.pi
+                
             #General Homogeneouse Transformation Matrix (Formular)
             self.row1 = [m.cos(self.theta), -m.sin(self.theta)*m.cos(self.link_twist),  m.sin(self.theta)*m.sin(self.link_twist), self.link_length*m.cos(self.theta)]
             self.row2 = [m.sin(self.theta),  m.cos(self.theta)*m.cos(self.link_twist), -m.cos(self.theta)*m.sin(self.link_twist), self.link_length*m.sin(self.theta)]
@@ -174,6 +181,7 @@ class CreateRobot():
                 formated_res = list(map(self.format, result))
                 for i in formated_res:
                     print(i)
+                print("\n")
         except ValueError as e:
             print(f"Error: {e}")
         
