@@ -1,7 +1,7 @@
 """
 Author: Silas Udofia
 Date: 2024-08-02
-Description: This script performs kinematics analysis for a 6DOF robot.
+Description: This script performs kinematics analysis for a UR20 robot.
 
 GitHub: https://github.com/Silas-U/Robot-Kinematics-lib/tree/main
 
@@ -36,13 +36,13 @@ from time import sleep
 from math import pi as π
 
 
-#SCARA JOINT CONFIGURATIONS [Frame_name, Joint_type, link_length, link_twist, joint_offset, joint_variable] the joint_variables are initialized to 0.0 here]
-dh_params_link1 = ["frame0", "r", 0.05,  π/2,  0.105, 0.0]
-dh_params_link2 = ["frame1", "r", 0.14,  0.0,  0.0,   0.0]
-dh_params_link3 = ["frame2", "r", 0.17,  π/2,  0.0,   0.0]
-dh_params_link4 = ["frame3", "r", 0.0,  -π/2,  0.0,   0.0]
-dh_params_link5 = ["frame4", "r", 0.0,   π/2,  0.0,   0.0]
-dh_params_link6 = ["frame5", "r", 0.0,   0.0,  0.0,   0.0]
+#[Frame_name, Joint_type, link_length, link_twist, joint_offset, joint_variable]
+dh_params_link1 = ["frame0", "r", 0,        π/2,  0.2363, 0]
+dh_params_link2 = ["frame1", "r",-0.8620,   0,    0,      0]
+dh_params_link3 = ["frame2", "r",-0.7287,   0,    0,      0]
+dh_params_link4 = ["frame3", "r", 0,        π/2,  0.2010, 0]
+dh_params_link5 = ["frame4", "r", 0,       -π/2,  0.1593, 0]
+dh_params_link6 = ["frame5", "r", 0,        0,    0.1543, 0]
 
 
 dh_params = [
@@ -54,7 +54,7 @@ dh_params = [
     dh_params_link6,
     ]
 
-_6dof = CreateRobot(dh_params,"6DOF",link_twist_in_rads=True)
+ur20 = CreateRobot(dh_params,"UR20",link_twist_in_rads=True)
 
 def exec_time(f):
         print( 
@@ -69,13 +69,11 @@ def exec_time(f):
      )
 
 #Move joints in rads
-r =_6dof.move_joints([0, π/2,-π/2, 0, 0, 0],rads=True)
-_6dof.print_transforms(6)
+r = ur20.move_joints([0, π/2, -π/2, 0, 0, 0],rads=True)
+ur20.print_transforms(6)
 sleep(1)
 #Move joints in degrees
-r =_6dof.move_joints([0, 90, -90, 0, 0, 0])
-_6dof.print_transforms(6)
+r =ur20.move_joints([0, 90, -60, 20, 10, 10])
+ur20.print_transforms(6)
 sleep(1)
-
-exec_time("_6dof.move_joints([0, π/2,-π/2, 0, 0, 0],rads=True)")
 

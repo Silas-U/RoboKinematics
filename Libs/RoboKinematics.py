@@ -22,7 +22,7 @@ import functools
 
 class CreateRobot():
 
-    def __init__(self, args, robot_name):
+    def __init__(self, args, robot_name, link_twist_in_rads = False):
         self.args = args
         self.robot_name = robot_name
         self.n_links = 0
@@ -36,7 +36,7 @@ class CreateRobot():
         self.dh_param_grouped_list = [] 
         self._homogeneous_t_matrix_ = []
         self.set_to_rads = False
-
+        self.link_twist_in_rads = link_twist_in_rads
     
     def move_joints(self, joint_vars, speed=0, rads=False):
         self.set_to_rads = rads
@@ -63,7 +63,6 @@ class CreateRobot():
             elif len(joint_vars) < num_of_joints:
                 raise ValueError(f"Joint varibles insufficient: Your {self.robot_name} robot has only {num_of_joints} joints of type: {joint_type_arr}")
            
-
             for i in range(num_of_joints):
                 if dh_param_g_list[i][1] == "r":
                     dh_param_g_list[i][5] = float(joint_vars[i])
@@ -77,7 +76,7 @@ class CreateRobot():
             print(f"Error: {e}")
 
 
-    def get_pos(self):
+    def get_dh_params(self):
         return self.dh_param_grouped_list
     
     
@@ -92,13 +91,16 @@ class CreateRobot():
 
             self.link_length  = float(self.dh_param_grouped_list[col_index][2])
             self.joint_offset = float(self.dh_param_grouped_list[col_index][4])
-            # self.link_twist   = float(self.dh_param_grouped_list[col_index][3])
-            self.link_twist   = (float(self.dh_param_grouped_list[col_index][3])/180)*m.pi
+
+            if self.link_twist_in_rads ==True:
+                self.link_twist   = float(self.dh_param_grouped_list[col_index][3])
+            else:
+                self.link_twist   = (float(self.dh_param_grouped_list[col_index][3])/180)*m.pi
 
             if self.set_to_rads == True:
-                self.theta        = float(self.dh_param_grouped_list[col_index][5])
+                self.theta = float(self.dh_param_grouped_list[col_index][5])
             else:
-                self.theta        = (float(self.dh_param_grouped_list[col_index][5])/180)*m.pi
+                self.theta = (float(self.dh_param_grouped_list[col_index][5])/180)*m.pi
                 
             #General Homogeneouse Transformation Matrix (Formular)
             self.row1 = [m.cos(self.theta), -m.sin(self.theta)*m.cos(self.link_twist),  m.sin(self.theta)*m.sin(self.link_twist), self.link_length*m.cos(self.theta)]
@@ -162,7 +164,6 @@ class CreateRobot():
         except ValueError as e:
             print(f"Error: {e}")
             
-
 
     def print_transforms(self, stop_index=1):
         new = []

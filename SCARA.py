@@ -30,12 +30,13 @@ limitations under the License.
 
 from Libs.RoboKinematics import CreateRobot
 import timeit
+from math import pi as π
 from time import sleep
 
 
 #SCARA JOINT CONFIGURATIONS [Frame_name, Joint_type, link_length, link_twist, joint_offset, joint_variable] the joint_variables are initialized to 0.0 here]
 dh_params_link1 = ["frame0", "r", 0.0,  0.0,  0.4, 0.0]
-dh_params_link2 = ["frame1", "r", 0.14, 180,  0.0, 0.0]
+dh_params_link2 = ["frame1", "r", 0.14, π,    0.0, 0.0]
 dh_params_link3 = ["frame2", "p", 0.0,  0.0,  0.0, 0.0]
 
 
@@ -45,7 +46,7 @@ dh_params = [
     dh_params_link3,
     ]
 
-scara_arm = CreateRobot(dh_params,"SCARA")
+scara_arm = CreateRobot(dh_params, robot_name="SCARA", link_twist_in_rads=True)
 
 def exec_time(f):
         print( 
@@ -58,25 +59,23 @@ def exec_time(f):
                 )
             )      
      )
-#Set joint limit for scara_arm        
-# set_joint_limit(joint,min,max)
 
-#Moves the robot revolute_joint_1 45 deg, revolute_joint_2 20 deg and prismatic_joint_3 0.2m
-scara_arm.move_joints([1.5708, -1.5708, 0.2],rads=True)
+#Moves the robot revolute_joint_1 90 deg, revolute_joint_2 90 deg and prismatic_joint_3 0.2m
+scara_arm.move_joints([π/2, -π/2, 0.2],rads=True)
 scara_arm.print_transforms(3)
 
 # The following code can make the SCARA arm swing left and right
 # sleep(2)
-# scara_arm.move_joints([45,45,0.2])
+# scara_arm.move_joints([1.5708, -1.5708, 0.2],rads=True)
 # scara_arm.print_transforms(3)
 # sleep(2)
-# scara_arm.move_joints([0,0,0.2])
+# scara_arm.move_joints([1.5708, -1.5708, 0.2],rads=True)
 # scara_arm.print_transforms(3)
 # sleep(2)
-# scara_arm.move_joints([45,45,0.2])
+# scara_arm.move_joints([1.5708, -1.5708, 0.2],rads=True)
 # scara_arm.print_transforms(3)
 # sleep(2)
-# scara_arm.move_joints([0,0,0.2])
+# scara_arm.move_joints([1.5708, -1.5708, 0.2],rads=True)
 # scara_arm.print_transforms(3)
 # sleep(2)
 
