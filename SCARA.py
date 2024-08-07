@@ -60,24 +60,30 @@ def exec_time(f):
             )      
      )
 
-#Moves the robot revolute_joint_1 90 deg, revolute_joint_2 90 deg and prismatic_joint_3 0.2m
-scara_arm.move_joints([π/2, -π/2, 0.2],rads=True)
+#Moves the robot to home position
+scara_arm.move_joints([0, 0, 0.0],rads=True)
 scara_arm.print_transforms(3)
+sleep(3)
 
 # The following code can make the SCARA arm swing left and right
-# sleep(2)
-# scara_arm.move_joints([1.5708, -1.5708, 0.2],rads=True)
-# scara_arm.print_transforms(3)
-# sleep(2)
-# scara_arm.move_joints([1.5708, -1.5708, 0.2],rads=True)
-# scara_arm.print_transforms(3)
-# sleep(2)
-# scara_arm.move_joints([1.5708, -1.5708, 0.2],rads=True)
-# scara_arm.print_transforms(3)
-# sleep(2)
-# scara_arm.move_joints([1.5708, -1.5708, 0.2],rads=True)
-# scara_arm.print_transforms(3)
-# sleep(2)
+
+scara_arm.move_joints([π/3, 0, 0.0],rads=True)
+scara_arm.print_transforms(3)
+print("\n")
+sleep(0.5)
+scara_arm.move_joints([0, 0, 0.0],rads=True)
+scara_arm.print_transforms(3)
+print("\n")
+sleep(0.5)
+scara_arm.move_joints([π/3, 0, 0.0],rads=True)
+scara_arm.print_transforms(3)
+print("\n")
+sleep(0.5)
+scara_arm.move_joints([0, 0, 0.0],rads=True)
+scara_arm.print_transforms(3)
+print("\n")
+sleep(0.5)
+
 
 
 

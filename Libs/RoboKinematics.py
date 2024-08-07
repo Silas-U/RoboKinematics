@@ -182,7 +182,6 @@ class CreateRobot():
                 formated_res = list(map(self.format, result))
                 for i in formated_res:
                     print(i)
-                print("\n")
         except ValueError as e:
             print(f"Error: {e}")
         
@@ -230,5 +229,5 @@ class CreateRobot():
             pass
 
 
-#---------------------------------JACOBIAN---------------------------------------#
+#---------------------------------JA---------------------------------------#
 
