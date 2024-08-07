@@ -69,11 +69,11 @@ def exec_time(f):
      )
 
 #Move joints in rads
-r = ur20.move_joints([0, π/2, -π/2, 0, 0, 0],rads=True)
+ur20.move_joints([0, π/2, -π/2, 0, 0, 0],rads=True)
 ur20.print_transforms(6)
 sleep(1)
 #Move joints in degrees
-r =ur20.move_joints([0, 90, -60, 20, 10, 10])
+ur20.move_joints([0, 90, -60, 20, 10, 10])
 ur20.print_transforms(6)
 sleep(1)
 

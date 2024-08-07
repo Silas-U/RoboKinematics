@@ -21,13 +21,15 @@ limitations under the License.
 """
 The Denavit–Hartenberg parameters for UR20  robot is shown below.
 
-Kinematics 	theta [rad]   a [m] 	d [m] 	alpha [rad] 	
-Joint 1 	  0 	        0       0.2363 	    π/2 		
-Joint 2 	  0 	       -0.8620 	0 		 	0
-Joint 3 	  0 	       -0.7287 	0 			0
-Joint 4 	  0 	        0 	    0.2010 	    π/2 		
-Joint 5 	  0 	        0 	    0.1593 	   -π/2 	 	
-Joint 6 	  0 	        0 	    0.1543 	     0 	    	
+The Denavit–Hartenberg parameters for UR20  robot is shown below.
+
+Kinematics  theta [rad]     a [m]   d [m]   alpha [rad]
+Joint 1     0               0.05    0.105       π/2
+Joint 2     0               0.14    0           0
+Joint 3     0               0.17    0           π/2
+Joint 4     0               0       0          -π/2
+Joint 5     0               0       0           π/2
+Joint 6     0               0       0           0
 """
 
 from Libs.RoboKinematics import CreateRobot
@@ -54,12 +56,12 @@ dh_params = [
     dh_params_link6,
     ]
 
-_6dof = CreateRobot(dh_params,"6DOF",link_twist_in_rads=True)
+robot = CreateRobot(dh_params,"6DOF",link_twist_in_rads=True)
 
 def exec_time(f):
         print( 
-            'Execution time : '    
-            '{:.10f} s'.format(
+            'Execution time : ',    
+                '{:.10f} sec'.format(
                 timeit.timeit(
                 f,
                 globals=globals(),
@@ -69,13 +71,13 @@ def exec_time(f):
      )
 
 #Move joints in rads
-r =_6dof.move_joints([0, π/2,-π/2, 0, 0, 0],rads=True)
-_6dof.print_transforms(6)
+robot.move_joints([0, π/2,-π/2, 0, 0, 0],rads=True)
+robot.print_transforms(6)
 sleep(1)
 #Move joints in degrees
-r =_6dof.move_joints([0, 90, -90, 0, 0, 0])
-_6dof.print_transforms(6)
+robot.move_joints([0, 90, -90, 0, 0, 0])
+robot.print_transforms(6)
 sleep(1)
 
-exec_time("_6dof.move_joints([0, π/2,-π/2, 0, 0, 0],rads=True)")
+exec_time("robot.move_joints([0, π/2,-π/2, 0, 0, 0],rads=True)")
 
