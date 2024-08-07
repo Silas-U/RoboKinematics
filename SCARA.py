@@ -34,19 +34,6 @@ from math import pi as π
 from time import sleep
 
 
-#SCARA JOINT CONFIGURATIONS [Frame_name, Joint_type, link_length, link_twist, joint_offset, joint_variable] the joint_variables are initialized to 0.0 here]
-dh_params_link1 = ["frame0", "r", 0.0,  0.0,  0.4, 0.0]
-dh_params_link2 = ["frame1", "r", 0.14, π,    0.0, 0.0]
-dh_params_link3 = ["frame2", "p", 0.0,  0.0,  0.0, 0.0]
-
-
-dh_params = [
-    dh_params_link1,
-    dh_params_link2,
-    dh_params_link3,
-    ]
-
-scara_arm = CreateRobot(dh_params, robot_name="SCARA", link_twist_in_rads=True)
 
 def exec_time(f):
         print( 
@@ -58,10 +45,37 @@ def exec_time(f):
                 number=1,  
                 )
             )      
-     )
+        )
+
+
+#[Frame_name, Joint_type, link_length, link_twist, joint_offset, joint_variable] the joint_variables are initialized to 0.0 here]
+dh_params_link1 = ["frame0", "r", 0.0,  0.0,  0.4, 0.0]
+dh_params_link2 = ["frame1", "r", 0.14, π,    0.0, 0.0]
+dh_params_link3 = ["frame2", "p", 0.0,  0.0,  0.0, 0.0]
+
+
+dh_params = [
+    dh_params_link1,
+    dh_params_link2,
+    dh_params_link3,
+]
+
+"""
+If joint vars are provided in radians then the min and max limit should be set in radians: 
+Default min and max limits are set in degrees
+"""
+joint_lim = [
+    [-π/2, π/2], #min max j1
+    [-π/2, π/2], #min max j2
+    [0, 0.5],    #min max j3
+]
+
+scara_arm = CreateRobot(dh_params, robot_name="SCARA", link_twist_in_rads=True, joint_lim_enable=True)
+
+scara_arm.set_joint_limit(joint_lim)
 
 #Moves the robot to home position
-scara_arm.move_joints([0, 0, 0.0],rads=True)
+scara_arm.move_joints([π/2, π/2, 0.5],rads=True)
 scara_arm.print_transforms(3)
 sleep(3)
 

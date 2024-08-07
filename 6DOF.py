@@ -38,6 +38,19 @@ from time import sleep
 from math import pi as π
 
 
+def exec_time(f):
+        print( 
+            'Execution time : ',    
+                '{:.10f} sec'.format(
+                timeit.timeit(
+                f,
+                globals=globals(),
+                number=1,  
+                )
+            )      
+        )
+
+
 #SCARA JOINT CONFIGURATIONS [Frame_name, Joint_type, link_length, link_twist, joint_offset, joint_variable] the joint_variables are initialized to 0.0 here]
 dh_params_link1 = ["frame0", "r", 0.05,  π/2,  0.105, 0.0]
 dh_params_link2 = ["frame1", "r", 0.14,  0.0,  0.0,   0.0]
@@ -56,28 +69,23 @@ dh_params = [
     dh_params_link6,
     ]
 
-robot = CreateRobot(dh_params,"6DOF",link_twist_in_rads=True)
+joint_lim = [
+    [-90, 90], #min max j1
+    [-90, 90], #min max j2
+    [-90, 90], #min max j1
+    [-90, 90], #min max j2
+    [-90, 90], #min max j1
+    [-90, 90], #min max j2
+]
 
-def exec_time(f):
-        print( 
-            'Execution time : ',    
-                '{:.10f} sec'.format(
-                timeit.timeit(
-                f,
-                globals=globals(),
-                number=1,  
-                )
-            )      
-     )
+robot = CreateRobot(dh_params,"6DOF",link_twist_in_rads=True, joint_lim_enable=True)
 
-#Move joints in rads
-robot.move_joints([0, π/2,-π/2, 0, 0, 0],rads=True)
-robot.print_transforms(6)
-sleep(1)
+robot.set_joint_limit(joint_lim)
+
+
 #Move joints in degrees
 robot.move_joints([0, 90, -90, 0, 0, 0])
 robot.print_transforms(6)
-sleep(1)
 
 exec_time("robot.move_joints([0, π/2,-π/2, 0, 0, 0],rads=True)")
 

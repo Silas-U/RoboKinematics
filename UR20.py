@@ -54,7 +54,18 @@ dh_params = [
     dh_params_link6,
     ]
 
-ur20 = CreateRobot(dh_params,"UR20",link_twist_in_rads=True)
+joint_lim = [
+    [-π/2, π/2], #min max j1
+    [-π/2, π/2], #min max j2
+    [-π/2, π/2], #min max j1
+    [-π/2, π/2], #min max j2
+    [-π/2, π/2], #min max j1
+    [-π/2, π/2], #min max j2
+]
+
+ur20 = CreateRobot(dh_params,"UR20",link_twist_in_rads=True, joint_lim_enable=True)
+
+ur20.set_joint_limit(joint_lim)
 
 def exec_time(f):
         print( 
@@ -69,11 +80,7 @@ def exec_time(f):
      )
 
 #Move joints in rads
-ur20.move_joints([0, π/2, -π/2, 0, 0, 0],rads=True)
-ur20.print_transforms(6)
-sleep(1)
-#Move joints in degrees
-ur20.move_joints([0, 90, -60, 20, 10, 10])
+ur20.move_joints([0, -π/2, -π/2, 0, 0, 0],rads=True)
 ur20.print_transforms(6)
 sleep(1)
 
