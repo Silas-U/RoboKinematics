@@ -21,13 +21,13 @@ limitations under the License.
 """
 The Denavit–Hartenberg parameters for UR20  robot is shown below.
 
-Kinematics 	theta [rad]   a [m] 	d [m] 	alpha [rad] 	
-Joint 1 	  0 	        0       0.2363 	    π/2 		
-Joint 2 	  0 	       -0.8620 	0 		 	0
-Joint 3 	  0 	       -0.7287 	0 			0
-Joint 4 	  0 	        0 	    0.2010 	    π/2 		
-Joint 5 	  0 	        0 	    0.1593 	   -π/2 	 	
-Joint 6 	  0 	        0 	    0.1543 	     0 	    	
+Kinematics  theta [rad]   a [m]     d [m]   alpha [rad]
+Joint 1     0               0       0.2363      π/2
+Joint 2     0              -0.8620  0           0
+Joint 3     0              -0.7287  0           0
+Joint 4     0               0       0.2010      π/2
+Joint 5     0               0       0.1593     -π/2
+Joint 6     0               0       0.1543      0
 """
 
 from Libs.RoboKinematics import CreateRobot
