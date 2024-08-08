@@ -17,6 +17,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+from Libs.RoboKinematics import CreateRobot
+import timeit
+from time import sleep
+from math import pi
 
 """
 The Denavit–Hartenberg parameters for UR20  robot is shown below.
@@ -30,19 +34,14 @@ Joint 5     0               0       0.1593     -π/2
 Joint 6     0               0       0.1543      0
 """
 
-from Libs.RoboKinematics import CreateRobot
-import timeit
-from time import sleep
-from math import pi as π
+# [Frame_name, Joint_type, link_length, link_twist, joint_offset, joint_variable]
 
-
-#[Frame_name, Joint_type, link_length, link_twist, joint_offset, joint_variable]
-dh_params_link1 = ["frame0", "r", 0,        π/2,  0.2363, 0]
-dh_params_link2 = ["frame1", "r",-0.8620,   0,    0,      0]
-dh_params_link3 = ["frame2", "r",-0.7287,   0,    0,      0]
-dh_params_link4 = ["frame3", "r", 0,        π/2,  0.2010, 0]
-dh_params_link5 = ["frame4", "r", 0,       -π/2,  0.1593, 0]
-dh_params_link6 = ["frame5", "r", 0,        0,    0.1543, 0]
+dh_params_link1 = ["frame0", "r", 0,        pi/2,  0.2363, 0]
+dh_params_link2 = ["frame1", "r", -0.8620,   0,    0,      0]
+dh_params_link3 = ["frame2", "r", -0.7287,   0,    0,      0]
+dh_params_link4 = ["frame3", "r", 0,        pi/2,  0.2010, 0]
+dh_params_link5 = ["frame4", "r", 0,       -pi/2,  0.1593, 0]
+dh_params_link6 = ["frame5", "r", 0,        0,     0.1543, 0]
 
 
 dh_params = [
@@ -55,32 +54,33 @@ dh_params = [
     ]
 
 joint_lim = [
-    [-π/2, π/2], #min max j1
-    [-π/2, π/2], #min max j2
-    [-π/2, π/2], #min max j1
-    [-π/2, π/2], #min max j2
-    [-π/2, π/2], #min max j1
-    [-π/2, π/2], #min max j2
+    [-pi/2, pi/2],  # min max j1
+    [-pi/2, pi/2],  # min max j2
+    [-pi/2, pi/2],  # min max j1
+    [-pi/2, pi/2],  # min max j2
+    [-pi/2, pi/2],  # min max j1
+    [-pi/2, pi/2],  # min max j2
 ]
 
-ur20 = CreateRobot(dh_params,"UR20",link_twist_in_rads=True, joint_lim_enable=True)
+ur20 = CreateRobot(dh_params, "UR20", link_twist_in_rads=True, joint_lim_enable=True)
 
 ur20.set_joint_limit(joint_lim)
 
+
 def exec_time(f):
-    print( 
+    print(
         'Execution time : '    
         '{:.10f} s'.format(
             timeit.timeit(
-            f,
-            globals=globals(),
-            number=1,  
+                f,
+                globals=globals(),
+                number=1,
             )
-        )      
+        )
      )
 
-#Move joints in rads
-ur20.move_joints([0, -π/2, -π/2, 0, 0, 0],rads=True)
+
+# Move joints in rads
+ur20.move_joints([0, -pi/2, -pi/2, 0, 0, 0], rads=True)
 ur20.print_transforms(6)
 sleep(1)
-
