@@ -68,15 +68,15 @@ ur20 = CreateRobot(dh_params,"UR20",link_twist_in_rads=True, joint_lim_enable=Tr
 ur20.set_joint_limit(joint_lim)
 
 def exec_time(f):
-        print( 
-            'Execution time : '    
-            '{:.10f} s'.format(
-                timeit.timeit(
-                f,
-                globals=globals(),
-                number=1,  
-                )
-            )      
+    print( 
+        'Execution time : '    
+        '{:.10f} s'.format(
+            timeit.timeit(
+            f,
+            globals=globals(),
+            number=1,  
+            )
+        )      
      )
 
 #Move joints in rads

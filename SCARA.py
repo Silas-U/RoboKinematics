@@ -36,16 +36,16 @@ from time import sleep
 
 
 def exec_time(f):
-        print( 
-            'Execution time : '    
-            '{:.10f} s'.format(
-                timeit.timeit(
-                f,
-                globals=globals(),
-                number=1,  
-                )
-            )      
-        )
+    print( 
+        'Execution time : '    
+        '{:.10f} s'.format(
+            timeit.timeit(
+            f,
+            globals=globals(),
+            number=1,  
+            )
+        )      
+    )
 
 
 #[Frame_name, Joint_type, link_length, link_twist, joint_offset, joint_variable] the joint_variables are initialized to 0.0 here]

@@ -34,30 +34,29 @@ Joint 6     0               0       0           0
 
 from Libs.RoboKinematics import CreateRobot
 import timeit
-from time import sleep
 from math import pi as π
 
 
 def exec_time(f):
-        print( 
-            'Execution time : ',    
-                '{:.10f} sec'.format(
-                timeit.timeit(
-                f,
-                globals=globals(),
-                number=1,  
-                )
-            )      
-        )
+    print( 
+        'Execution time : ',    
+            '{:.10f} sec'.format(
+            timeit.timeit(
+            f,
+            globals=globals(),
+            number=1,  
+            )
+        )      
+    )
 
 
 #SCARA JOINT CONFIGURATIONS [Frame_name, Joint_type, link_length, link_twist, joint_offset, joint_variable] the joint_variables are initialized to 0.0 here]
-dh_params_link1 = ["frame0", "r", 0.05,  π/2,  0.105, 0.0]
-dh_params_link2 = ["frame1", "r", 0.14,  0.0,  0.0,   0.0]
-dh_params_link3 = ["frame2", "r", 0.17,  π/2,  0.0,   0.0]
-dh_params_link4 = ["frame3", "r", 0.0,  -π/2,  0.0,   0.0]
+dh_params_link1 = ["frame0", "r", 0.0,  π/2,  100, 0.0]
+dh_params_link2 = ["frame1", "r", 200,  0.0,  0.0,   0.0]
+dh_params_link3 = ["frame2", "r", 150,  π/2,  0.0,   0.0]
+dh_params_link4 = ["frame3", "r", 0.0,  -π/2,  100,   0.0]
 dh_params_link5 = ["frame4", "r", 0.0,   π/2,  0.0,   0.0]
-dh_params_link6 = ["frame5", "r", 0.0,   0.0,  0.0,   0.0]
+dh_params_link6 = ["frame5", "r", 0.0,   0.0,  50,   0.0]
 
 
 dh_params = [
@@ -69,7 +68,7 @@ dh_params = [
     dh_params_link6,
     ]
 
-joint_lim = [
+joint_lims = [
     [-90, 90], #min max j1
     [-90, 90], #min max j2
     [-90, 90], #min max j1
@@ -80,12 +79,18 @@ joint_lim = [
 
 robot = CreateRobot(dh_params,"6DOF",link_twist_in_rads=True, joint_lim_enable=True)
 
-robot.set_joint_limit(joint_lim)
-
+robot.set_joint_limit(joint_lims)
 
 #Move joints in degrees
-robot.move_joints([0, 90, -90, 0, 0, 0])
+robot.move_joints([30, 45, 60, 90, 45, 30])
 robot.print_transforms(6)
 
-exec_time("robot.move_joints([0, π/2,-π/2, 0, 0, 0],rads=True)")
+exec_time("robot.move_joints([30, 45, 60, 90, 45, 30])")
+
+# # Get a list of methods
+# methods_list = [method for method in CreateRobot.__dict__ if callable(
+#     getattr(CreateRobot, method)) and not method.startswith("__")]
+
+# for i in methods_list:   
+#     print("Methods :", i)
 

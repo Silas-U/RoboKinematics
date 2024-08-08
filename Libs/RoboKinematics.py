@@ -27,10 +27,10 @@ class CreateRobot():
         self.robot_name = robot_name
         self.n_links = 0
         self.n_dh_params = 6
-        self.theta = 0
-        self.link_twist = 0
-        self.link_length = 0
-        self.joint_offset = 0
+        self.theta = 0.0
+        self.link_twist = 0.0
+        self.link_length = 0.0
+        self.joint_offset = 0.0
         self.frame = ""
         self.joint_type = ""
         self.dh_param_grouped_list = [] 
@@ -42,7 +42,7 @@ class CreateRobot():
         self.joint_limits = []
         self.joint_type_info = []
     
-    def move_joints(self, joint_vars, speed=0, rads=False):
+    def move_joints(self, joint_vars, rads=False):
         self.set_to_rads = rads
         try:
 
@@ -85,8 +85,7 @@ class CreateRobot():
                     dh_param_g_list[i][4] = float(joint_vars[i])
             self.dh_param_grouped_list = dh_param_g_list   
             self.generate_ht_matrix() #UPDATE ROBOT JOINT STATE       
-            return dh_param_g_list
-         
+            
         except ValueError as e:
             print(f"Error: {e}")
 
@@ -162,6 +161,7 @@ class CreateRobot():
     
     def get_transforms(self, stop_index = 1):
         new = []
+        self.formated_res = []
         HTMatrix = self._homogeneous_t_matrix_
         try:
             if len(HTMatrix) == 0:
@@ -170,14 +170,15 @@ class CreateRobot():
                 raise ValueError(f"Valid inputs range from 1 - {self.n_links}")
             elif stop_index > self.n_links:
                 raise ValueError(f"{self.robot_name} has only {self.n_links} Joints, try values from 1 - {self.n_links}")
-            else:
-                for i in range(stop_index):
-                    new.append(HTMatrix[i])
-                result = functools.reduce(self.mul,new)
-                formated_res = list(map(self.format, result))
-                return formated_res
+           
+            for i in range(stop_index):
+                new.append(HTMatrix[i])
+            result = functools.reduce(self.mul,new)
+            self.formated_res = list(map(self.format, result))
+              
         except ValueError as e:
             print(f"Error: {e}")
+        return self.formated_res     
             
 
     def print_transforms(self, stop_index=1):
@@ -203,55 +204,57 @@ class CreateRobot():
 
     def get_tcp(self):
         displacement_vetor = []
-        m = self.get_transforms(self.n_links)
+        tmatrix = self.get_transforms(self.n_links)
         for i in range(self.n_links):
-            displacement_vetor.append(m[i][self.n_links])
+            displacement_vetor.append(tmatrix[i][self.n_links])
         return displacement_vetor
 
     def get_j_origin(self, index):
-        displacement_vetor = []
-        m = self.get_transforms(index)
+        self.displacement_vetor = []
+        tmatrix = self.get_transforms(index)
         try:
             if index > self.n_links:
-                raise ValueError(f"...............................................")
+                raise ValueError("...............................................")
             elif index <= 0:
-                raise ValueError(f"...............................................")
+                raise ValueError("...............................................")
             else:
                 for i in range(3):
-                    displacement_vetor.append(m[i][3])
-                return displacement_vetor
+                    self.displacement_vetor.append(tmatrix[i][3])
         except ValueError as e:
+            print(f'{e}')
             pass
+        return self.displacement_vetor
             
 
     def get_r_matrix(self,index):
         r_matrix = []
-        m = self.get_transforms(index)
+        self.res = []
+        tmatrix = self.get_transforms(index)
         try:
             if index > self.n_links:
-                raise ValueError(f"...............................................")
+                raise ValueError("...............................................")
             elif index <= 0:
-                raise ValueError(f"...............................................")
+                raise ValueError("...............................................")
             else:
                 for i in range(3):
                     for j in range(3):
-                        r_matrix.append(m[i][j])
+                        r_matrix.append(tmatrix[i][j])
 
                 chunk_size3 = 3   
-                res = [r_matrix[i:i + chunk_size3] for i in range(0, len(r_matrix), chunk_size3)]    
-                return res
+                self.res = [r_matrix[i:i + chunk_size3] for i in range(0, len(r_matrix), chunk_size3)]    
+                return self.res
         except ValueError as e:
-            pass
+            print(f"{e}")
+        return self.res
     
     def set_joint_limit(self, join_limits):
         self.joint_limits = join_limits
         try:
             if len(join_limits) > len(self.args) or len(join_limits) < len(self.args):
-                raise ValueError(f"Invalid joint limit entry: {self.robot_name} robot has {len(self.args)} joints but {len(join_limits)} was given")
-            return self.joint_limits 
+                raise ValueError(f"Invalid joint limit entry: {self.robot_name} robot has {len(self.args)} joints but {len(join_limits)} was given") 
         except ValueError as e:
             print(f"Error: {e}")
-        
+        return self.joint_limits
     
     def get_joint_limits(self):
         return self.joint_limits
@@ -262,3 +265,4 @@ class CreateRobot():
 
 #---------------------------------JA---------------------------------------#
 
+  
