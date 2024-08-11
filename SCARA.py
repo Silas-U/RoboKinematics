@@ -71,7 +71,7 @@ Default min and max limits are set in degrees
 joint_lim = [
     [0, 90], #min max j1
     [0, 90], #min max j2
-    [0, 0.5],    #min max j3
+    [0, 0.5],#min max j3
 ]
 
 scara_arm = CreateRobot(dh_params, robot_name="SCARA", link_twist_in_rads=True, joint_lim_enable=True)
@@ -81,29 +81,8 @@ scara_arm.set_joint_limit(joint_lim)
 #Moves the robot to home position
 scara_arm.move_joints([10, 10, 0.3])
 scara_arm.print_transforms(3)
-
-scara_arm.genJacobian()
-# sleep(3)
+print("\n")
+scara_arm.compute_jacobian()
 
 print(exec_time("scara_arm.move_joints([90, 90, 0.5])"))
-
-# The following code can make the SCARA arm swing left and right
-
-# scara_arm.move_joints([π/3, 0, 0.0],rads=True)
-# scara_arm.print_transforms(3)
-# print("\n")
-# sleep(0.5)
-# scara_arm.move_joints([0, 0, 0.0],rads=True)
-# scara_arm.print_transforms(3)
-# print("\n")
-# sleep(0.5)
-# scara_arm.move_joints([π/3, 0, 0.0],rads=True)
-# scara_arm.print_transforms(3)
-# print("\n")
-# sleep(0.5)
-# scara_arm.move_joints([0, 0, 0.0],rads=True)
-# scara_arm.print_transforms(3)
-# print("\n")
-# sleep(0.5)
-
 

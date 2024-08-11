@@ -81,9 +81,9 @@ robot = CreateRobot(dh_params, "6DOF", link_twist_in_rads=True, joint_lim_enable
 robot.set_joint_limit(joint_lims)
 
 # Move joints in degrees
-robot.move_joints([0, 20, 0, 0, 0, 20])
+robot.move_joints([0, 90, -90, 0, 0, 0])
 robot.print_transforms(6)
 
-robot.genJacobian()
+robot.compute_jacobian()
 
 exec_time("robot.move_joints([30, 45, 60, 90, 45, 30])")

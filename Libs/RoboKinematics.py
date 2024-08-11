@@ -19,7 +19,7 @@ limitations under the License.
 """
 import math as m
 import functools
-
+import numpy as np
 
 class CreateRobot:
 
@@ -316,7 +316,7 @@ class CreateRobot:
             b.append(functools.reduce(lambda a, b: a+b, res[i]))
         return b
     
-    def get_j(self):
+    def compute_jacobian(self):
         self.On = self.get_j_origin(self.num_of_joints)
         for i in range(self.num_of_joints):
             if i == 0 and self.joint_type_info[i] == "r":
@@ -341,14 +341,21 @@ class CreateRobot:
                 self.zi = self.mul_mat_vec(self.get_r_matrix(i), self.z_axis_vector)  
                 self.jv.append(self.zi)
                 self.jw.append([0, 0, 0])
-        self.j = [self.jv, self.jw]
-        return self.j
     
-    def genJacobian(self):
-        j = self.get_j()
-        for i in j:
-          print(i)
-       
+        v = np.array(self.jv)
+        vt = np.transpose(v)
+        for i in range(len(vt)):
+            self.J.append(vt[i])
+        w = np.array(self.jw)
+        wt = np.transpose(w)
+        for i in range(len(wt)):
+            self.J.append(wt[i])
+
+        print(np.array(self.J))
+        
+
+    def get_joint_states(self):
+        pass   
 
 
 
