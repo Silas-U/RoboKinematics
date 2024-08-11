@@ -50,12 +50,12 @@ def exec_time(f):
 
 
 # [Frame_name, Joint_type, link_length, link_twist, joint_offset, joint_variable]
-dh_params_link1 = ["frame0", "r", 0.0,  pi/2,   100,    0.0]
-dh_params_link2 = ["frame1", "r", 200,  0.0,    0.0,    0.0]
-dh_params_link3 = ["frame2", "r", 150,  pi/2,   0.0,    0.0]
-dh_params_link4 = ["frame3", "r", 0.0, -pi/2,   100,    0.0]
-dh_params_link5 = ["frame4", "r", 0.0,  pi/2,   0.0,    0.0]
-dh_params_link6 = ["frame5", "r", 0.0,  0.0,    50,     0.0]
+dh_params_link1 = ["frame0", "r", 0.05,  pi/2,   0.105,    0.0]
+dh_params_link2 = ["frame1", "r", 0.14,  0.0,    0.0,    0.0]
+dh_params_link3 = ["frame2", "r", 1.17,  pi/2,   0.0,    0.0]
+dh_params_link4 = ["frame3", "r", 0.0, -pi/2,    0.0,    0.0]
+dh_params_link5 = ["frame4", "r", 0.0,  pi/2,    0.0,    0.0]
+dh_params_link6 = ["frame5", "r", 0.0,  0.0,     0.0,    0.0]
 
 
 dh_params = [
@@ -81,7 +81,9 @@ robot = CreateRobot(dh_params, "6DOF", link_twist_in_rads=True, joint_lim_enable
 robot.set_joint_limit(joint_lims)
 
 # Move joints in degrees
-robot.move_joints([30, 45, 60, 90, 45, 30])
+robot.move_joints([0, 20, 0, 0, 0, 20])
 robot.print_transforms(6)
+
+robot.genJacobian()
 
 exec_time("robot.move_joints([30, 45, 60, 90, 45, 30])")

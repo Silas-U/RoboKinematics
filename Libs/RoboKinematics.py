@@ -42,6 +42,25 @@ class CreateRobot:
         self.num_of_joints = 0
         self.joint_limits = []
         self.joint_type_info = []
+
+        # Jcparams
+        self.z_axis_vector = [0.0, 0.0, 1.0]
+        self.z0 = [0.0,0.0,1.0]
+        self.zi = []
+
+        self.O0 = [0.0,0.0,0.0]
+        self.On = []
+        self.Oi = []
+       
+
+        self.jv = []
+        self.jw = []
+        self.J = []
+
+        self.jr = []  
+        self.jp = []
+        self.skew = [[0.0,-1.0, 1.0],[1.0, 0.0, -1.0],[-1.0, 1.0, 0.0]]
+        self.skewed_z_vectors = []
     
     def move_joints(self, joint_vars, rads=False):
         self.set_to_rads = rads
@@ -200,7 +219,9 @@ class CreateRobot:
                 result = functools.reduce(self.mul, new)
                 formated_res = list(map(self.format, result))
                 for i in formated_res:
-                    print(i)
+                    for element in i:
+                        print(element, end="\t ")
+                    print()
         except ValueError as e:
             print(f"Error: {e}")
 
@@ -264,4 +285,70 @@ class CreateRobot:
 
 # ---------------------------------JA--------------------------------------- #
 
-  
+# The jacobian for revolute joints is given by
+    
+    def skewThis(self, vector):
+        skewd = [[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0]]
+        xa_s = vector[0] * self.skew[1][2]
+        ya_s = vector[1] * self.skew[0][2]
+        za_s = vector[2] * self.skew[0][1]
+        xb_s = vector[0] * self.skew[2][1]
+        yb_s = vector[1] * self.skew[2][0]
+        zb_s = vector[2] * self.skew[1][0]
+        skewd[1][2] = xa_s
+        skewd[0][2] = ya_s 
+        skewd[0][1] = za_s
+        skewd[2][1] = xb_s
+        skewd[2][0] = yb_s 
+        skewd[1][0] = zb_s
+        return skewd
+    
+
+    def mul_mat_vec(self, mat, vec):
+        a = [] 
+        b = []
+        for x in range(len(mat)):
+            for y in range(len(mat)):
+                a.append(float(mat[x][y]) * vec[y])        
+        chunk_size3 = 3   
+        res = [a[i:i + chunk_size3] for i in range(0, len(a), chunk_size3)]
+        for i in range(len(res)):
+            b.append(functools.reduce(lambda a, b: a+b, res[i]))
+        return b
+    
+    def get_j(self):
+        self.On = self.get_j_origin(self.num_of_joints)
+        for i in range(self.num_of_joints):
+            if i == 0 and self.joint_type_info[i] == "r":
+                sub_result = []
+                for r in range(len(self.On)):
+                    sub_result.append(round(float(self.On[r]) - self.O0[r],5))
+                derivative = self.mul_mat_vec(self.skewThis(self.z0),sub_result)
+                self.jv.append(derivative)
+                self.jw.append(self.z0)
+            elif i == 0 and self.joint_type_info[i] == "p":
+                self.jv.append(self.z0)
+                self.jw.append([0, 0, 0])
+            elif self.joint_type_info[i] == "r":
+                self.zi = self.mul_mat_vec(self.get_r_matrix(i), self.z_axis_vector)
+                sub_result = []
+                for r in range(len(self.On)):
+                    sub_result.append(round(float(self.On[r]) - float(self.get_j_origin(i)[r]),5))      
+                derivative = self.mul_mat_vec(self.skewThis(self.zi),sub_result)
+                self.jv.append(derivative)  
+                self.jw.append(self.zi)
+            elif self.joint_type_info[i] == "p":
+                self.zi = self.mul_mat_vec(self.get_r_matrix(i), self.z_axis_vector)  
+                self.jv.append(self.zi)
+                self.jw.append([0, 0, 0])
+        self.j = [self.jv, self.jw]
+        return self.j
+    
+    def genJacobian(self):
+        j = self.get_j()
+        for i in j:
+          print(i)
+       
+
+
+

@@ -83,4 +83,5 @@ def exec_time(f):
 # Move joints in rads
 ur20.move_joints([0, -pi/2, -pi/2, 0, 0, 0], rads=True)
 ur20.print_transforms(6)
-sleep(1)
+print("\n")
+ur20.genJacobian()
