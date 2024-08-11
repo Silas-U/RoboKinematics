@@ -53,10 +53,6 @@ dh_params_link1 = ["frame0", "r", 0.0,  0.0,  0.4, 0.0]
 dh_params_link2 = ["frame1", "r", 0.14, π,    0.0, 0.0]
 dh_params_link3 = ["frame2", "p", 0.0,  0.0,  0.0, 0.0]
 
-# dh_params_link1 = ["frame0", "r", 0.1,  0.0,  0.0, 0.0]
-# dh_params_link2 = ["frame1", "r", 0.2, 0.0,  0.0, 0.0]
-# dh_params_link3 = ["frame2", "p", 0.3,  0.0,  0.0, 0.0]
-
 
 dh_params = [
     dh_params_link1,
@@ -84,5 +80,5 @@ scara_arm.print_transforms(3)
 print("\n")
 scara_arm.compute_jacobian()
 
-print(exec_time("scara_arm.move_joints([90, 90, 0.5])"))
+# print(exec_time("scara_arm.move_joints([90, 90, 0.5])"))
 
