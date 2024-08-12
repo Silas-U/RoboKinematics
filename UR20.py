@@ -34,39 +34,6 @@ Joint 5     0               0       0.1593     -π/2
 Joint 6     0               0       0.1543      0
 """
 
-# [Frame_name, Joint_type, link_length, link_twist, joint_offset, joint_variable]
-
-dh_params_link1 = ["frame0", "r", 0,        pi/2,  0.2363, 0]
-dh_params_link2 = ["frame1", "r", -0.8620,   0,    0,      0]
-dh_params_link3 = ["frame2", "r", -0.7287,   0,    0,      0]
-dh_params_link4 = ["frame3", "r", 0,        pi/2,  0.2010, 0]
-dh_params_link5 = ["frame4", "r", 0,       -pi/2,  0.1593, 0]
-dh_params_link6 = ["frame5", "r", 0,        0,     0.1543, 0]
-
-
-dh_params = [
-    dh_params_link1,
-    dh_params_link2,
-    dh_params_link3,
-    dh_params_link4,
-    dh_params_link5,
-    dh_params_link6,
-    ]
-
-joint_lim = [
-    [-pi/2, pi/2],  # min max j1
-    [-pi/2, pi/2],  # min max j2
-    [-pi/2, pi/2],  # min max j1
-    [-pi/2, pi/2],  # min max j2
-    [-pi/2, pi/2],  # min max j1
-    [-pi/2, pi/2],  # min max j2
-]
-
-ur20 = CreateRobot(dh_params, "UR20", link_twist_in_rads=True, joint_lim_enable=True)
-
-ur20.set_joint_limit(joint_lim)
-
-
 def exec_time(f):
     print(
         'Execution time : '    
@@ -78,10 +45,31 @@ def exec_time(f):
             )
         )
      )
+    
+ur20 = CreateRobot(
+    [
+        ("frame0", "r", 0,        pi/2,  0.2363, 0),
+        ("frame1", "r", -0.8620,   0,    0,      0),
+        ("frame2", "r", -0.7287,   0,    0,      0),
+        ("frame3", "r", 0,        pi/2,  0.2010, 0),
+        ("frame4", "r", 0,       -pi/2,  0.1593, 0),
+        ("frame5", "r", 0,        0,     0.1543, 0),
+    ]
+    , robot_name="UR20", link_twist_in_rads=True, joint_lim_enable=True)
 
+ur20.set_joint_limit(
+    [
+        (-pi/2, pi/2),  # min max j1
+        (-pi/2, pi/2),  # min max j2
+        (-pi/2, pi/2),  # min max j3
+        (-pi/2, pi/2),  # min max j4
+        (-pi/2, pi/2),  # min max j5
+        (-pi/2, pi/2),  # min max j6
+    ]
+)
 
-# Move joints in rads
-ur20.move_joints([0, -pi/2, -pi/2, 0, 0, 0], rads=True)
+#Set initial joint angles, print A0_6, compute jacobian
+ur20.set_joints([0, -pi/2, -pi/2, 0, 0, 0], rads=True)
 ur20.print_transforms(6)
-print("\n")
-ur20.compute_jacobian()
+j = ur20.jacobian()
+print(j)

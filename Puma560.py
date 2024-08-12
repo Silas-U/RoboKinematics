@@ -17,9 +17,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from Libs.RoboKinematics import CreateRobot
+from Libs.RoboKinematics import CreateKinematicModel
 import timeit
-from math import pi
 
 """
 The Denavit–Hartenberg parameters for UR20  robot is shown below.
@@ -27,11 +26,11 @@ The Denavit–Hartenberg parameters for UR20  robot is shown below.
 The Denavit–Hartenberg parameters for UR20  robot is shown below.
 
 Kinematics  theta [rad]     a [m]   d [m]   alpha [rad]
-Joint 1     0               0.05    0.105       π/2
-Joint 2     0               0.14    0           0
-Joint 3     0               0.17    0           π/2
-Joint 4     0               0       0          -π/2
-Joint 5     0               0       0           π/2
+Joint 1     0               0       0.6718      π/2
+Joint 2     0               0.4318    0           0
+Joint 3     0               0.0203  0.15       -π/2
+Joint 4     0               0       0.4318      π/2
+Joint 5     0               0       0          -π/2
 Joint 6     0               0       0           0
 """
 
@@ -48,19 +47,20 @@ def exec_time(f):
         )
     )
 
-robot = CreateRobot(
+# Creates a kinematic model of the Puma560 robot
+Puma560 = CreateKinematicModel(
     [
-        ("frame0", "r", 0.05,  90,   0.0,   0.0),
-        ("frame1", "r", 0.14,  0,    0.0,   0.0),
-        ("frame2", "r", 0.17,  90,   0.0,   0.0),
-        ("frame3", "r", 0.0,  -90,   0.0,   0.0),
-        ("frame4", "r", 0.0,   90,   0.0,   0.0),
-        ("frame5", "r", 0.0,   0,    0.0,   0.0)
+        ("frame0", "r", 0,       90,    0.6718, 0.0),
+        ("frame1", "r", 0.4318,   0,    0,      0.0),
+        ("frame2", "r", 0.0203, -90,    0.15,   0.0),
+        ("frame3", "r", 0,       90,    0.4318, 0.0),
+        ("frame4", "r", 0,      -90,    0.0,    0.0),
+        ("frame5", "r", 0,        0,    0.0,    0.0)
     ]
-    , robot_name="6DOF")
+    , robot_name="Puma560")
 
-#Set initial joint angles, print A0_6, compute jacobian
-robot.set_joints([0, 90, -90, 0, 90, 0])
-robot.print_transforms(6)
-j = robot.jacobian()
+# Set initial joint angles, print A0_6, compute jacobian
+Puma560.set_joints([0.1, 0.2, 0.3, 0.4, 0.5, 0.6],rads=True)
+Puma560.print_transforms(6)
+j = Puma560.jacobian()
 print(j)

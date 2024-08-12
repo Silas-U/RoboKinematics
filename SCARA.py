@@ -28,11 +28,10 @@ limitations under the License.
 |     3     |      a3     |      0 deg   |       d3      |    theta3    |
 +-----------+-------------+--------------+---------------+------------'''
 
-from Libs.RoboKinematics import CreateRobot
+from Libs.RoboKinematics import CreateKinematicModel
 import timeit
 from math import pi as π
 from time import sleep
-
 
 
 def exec_time(f):
@@ -47,38 +46,34 @@ def exec_time(f):
         )      
     )
 
-
-#[Frame_name, Joint_type, link_length, link_twist, joint_offset, joint_variable] the joint_variables are initialized to 0.0 here]
-dh_params_link1 = ["frame0", "r", 0.0,  0.0,  0.4, 0.0]
-dh_params_link2 = ["frame1", "r", 0.14, π,    0.0, 0.0]
-dh_params_link3 = ["frame2", "p", 0.0,  0.0,  0.0, 0.0]
-
-
-dh_params = [
-    dh_params_link1,
-    dh_params_link2,
-    dh_params_link3,
-]
+# Creates a kinematic model of the SCARA robot
+scara = CreateKinematicModel(
+    [
+        ("frame0", "r", 0.0,  0.0,  0.4, 0.0),
+        ("frame1", "r", 0.14, π,    0.0, 0.0),
+        ("frame2", "p", 0.0,  0.0,  0.0, 0.0),
+    ],
+    robot_name="SCARA", link_twist_in_rads=True, joint_lim_enable=True
+)
 
 """
 If joint vars are provided in radians then the min and max limit should be set in radians: 
 Default min and max limits are set in degrees
 """
-joint_lim = [
-    [0, 90], #min max j1
-    [0, 90], #min max j2
-    [0, 0.5],#min max j3
-]
+scara.set_joint_limit(
+    [
+        (0, 90), #min max j1
+        (0, 90), #min max j2
+        (0, 0.5),#min max j3
+    ]
+)
 
-scara_arm = CreateRobot(dh_params, robot_name="SCARA", link_twist_in_rads=True, joint_lim_enable=True)
+# Set initial joint angles, print A0_3, compute jacobian
+scara.set_joints([10, 10, 0.2])
+scara.print_transforms(3)
+j = scara.jacobian()
+print(j)
 
-scara_arm.set_joint_limit(joint_lim)
 
-#Moves the robot to home position
-scara_arm.move_joints([10, 10, 0.3])
-scara_arm.print_transforms(3)
-print("\n")
-scara_arm.compute_jacobian()
 
-# print(exec_time("scara_arm.move_joints([90, 90, 0.5])"))
 
