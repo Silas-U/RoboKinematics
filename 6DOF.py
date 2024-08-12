@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from Libs.RoboKinematics import CreateRobot
+from Libs.RoboKinematics import CreateKinematicModel
 import timeit
 from math import pi
 
@@ -48,7 +48,7 @@ def exec_time(f):
         )
     )
 
-robot = CreateRobot(
+robot = CreateKinematicModel(
     [
         ("frame0", "r", 0.05,  90,   0.0,   0.0),
         ("frame1", "r", 0.14,  0,    0.0,   0.0),
