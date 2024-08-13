@@ -32,6 +32,7 @@ from Libs.RoboKinematics import CreateKinematicModel
 import timeit
 from math import pi as π
 from time import sleep
+import os
 
 
 def exec_time(f):
@@ -69,10 +70,14 @@ scara.set_joint_limit(
 )
 
 # Set initial joint angles, print A0_3, compute jacobian
-scara.set_joints([10, 10, 0.2])
-scara.print_transforms(3)
-j = scara.jacobian()
-print(j)
+for i in range(0,90,1):
+    os.system('clear')
+    scara.set_joints([i, i, 0.2])
+    scara.print_transforms(3)
+    j = scara.jacobian()
+    print(j)
+    sleep(0.02)
+
 
 
 

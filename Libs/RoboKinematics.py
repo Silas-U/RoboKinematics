@@ -225,7 +225,7 @@ class CreateKinematicModel:
 
     def get_tcp(self):
         t_matrix = self.get_transforms(self.__n_links)
-        displacement_vector = [t_matrix[i][self.__n_links] for i in range(self.__n_links)]
+        displacement_vector = [t_matrix[i][3] for i in range(3)]
         return displacement_vector
 
     def get_j_origin(self, index):

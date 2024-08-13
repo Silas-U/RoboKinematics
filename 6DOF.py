@@ -20,6 +20,8 @@ limitations under the License.
 from Libs.RoboKinematics import CreateKinematicModel
 import timeit
 from math import pi
+from time import sleep
+import os
 
 """
 The Denavit–Hartenberg parameters for UR20  robot is shown below.
@@ -60,7 +62,14 @@ robot = CreateKinematicModel(
     , robot_name="6DOF")
 
 #Set initial joint angles, print A0_6, compute jacobian
-robot.set_joints([0, 90, -90, 0, 90, 0])
-robot.print_transforms(6)
-j = robot.jacobian()
-print(j)
+
+for i in range(0,90,1):
+    os.system('clear')
+    robot.set_joints([0, i, -90, 0, 0, i])
+    robot.print_transforms(6)
+    print("\n")
+    print(robot.get_tcp())
+    print("\n")
+    j = robot.jacobian()
+    print(j)
+    sleep(0.02)
