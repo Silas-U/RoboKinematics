@@ -51,7 +51,7 @@ def exec_time(f):
 scara = CreateKinematicModel(
     [
         ("frame0", "r", 0.0,  0.0,  0.4, 0.0),
-        ("frame1", "r", 0.14, π,    0.0, 0.0),
+        ("frame1", "r", 0.14,  π,    0.0, 0.0),
         ("frame2", "p", 0.0,  0.0,  0.0, 0.0),
     ],
     robot_name="SCARA", link_twist_in_rads=True, joint_lim_enable=True
@@ -70,13 +70,14 @@ scara.set_joint_limit(
 )
 
 # Set initial joint angles, print A0_3, compute jacobian
-for i in range(0,90,1):
+for i in range(0,10,1):
     os.system('clear')
-    scara.set_joints([i, i, 0.2])
-    scara.print_transforms(3)
+    qr = scara.set_joints([i, 10, 0.2])
+    scara.f_kin(qr)
     j = scara.jacobian()
     print(j)
     sleep(0.02)
+    exec_time("scara.jacobian()")
 
 
 

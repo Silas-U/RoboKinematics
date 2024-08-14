@@ -65,11 +65,12 @@ robot = CreateKinematicModel(
 
 for i in range(0,90,1):
     os.system('clear')
-    robot.set_joints([0, i, -90, 0, 0, i])
-    robot.print_transforms(6)
-    print("\n")
-    print(robot.get_tcp())
-    print("\n")
+    q = robot.set_joints([0, 0, -90, 0, i, 0])
+    t = robot.f_kin(q)
+    tcp = robot.get_tcp()
     j = robot.jacobian()
-    print(j)
+   
+    print(t,"\n")
+    print(tcp,"\n")
+    print(j,"\n")
     sleep(0.02)
