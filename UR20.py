@@ -18,7 +18,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from Libs.RoboKinematics import CreateKinematicModel
-import timeit
 from time import sleep
 from numpy import pi
 import os
@@ -34,18 +33,6 @@ Joint 4     0               0       0.2010      π/2
 Joint 5     0               0       0.1593     -π/2
 Joint 6     0               0       0.1543      0
 """
-
-def exec_time(f):
-    print(
-        'Execution time : '    
-        '{:.10f} s'.format(
-            timeit.timeit(
-                f,
-                globals=globals(),
-                number=1,
-            )
-        )
-     )
     
 ur20 = CreateKinematicModel(
     [

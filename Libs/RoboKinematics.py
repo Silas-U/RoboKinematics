@@ -21,6 +21,7 @@ import math as m
 from functools import reduce
 import numpy as np
 
+
 class CreateKinematicModel:
     def __init__(self, args, robot_name, link_twist_in_rads=False, joint_lim_enable=False):
         self.__args = args
@@ -32,7 +33,6 @@ class CreateKinematicModel:
         self.__link_length = 0.0
         self.__joint_offset = 0.0
         self.__frame = ""
-        self.__joint_type = ""
         self.__dh_param_grouped_list = [] 
         self.__homogeneous_t_matrix_ = []
         self.__set_to_rads = False
@@ -41,26 +41,7 @@ class CreateKinematicModel:
         self.__num_of_joints = 0
         self.__joint_limits = []
         self.__joint_type_info = []
-        self.__transforms = []
-
-        # Jcparams
-        self.__Z_AXIS_VEC = [0, 0, 1]
-        self.__Z0 = [0, 0, 1]
-        self.__zi = []
-
-        self.__O0 = [0, 0, 0]
-        self.__On = []
-        self.__Oi = []
-       
-        self.__jv = []
-        self.__jw = []
-        self.__J = []
-
-        self.__jr = []  
-        self.__jp = []
-        self.__skew = [[0,-1, 1],[1, 0, -1],[-1, 1, 0]]
-        self.__skewed_z_vectors = []
-    
+        
    
     def set_joints(self, joint_vars, rads=False):
         self.__set_to_rads = rads
@@ -126,15 +107,12 @@ class CreateKinematicModel:
             if dh_params == None:
                 raise ValueError(f"Could not calculate fk for {self.__robot_name}. Ensure inputed joint values are within the set limits")
             for col_index in range(len(dh_params)):
-
                 self.__link_length = float(dh_params[col_index][2])
                 self.__joint_offset = float(dh_params[col_index][4])
-
                 if self.__link_twist_in_rads:
                     self.__link_twist = float(dh_params[col_index][3])
                 else:
                     self.__link_twist = (float(dh_params[col_index][3])/180)*m.pi
-
                 if self.__set_to_rads:
                     self.__theta = float(dh_params[col_index][5])
                 else:
@@ -147,8 +125,7 @@ class CreateKinematicModel:
                         -m.cos(self.__theta)*m.sin(self.__link_twist), self.__link_length*m.sin(self.__theta)]
                 row3 = [0.0, m.sin(self.__link_twist),  m.cos(self.__link_twist), self.__joint_offset]
                 row4 = [0.0, 0.0, 0.0, 1.0]
-
-                
+    
                 cumulative_list_row1_data.append(row1)
                 cumulative_list_row2_data.append(row2)
                 cumulative_list_row3_data.append(row3)
@@ -170,15 +147,11 @@ class CreateKinematicModel:
                 all_hm.append(h_m[3][i])
 
             chunk_size2 = 4
-            
             transformation_mtrxs = [all_hm[i:i + chunk_size2] for i in range(0, len(all_hm), chunk_size2)]
             self.__homogeneous_t_matrix_ = transformation_mtrxs
-            new = [ self.__homogeneous_t_matrix_ [i] for i in range(self.__n_links)]
+            new = [transformation_mtrxs[i] for i in range(self.__n_links)]
             result = reduce(np.dot, new)
-            np.set_printoptions(suppress=True)
-            res = np.array(result)
-            self.__transforms = res 
-            return res
+            return result
         except ValueError as e:
             print(f"Error: {e}")
 
@@ -212,14 +185,15 @@ class CreateKinematicModel:
            
             new = [h_t_matrix[i] for i in range(stop_index)]
             result = reduce(np.dot, new)
-            self.__transforms = np.array(result)
+            np.set_printoptions(suppress=True)
+            return result
         except ValueError as e:
             print(f"Error: {e}")
-        return self.__transforms
+        
 
 
     def get_tcp(self):
-        t_matrix = self.__transforms
+        t_matrix = self.get_transforms(self.__n_links)
         try:
             if len(t_matrix) == 0:
                 raise ValueError(f"Could not generate transforms for {self.__robot_name}")
@@ -230,10 +204,12 @@ class CreateKinematicModel:
 
 
     def get_j_origin(self, index):
-        t_matrix = self.get_transforms(index)
         try:
-            if index > self.__n_links or index <= 0 or len(t_matrix) == 0:
+            res = self.__homogeneous_t_matrix_
+            if index > self.__n_links or index <= 0 or len(res) == 0:
                 raise ValueError(f"Error: {self.__robot_name} joint origin {index} does not exist, be sure the fk solution has been generated")
+            new = [res[i] for i in range(index)]
+            t_matrix = reduce(np.dot, new)
             displacement_vector = [t_matrix[i][3] for i in range(3)]
             return displacement_vector
         except ValueError as e:
@@ -242,21 +218,21 @@ class CreateKinematicModel:
 
     def get_r_matrix(self, index):
         r_matrix = []
-        t_matrix = self.get_transforms(index)
+        res = self.__homogeneous_t_matrix_
+        if index > self.__n_links or index <= 0 or len(res) == 0:
+            raise ValueError(f"Error: {self.__robot_name} joint origin {index} does not exist, be sure the fk solution has been generated")
+        new = [res[i] for i in range(index)]
+        t_matrix = reduce(np.dot, new)
         try:
-            if index > self.__n_links:
-                raise ValueError("...............................................")
-            elif index <= 0:
-                raise ValueError("...............................................")
-            else:
                 for i in range(3):
                     for j in range(3):
                         r_matrix.append(t_matrix[i][j])
                 chunk_size3 = 3   
                 res = [r_matrix[i:i + chunk_size3] for i in range(0, len(r_matrix), chunk_size3)]
+                return res
         except ValueError as e:
             print(f"{e}")
-        return res
+        
     
     
     def set_joint_limit(self, join_limits):
@@ -278,14 +254,15 @@ class CreateKinematicModel:
 
 # ROBOT JACOBIAN ALGORITHM
     
-    def skewThis(self, vector):
-        skewd = [[0.0, 0.0, 0.0],[0.0, 0.0, 0.0],[0.0, 0.0, 0.0]]
-        xa_s = vector[0] * self.__skew[1][2]
-        ya_s = vector[1] * self.__skew[0][2]
-        za_s = vector[2] * self.__skew[0][1]
-        xb_s = vector[0] * self.__skew[2][1]
-        yb_s = vector[1] * self.__skew[2][0]
-        zb_s = vector[2] * self.__skew[1][0]
+    def skew(self, vector):
+        skew = [[0,-1, 1],[1, 0, -1],[-1, 1, 0]]
+        skewd = [[0, 0, 0],[0, 0, 0],[0, 0, 0]]
+        xa_s = vector[0] * skew[1][2]
+        ya_s = vector[1] * skew[0][2]
+        za_s = vector[2] * skew[0][1]
+        xb_s = vector[0] * skew[2][1]
+        yb_s = vector[1] * skew[2][0]
+        zb_s = vector[2] * skew[1][0]
         skewd[1][2] = xa_s
         skewd[0][2] = ya_s 
         skewd[0][1] = za_s
@@ -307,43 +284,43 @@ class CreateKinematicModel:
     
     
     def jacobian(self):
-        self.__On = self.get_j_origin(self.__num_of_joints)
+        On = self.get_j_origin(self.__num_of_joints)
+        Z_AXIS_VEC, Z0, O0 = [0, 0, 1], [0, 0, 1], [0, 0, 0]
+        jv ,jw, J, zi = [], [], [], []
         try:
-            if self.__On == None:
+            if On == None:
                 raise ValueError(f"Could not calculate jacobian for {self.__robot_name}")
             for i in range(self.__num_of_joints):
                 if i == 0 and self.__joint_type_info[i] == "r":
-                    sub_result = [float(self.__On[r]) - self.__O0[r] for r in range(len(self.__On))]
-                    dt = self.mul_mat_vec(self.skewThis(self.__Z0),sub_result)
-                    self.__jv.append(dt)
-                    self.__jw.append(self.__Z0)
+                    dt = self.mul_mat_vec(self.skew(Z0), [float(On[r]) - O0[r] for r in range(len(On))])
+                    jv.append(dt)
+                    jw.append(Z0)
                 elif i == 0 and self.__joint_type_info[i] == "p":
-                    self.__jv.append(self.__Z0)
-                    self.__jw.append([0, 0, 0])
+                    jv.append(Z0)
+                    jw.append([0,0,0])
                 elif self.__joint_type_info[i] == "r":
-                    self.__zi = self.mul_mat_vec(self.get_r_matrix(i), self.__Z_AXIS_VEC)
-                    sub_result = [round(float(self.__On[r]) - float(self.get_j_origin(i)[r]),5) for r in range(len(self.__On))]      
-                    dt = self.mul_mat_vec(self.skewThis(self.__zi),sub_result)
-                    self.__jv.append(dt)  
-                    self.__jw.append(self.__zi)
+                    zi = self.mul_mat_vec(self.get_r_matrix(i), Z_AXIS_VEC)   
+                    dt = self.mul_mat_vec(self.skew(zi), [round(float(On[r]) - float(self.get_j_origin(i)[r]),5) for r in range(len(On))])
+                    jv.append(dt)  
+                    jw.append(zi)
                 elif self.__joint_type_info[i] == "p":
-                    self.__zi = self.mul_mat_vec(self.get_r_matrix(i), self.__Z_AXIS_VEC)  
-                    self.__jv.append(self.__zi)
-                    self.__jw.append([0, 0, 0])
+                    zi = self.mul_mat_vec(self.get_r_matrix(i), Z_AXIS_VEC)  
+                    jv.append(zi)
+                    jw.append([0,0,0])
                 
                 
-            self.__J.clear()
-            vt = np.transpose(np.array(self.__jv))
+            J.clear()
+            vt = np.transpose(np.array(jv))
+            wt = np.transpose(np.array(jw))
             for i in range(len(vt)):
-                self.__J.append(vt[i])
-            wt = np.transpose(np.array(self.__jw))
+                J.append(vt[i])
             for i in range(len(wt)):
-                self.__J.append(wt[i])
-            self.__jv.clear()
-            self.__jw.clear()
+                J.append(wt[i])
+            jv.clear()
+            jw.clear()
 
             np.set_printoptions(suppress=True)
-            return np.array(self.__J)
+            return np.array(J)
         except ValueError as e:
             print(f"Error: {e}")
             

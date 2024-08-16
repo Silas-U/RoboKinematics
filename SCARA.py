@@ -28,24 +28,13 @@ limitations under the License.
 |     3     |      a3     |      0 deg   |       d3      |    theta3    |
 +-----------+-------------+--------------+---------------+------------'''
 
+import os
 from Libs.RoboKinematics import CreateKinematicModel
 import timeit
 from math import pi as π
 from time import sleep
-import os
+from timeit import default_timer as timer
 
-
-def exec_time(f):
-    print( 
-        'Execution time : '    
-        '{:.10f} s'.format(
-            timeit.timeit(
-            f,
-            globals=globals(),
-            number=1,  
-            )
-        )      
-    )
 
 # Creates a kinematic model of the SCARA robot
 scara = CreateKinematicModel(
@@ -65,21 +54,21 @@ scara.set_joint_limit(
     [
         (0, 90), #min max j1
         (0, 90), #min max j2
-        (0, 0.5),#min max j3
+        (0, 5),#min max j3
     ]
 )
 
-# Set initial joint angles, print A0_3, compute jacobian
-for i in range(0,10,1):
+# # Set initial joint angles, print A0_3, compute jacobian
+for i in range(0,90,1):
     os.system('clear')
-    qr = scara.set_joints([i, 10, 0.2])
-    scara.f_kin(qr)
+    start = timer()
+    qr = scara.set_joints([i, i, 0.2])
+    t = scara.f_kin(qr)
     j = scara.jacobian()
+    end = timer()
+   
+    print(t)
     print(j)
+    print('It took %.5f s. to execute.' % (end - start)) 
     sleep(0.02)
-    exec_time("scara.jacobian()")
-
-
-
-
 

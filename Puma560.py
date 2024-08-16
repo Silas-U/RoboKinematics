@@ -17,16 +17,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import os
 from Libs.RoboKinematics import CreateKinematicModel
-import timeit
 from math import pi
 from time import sleep
-import os
+from timeit import default_timer as timer
 
 """
-The Denavit–Hartenberg parameters for UR20  robot is shown below.
-
-The Denavit–Hartenberg parameters for UR20  robot is shown below.
+The Denavit–Hartenberg parameters for Puma560  robot is shown below.
 
 Kinematics  theta [rad]     a [m]   d [m]   alpha [rad]
 Joint 1     0               0       0.6718      π/2
@@ -36,19 +34,6 @@ Joint 4     0               0       0.4318      π/2
 Joint 5     0               0       0          -π/2
 Joint 6     0               0       0           0
 """
-
-
-def exec_time(f):
-    print( 
-        'Execution time : ',    
-        '{:.10f} sec'.format(
-            timeit.timeit(
-                f,
-                globals=globals(),
-                number=1,
-            )
-        )
-    )
 
 # Creates a kinematic model of the Puma560 robot
 Puma560 = CreateKinematicModel(
@@ -65,12 +50,15 @@ Puma560 = CreateKinematicModel(
 # Set initial joint angles, print A0_6, compute jacobian
 for i in range(0,90,1):
     os.system('clear')
-    qr = Puma560.set_joints([i, 0, 0, 0, 0, 0])
+    start = timer()
+    qr = Puma560.set_joints([0, i, -90, 0, 0, i])
     t = Puma560.f_kin(qr)
     tcp = Puma560.get_tcp()
     j = Puma560.jacobian()
+    end = timer()
 
     print(t,"\n")
     print(tcp,"\n")
     print(j,"\n")
+    print('It took %.5f s. to execute.' % (end - start)) 
     sleep(0.02)
