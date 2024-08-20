@@ -42,7 +42,7 @@ scara = CreateKinematicModel(
         ("frame1", "r", 0.14,  π,   0.0, 0.0),
         ("frame2", "p", 0.0,  0.0,  0.0, 0.0),
     ],
-    robot_name="SCARA", link_twist_in_rads=True, joint_lim_enable=False
+    robot_name="SCARA", link_twist_in_rads=True, joint_lim_enable=True
 )
 
 

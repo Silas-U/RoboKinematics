@@ -47,19 +47,14 @@ Puma560 = CreateKinematicModel(
     ]
     , robot_name="Puma560")
 
-# Set initial joint angles, print A0_6, compute jacobian
-for i in range(0,180,1):
-    os.system('clear')
-    qr = Puma560.set_joints([i, i, 20, 0, 0, 0])
-    t = Puma560.f_kin(qr)
-    tcp = Puma560.get_tcp()
-    j = Puma560.jacobian()
 
-    print(t,"\n")
-    print(tcp,"\n")
-    print(j,"\n")
-    start = timer()
-    Puma560.singular_configs()
-    end = timer()
-    print('It took %.5f s. to execute.' % (end - start)) 
-    sleep(0.02)
+#Set initial joint angles, print A0_6, compute jacobian
+qr = Puma560.set_joints([0, 0, 0, 0, 0, 0]) #20, 10, 20, 30, 20, 0
+t = Puma560.f_kin(qr)
+start = timer()
+p = Puma560.i_kin([0.26453836, -0.06334258,  0.45908105, -0.35924867, -0.7797434,  1.07086644])
+print(p)
+end = timer()
+print('It took %.5f s. to execute.' % (end - start)) 
+
+

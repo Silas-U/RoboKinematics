@@ -311,19 +311,11 @@ class CreateKinematicModel:
                     jv.append(zi)
                     jw.append([0,0,0])
                 
-                
-            J.clear()
             vt = np.transpose(np.array(jv))
             wt = np.transpose(np.array(jw))
-            for i in range(len(vt)):
-                J.append(vt[i])
-            for i in range(len(wt)):
-                J.append(wt[i])
-            jv.clear()
-            jw.clear()
+            J = np.vstack([vt,wt])
             self.__jacobian = J
-            np.set_printoptions(suppress=True)
-            return np.array(J)
+            return J
         except ValueError as e:
             print(f"Error: {e}")
             
@@ -344,17 +336,19 @@ class CreateKinematicModel:
 #Inverse kinematics solutions
 
     # Searches for singular configurations
-    def singular_configs(self):
+    def singular_configs_check(self):
+        sing = False
         mrank = np.linalg.matrix_rank(np.array(self.__jacobian))
         if mrank < self.__num_of_joints:
             qn = self.get_joint_states()
             self.__singuarities.append(qn)
-        elif len(self.__singuarities) != 0:
+            sing = True
+        if sing:
             print("Checking for singularities >> \n")  
             print("found singularity at : \n")
             print(np.array(self.__singuarities),'\n')
             self.text=" "
-        elif len(self.__singuarities) == 0:    
+        elif not sing:    
             self.text="No singulargities found >> \n"
             print(self.text)
 
@@ -374,7 +368,7 @@ class CreateKinematicModel:
         try:
             if len(T)== 0:
                 raise ValueError(f"invalid robot parameters")
-             # Extract the position (x, y, z)
+            # Extract the position (x, y, z)
             position = T[:3, 3]
             # Extract the rotation matrix and convert to Euler angles (roll, pitch, yaw)
             rotation_matrix = T[:3, :3]
@@ -419,12 +413,8 @@ class CreateKinematicModel:
             q_desired = R.from_euler('xyz', r_desired, degrees=False).as_quat()  # desired quaternion
             q_current = R.from_euler('xyz', r_current, degrees=False).as_quat()  # current quaternion
 
-           # Convert quaternions to Rotation objects
-            R_desired = R.from_quat(q_desired)
-            R_current = R.from_quat(q_current)
-
            # Calculate the quaternion error (desired * inverse(current))
-            R_error = R_desired * R_current.inv()
+            R_error = R.from_quat(q_desired) * R.from_quat(q_current).inv()
 
             # Convert the error quaternion to a rotation vector (axis-angle representation)
             e_orientation = R_error.as_rotvec()
