@@ -54,7 +54,6 @@ scara.set_joint_limit(
     ]
 )
 
-
 qr = scara.set_joints([0, 0])
 t = scara.f_kin(qr)
 start = timer()

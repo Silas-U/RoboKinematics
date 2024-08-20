@@ -370,7 +370,7 @@ class CreateKinematicModel:
         return result
     
     
-    def fk_to_vector(self, T, deg=False):
+    def SE3(self, T, deg=False):
         try:
             if len(T)== 0:
                 raise ValueError(f"invalid robot parameters")
@@ -379,7 +379,8 @@ class CreateKinematicModel:
             # Extract the rotation matrix and convert to Euler angles (roll, pitch, yaw)
             rotation_matrix = T[:3, :3]
             r = R.from_matrix(rotation_matrix)
-            euler_angles = r.as_euler('xyz', degrees=deg)  # angles in radians
+            euler_angles = r.as_euler('xyz', degrees=False)  # angles in radians
+            self.quartenion = r.as_quat()
             # Combine position and orientation into a 1x6 vector
             vector = np.array([position, euler_angles])
             return vector
@@ -391,21 +392,45 @@ class CreateKinematicModel:
         # Maximum iterations and tolerance 1e-4
         TOL = 1e-4
         IT_MAX = 1000
-
+        damp   = 1e-12
         # Initial value of theta
         th = self.get_joint_states(rads=True)
-        convergence_error = 0
+
+        final_conv_error = 0
         i=0
 
         while True:
             # Current end-effector position
             fk = self.get_transforms(self.__num_of_joints)
-            current_position = self.fk_to_vector(fk)
 
-            vector_1x6 = np.hstack((current_position[0], current_position[1]))
-        
+            current_position = self.SE3(fk) #index 0 = posiion_vector, 1=eular_angles zyx
+
+            SE3 = [target_position[i:i + 3] for i in range(0, 4, 3)] 
+            
+            p_desired = SE3[0]
+            r_desired = SE3[1]
+
+            p_current = current_position[0]
+            r_current = current_position[1]
+
             # Calculate the position error
-            error = target_position - vector_1x6
+            e_position = p_desired - p_current
+
+            q_desired = R.from_euler('xyz', r_desired, degrees=False).as_quat()  # desired quaternion
+            q_current = R.from_euler('xyz', r_current, degrees=False).as_quat()  # current quaternion
+
+           # Convert quaternions to Rotation objects
+            R_desired = R.from_quat(q_desired)
+            R_current = R.from_quat(q_current)
+
+           # Calculate the quaternion error (desired * inverse(current))
+            R_error = R_desired * R_current.inv()
+
+            # Convert the error quaternion to a rotation vector (axis-angle representation)
+            e_orientation = R_error.as_rotvec()
+
+            # Combine the position and orientation errors into a 6D error vector
+            error = np.concatenate((e_position, e_orientation))
 
             # Check if the error is within the tolerance
             if np.linalg.norm(error) < TOL:
@@ -420,7 +445,7 @@ class CreateKinematicModel:
             JC = self.jacobian() 
 
             # Calculate the rate of change in the joint angles using the Jacobian pseudoinverse
-            d_theta = np.linalg.pinv(JC) @ error
+            d_theta = -np.dot(np.transpose(-JC),(np.linalg.solve(np.dot(JC,(np.transpose(JC))) + damp * np.eye(6), error)))
 
             # Updat joint state
             th += d_theta
@@ -430,10 +455,10 @@ class CreateKinematicModel:
                 print('iteration %d: CONV error = %s' % (i, np.linalg.norm(error)))
             i += 1
             
-            convergence_error = f"{np.linalg.norm(error):.6f}"
+            final_conv_error = f"{np.linalg.norm(error):.6f}"
 
         if self.success:
-            print(f"Convergence achieved in iteration <{i}> : CONV error {convergence_error}")
+            print(f"Convergence achieved in iteration <{i}> : CONV error {final_conv_error}")
 
             j_states = self.get_joint_states()
             
@@ -443,7 +468,6 @@ class CreateKinematicModel:
                     result.append(np.degrees(j_states[i]))
                 elif self.__joint_type_info[i] == "p":
                     result.append(j_states[i])
-
             return result
         else:
             print("\nWarning: the iterative algorithm has not reached convergence to the desired precision")

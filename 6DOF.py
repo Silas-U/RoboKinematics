@@ -23,6 +23,7 @@ import timeit
 from math import pi
 from time import sleep
 from timeit import default_timer as timer
+import numpy as np
 
 """
 The Denavit–Hartenberg parameters for 6DOF  robot is shown below.
@@ -59,20 +60,11 @@ robot.set_joint_limit(
     ]
 )
 
-
 #Set initial joint angles, print A0_6, compute jacobian
-
-for i in range(0,90,1):
-    os.system('clear')
-    start = timer()
-    q = robot.set_joints([0, 0, -90, 0, i, 0])
-    t = robot.f_kin(q)
-    tcp = robot.get_tcp()
-    j = robot.jacobian()
-    end = timer()
-
-    print(t,"\n")
-    print(tcp,"\n")
-    print(j,"\n")
-    print('It took %.5f s. to execute.' % (end - start)) 
-    sleep(0.02)
+qr = robot.set_joints([0, 0, 0, 0, 0, 0]) #20, 10, 20, 30, 20, 0
+t = robot.f_kin(qr)
+start = timer()
+p = robot.i_kin([0.31488856,  0.11461006,  0.10931074, -2.78234398, -0.7797434 , -0.37273474])
+print(p)
+end = timer()
+print('It took %.5f s. to execute.' % (end - start)) 
