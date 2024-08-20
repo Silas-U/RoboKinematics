@@ -20,6 +20,7 @@ limitations under the License.
 import math as m
 from functools import reduce
 import numpy as np
+from scipy.spatial.transform import Rotation as R
 
 
 class CreateKinematicModel:
@@ -41,6 +42,8 @@ class CreateKinematicModel:
         self.__num_of_joints = 0
         self.__joint_limits = []
         self.__joint_type_info = []
+        self.__jacobian = []
+        self.__singuarities = []
         
    
     def set_joints(self, joint_vars, rads=False):
@@ -318,21 +321,130 @@ class CreateKinematicModel:
                 J.append(wt[i])
             jv.clear()
             jw.clear()
-
+            self.__jacobian = J
             np.set_printoptions(suppress=True)
             return np.array(J)
         except ValueError as e:
             print(f"Error: {e}")
             
-
-    def get_joint_states(self):
+   
+    def get_joint_states(self, rads=False):
         joint_state = []
         for i in range(len(self.get_dh_params())):
            if self.get_dh_params()[i][1] == "r":
-                joint_state.append(self.get_dh_params()[i][5])
+                if rads:
+                    joint_state.append((self.get_dh_params()[i][5]/180)*m.pi)
+                elif not rads:
+                    joint_state.append(self.get_dh_params()[i][5])
            elif self.get_dh_params()[i][1] == "p":
                 joint_state.append(self.get_dh_params()[i][4])
         return joint_state
 
 
+#Inverse kinematics solutions
 
+    # Searches for singular configurations
+    def singular_configs(self):
+        mrank = np.linalg.matrix_rank(np.array(self.__jacobian))
+        if mrank < self.__num_of_joints:
+            qn = self.get_joint_states()
+            self.__singuarities.append(qn)
+        elif len(self.__singuarities) != 0:
+            print("Checking for singularities >> \n")  
+            print("found singularity at : \n")
+            print(np.array(self.__singuarities),'\n')
+            self.text=" "
+        elif len(self.__singuarities) == 0:    
+            self.text="No singulargities found >> \n"
+            print(self.text)
+
+
+    def end_eff_linangvel(self, joint_vels):
+        eff_velocity = np.matmul(np.array(self.__jacobian), np.array(joint_vels))
+        return eff_velocity
+    
+    
+    def joint_vels(self, end_eff_vels):
+        jvel = np.linalg.pinv(self.__jacobian)
+        result = np.matmul(jvel, end_eff_vels)
+        return result
+    
+    
+    def fk_to_vector(self, T, deg=False):
+        try:
+            if len(T)== 0:
+                raise ValueError(f"invalid robot parameters")
+             # Extract the position (x, y, z)
+            position = T[:3, 3]
+            # Extract the rotation matrix and convert to Euler angles (roll, pitch, yaw)
+            rotation_matrix = T[:3, :3]
+            r = R.from_matrix(rotation_matrix)
+            euler_angles = r.as_euler('xyz', degrees=deg)  # angles in radians
+            # Combine position and orientation into a 1x6 vector
+            vector = np.array([position, euler_angles])
+            return vector
+        except ValueError as e:
+            print(f"Error: {e}")
+
+
+    def i_kin(self, target_position):
+        # Maximum iterations and tolerance 1e-4
+        TOL = 1e-4
+        IT_MAX = 1000
+
+        # Initial value of theta
+        th = self.get_joint_states(rads=True)
+        convergence_error = 0
+        i=0
+
+        while True:
+            # Current end-effector position
+            fk = self.get_transforms(self.__num_of_joints)
+            current_position = self.fk_to_vector(fk)
+
+            vector_1x6 = np.hstack((current_position[0], current_position[1]))
+        
+            # Calculate the position error
+            error = target_position - vector_1x6
+
+            # Check if the error is within the tolerance
+            if np.linalg.norm(error) < TOL:
+                self.success = True
+                break
+
+            if i >= IT_MAX:
+                self.success = False
+                break
+
+            # Calculate the Jacobian matrix
+            JC = self.jacobian() 
+
+            # Calculate the rate of change in the joint angles using the Jacobian pseudoinverse
+            d_theta = np.linalg.pinv(JC) @ error
+
+            # Updat joint state
+            th += d_theta
+            self.f_kin(self.set_joints(th, rads=True))
+            
+            if not i % 10:
+                print('iteration %d: CONV error = %s' % (i, np.linalg.norm(error)))
+            i += 1
+            
+            convergence_error = f"{np.linalg.norm(error):.6f}"
+
+        if self.success:
+            print(f"Convergence achieved in iteration <{i}> : CONV error {convergence_error}")
+
+            j_states = self.get_joint_states()
+            
+            result = []
+            for i in range(self.__num_of_joints):
+                if self.__joint_type_info[i] == "r":
+                    result.append(np.degrees(j_states[i]))
+                elif self.__joint_type_info[i] == "p":
+                    result.append(j_states[i])
+
+            return result
+        else:
+            print("\nWarning: the iterative algorithm has not reached convergence to the desired precision")
+  
