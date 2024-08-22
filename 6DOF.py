@@ -17,13 +17,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-import os
+
 from Libs.RoboKinematics import CreateKinematicModel
-import timeit
 from math import pi
 from time import sleep
 from timeit import default_timer as timer
-import numpy as np
 
 """
 The Denavit–Hartenberg parameters for 6DOF  robot is shown below.
@@ -46,7 +44,7 @@ robot = CreateKinematicModel(
         ("frame4", "r", 0.0,   90,   0.0,   0.0),
         ("frame5", "r", 0.0,   0,    0.0,   0.0)
     ]
-    , robot_name="6DOF", joint_lim_enable=True)
+    , robot_name="6DOF", joint_lim_enable=False)
 
 
 robot.set_joint_limit(
@@ -61,10 +59,12 @@ robot.set_joint_limit(
 )
 
 #Set initial joint angles, print A0_6, compute jacobian
-qr = robot.set_joints([0, 0, 0, 0, 0, 0]) #20, 10, 20, 30, 20, 0
+qr = robot.set_joints([0,0,0,0,0,0])
 t = robot.f_kin(qr)
 start = timer()
-p = robot.i_kin([0.31488856,  0.11461006,  0.10931074, -2.78234398, -0.7797434 , -0.37273474])
-print(p)
+p1 = robot.i_kin([0.08757394,  0.24060742,  0.20617347, -1.49372705, -0.2124074,  -0.55325521])
+print(p1,'\n')
+p2 = robot.i_kin([0.31488856,  0.11461006,  0.10931074, -2.78234398, -0.7797434 , -0.37273474])
+print(p2,'\n')
 end = timer()
 print('It took %.5f s. to execute.' % (end - start)) 

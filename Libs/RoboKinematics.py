@@ -338,7 +338,8 @@ class CreateKinematicModel:
     # Searches for singular configurations
     def singular_configs_check(self):
         sing = False
-        mrank = np.linalg.matrix_rank(np.array(self.__jacobian))
+        jac = self.jacobian()
+        mrank = np.linalg.matrix_rank(np.array(jac))
         if mrank < self.__num_of_joints:
             qn = self.get_joint_states()
             self.__singuarities.append(qn)
@@ -349,7 +350,7 @@ class CreateKinematicModel:
             print(np.array(self.__singuarities),'\n')
             self.text=" "
         elif not sing:    
-            self.text="No singulargities found >> \n"
+            self.text="No singulargities found *** \n"
             print(self.text)
 
 
@@ -383,10 +384,14 @@ class CreateKinematicModel:
 
 
     def i_kin(self, target_position):
+        
         # Maximum iterations and tolerance 1e-4
         TOL = 1e-4
         IT_MAX = 1000
         damp   = 1e-12
+        
+        zero_vals = [0 for i in range(self.__num_of_joints)]
+
         # Initial value of theta
         th = self.get_joint_states(rads=True)
 
@@ -407,13 +412,13 @@ class CreateKinematicModel:
             p_current = current_position[0]
             r_current = current_position[1]
 
-            # Calculate the position error
+            # Calculates the position error
             e_position = p_desired - p_current
 
             q_desired = R.from_euler('xyz', r_desired, degrees=False).as_quat()  # desired quaternion
             q_current = R.from_euler('xyz', r_current, degrees=False).as_quat()  # current quaternion
 
-           # Calculate the quaternion error (desired * inverse(current))
+           # Calculates the quaternion error
             R_error = R.from_quat(q_desired) * R.from_quat(q_current).inv()
 
             # Convert the error quaternion to a rotation vector (axis-angle representation)
@@ -422,7 +427,7 @@ class CreateKinematicModel:
             # Combine the position and orientation errors into a 6D error vector
             error = np.concatenate((e_position, e_orientation))
 
-            # Check if the error is within the tolerance
+            # Checks if the error is within the tolerance
             if np.linalg.norm(error) < TOL:
                 self.success = True
                 break
@@ -431,13 +436,12 @@ class CreateKinematicModel:
                 self.success = False
                 break
 
-            # Calculate the Jacobian matrix
-            JC = self.jacobian() 
+            jc = self.jacobian() 
 
-            # Calculate the rate of change in the joint angles using the Jacobian pseudoinverse
-            d_theta = -np.dot(np.transpose(-JC),(np.linalg.solve(np.dot(JC,(np.transpose(JC))) + damp * np.eye(6), error)))
+            # Calculates the rate of change in the joint angles using the Jacobian pseudoinverse
+            d_theta = -np.dot(np.transpose(-jc),(np.linalg.solve(np.dot(jc,(np.transpose(jc))) + damp * np.eye(6), error)))
 
-            # Updat joint state
+            # Updat joint states
             th += d_theta
             self.f_kin(self.set_joints(th, rads=True))
             
@@ -448,17 +452,23 @@ class CreateKinematicModel:
             final_conv_error = f"{np.linalg.norm(error):.6f}"
 
         if self.success:
+
             print(f"Convergence achieved in iteration <{i}> : CONV error {final_conv_error}")
 
             j_states = self.get_joint_states()
-            
+
             result = []
+
             for i in range(self.__num_of_joints):
                 if self.__joint_type_info[i] == "r":
                     result.append(np.degrees(j_states[i]))
                 elif self.__joint_type_info[i] == "p":
                     result.append(j_states[i])
+
+            self.f_kin(self.set_joints(zero_vals, rads=True)) # reset joint states to [0, 0, 0, 0, 0, 0].
+
             return result
         else:
+            self.f_kin(self.set_joints(zero_vals, rads=True))
             print("\nWarning: the iterative algorithm has not reached convergence to the desired precision")
   

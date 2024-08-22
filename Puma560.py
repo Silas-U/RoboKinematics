@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-import os
+
 from Libs.RoboKinematics import CreateKinematicModel
 from math import pi
 from time import sleep
@@ -49,7 +49,7 @@ Puma560 = CreateKinematicModel(
 
 
 #Set initial joint angles, print A0_6, compute jacobian
-qr = Puma560.set_joints([0, 0, 0, 0, 0, 0]) #20, 10, 20, 30, 20, 0
+qr = Puma560.set_joints([0, 0, 0, 0, 0, 0])
 t = Puma560.f_kin(qr)
 start = timer()
 p = Puma560.i_kin([0.26453836, -0.06334258,  0.45908105, -0.35924867, -0.7797434,  1.07086644])
