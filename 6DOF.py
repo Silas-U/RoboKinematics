@@ -59,7 +59,7 @@ robot.set_joint_limit(
 )
 
 #Set initial joint angles, print A0_6, compute jacobian
-qr = robot.set_joints([0,0,0,0,0,0])
+qr = robot.set_joints([0,-90,90,0,0,0])
 t = robot.f_kin(qr)
 start = timer()
 p1 = robot.i_kin([0.08757394,  0.24060742,  0.20617347, -1.49372705, -0.2124074,  -0.55325521])

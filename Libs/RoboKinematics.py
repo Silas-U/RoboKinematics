@@ -367,7 +367,7 @@ class CreateKinematicModel:
     
     def SE3(self, T, deg=False):
         try:
-            if len(T)== 0:
+            if len(T) == 0:
                 raise ValueError(f"invalid robot parameters")
             # Extract the position (x, y, z)
             position = T[:3, 3]
@@ -384,31 +384,26 @@ class CreateKinematicModel:
 
 
     def i_kin(self, target_position):
-        
         # Maximum iterations and tolerance 1e-4
         TOL = 1e-4
         IT_MAX = 1000
-        damp   = 1e-12
-        
+        damp   = 1e-4
         zero_vals = [0 for i in range(self.__num_of_joints)]
 
         # Initial value of theta
-        th = self.get_joint_states(rads=True)
-
+        th = [0 for i in range(self.__num_of_joints)]
         final_conv_error = 0
-        i=0
 
+        i=0
         while True:
             # Current end-effector position
             fk = self.get_transforms(self.__num_of_joints)
-
             current_position = self.SE3(fk) #index 0 = posiion_vector, 1=eular_angles zyx
-
-            SE3 = [target_position[i:i + 3] for i in range(0, 4, 3)] 
             
+            SE3 = [target_position[i:i + 3] for i in range(0, 4, 3)] 
+
             p_desired = SE3[0]
             r_desired = SE3[1]
-
             p_current = current_position[0]
             r_current = current_position[1]
 
@@ -420,7 +415,6 @@ class CreateKinematicModel:
 
            # Calculates the quaternion error
             R_error = R.from_quat(q_desired) * R.from_quat(q_current).inv()
-
             # Convert the error quaternion to a rotation vector (axis-angle representation)
             e_orientation = R_error.as_rotvec()
 
@@ -431,7 +425,6 @@ class CreateKinematicModel:
             if np.linalg.norm(error) < TOL:
                 self.success = True
                 break
-
             if i >= IT_MAX:
                 self.success = False
                 break
@@ -445,28 +438,24 @@ class CreateKinematicModel:
             th += d_theta
             self.f_kin(self.set_joints(th, rads=True))
             
+            # self.f_kin(self.set_joints(zero_vals, rads=True))
             if not i % 10:
                 print('iteration %d: CONV error = %s' % (i, np.linalg.norm(error)))
-            i += 1
-            
+
             final_conv_error = f"{np.linalg.norm(error):.6f}"
 
+            i += 1
+
         if self.success:
-
             print(f"Convergence achieved in iteration <{i}> : CONV error {final_conv_error}")
-
             j_states = self.get_joint_states()
-
             result = []
-
             for i in range(self.__num_of_joints):
                 if self.__joint_type_info[i] == "r":
                     result.append(np.degrees(j_states[i]))
                 elif self.__joint_type_info[i] == "p":
                     result.append(j_states[i])
-
             self.f_kin(self.set_joints(zero_vals, rads=True)) # reset joint states to [0, 0, 0, 0, 0, 0].
-
             return result
         else:
             self.f_kin(self.set_joints(zero_vals, rads=True))

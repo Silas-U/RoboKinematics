@@ -53,11 +53,11 @@ scara.set_joint_limit(
     [
         (-90, 90), #min max j1
         (-90, 90), #min max j2
-        (0, 5), #min max j2
+        (0, 5), #min max j3
     ]
 )
 
-qr = scara.set_joints([0, 0, 0])
+qr = scara.set_joints([30, 60, 0.1])
 t = scara.f_kin(qr)
 start = timer()
 p= scara.i_kin([0.13155697,  0.04788282, -0.1,  3.14159265,  0,  0.34906585]) # x,y,z,roll,pitch,yaw
