@@ -492,10 +492,10 @@ class CreateKinematicModel:
             plt.plot(self.time_steps, np.degrees(trajectory[i]), label=f"q{i+1} Traj" ,color=colors[i])
 
             plt.annotate(f'initial ({np.round(np.degrees(trajectory[i][1]),0)})', xy=(self.time_steps[0], np.degrees(trajectory[i])[0]), xytext=(self.time_steps[0], np.degrees(trajectory[i])[0]+ 0.5),
-               arrowprops=dict(facecolor=colors[i], shrink=0.05))
+              bbox=dict(boxstyle='round,pad=0.5', fc='white', alpha=0.2), arrowprops=dict(facecolor=colors[i], shrink=0.05))
             
             plt.annotate(f'final ({np.round(np.degrees(trajectory[i][-1]),0)})', xy=(self.time_steps[-1], np.degrees(trajectory[i])[-1]), xytext=(self.time_steps[-1], np.degrees(trajectory[i])[-1] + 0.5),
-                ha='right', arrowprops=dict(facecolor=colors[i], shrink=0.05,))
+                bbox=dict(boxstyle='round,pad=0.5', fc='white', alpha=0.2) , ha='right', arrowprops=dict(facecolor=colors[i], shrink=0.05,))
                     
             plt.title(f"{self.__robot_name} Cubic Trajectory")
             plt.xlabel('Time [s]')
