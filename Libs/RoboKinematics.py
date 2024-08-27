@@ -21,6 +21,8 @@ import math as m
 from functools import reduce
 import numpy as np
 from scipy.spatial.transform import Rotation as R
+import matplotlib.pyplot as plt
+
 
 
 class CreateKinematicModel:
@@ -449,15 +451,55 @@ class CreateKinematicModel:
         if self.success:
             print(f"Convergence achieved in iteration <{i}> : CONV error {final_conv_error}")
             j_states = self.get_joint_states()
-            result = []
-            for i in range(self.__num_of_joints):
-                if self.__joint_type_info[i] == "r":
-                    result.append(np.degrees(j_states[i]))
-                elif self.__joint_type_info[i] == "p":
-                    result.append(j_states[i])
             self.f_kin(self.set_joints(zero_vals, rads=True)) # reset joint states to [0, 0, 0, 0, 0, 0].
-            return result
+            return j_states
         else:
             self.f_kin(self.set_joints(zero_vals, rads=True))
             print("\nWarning: the iterative algorithm has not reached convergence to the desired precision")
   
+
+    
+    def cubic_trajectory(self, t0, tf, q, v0, vf, t):
+        q0, qf = q[0],q[1]
+        a0 = q0
+        a1 = v0
+        a2 = (3 * (qf - q0) / (tf - t0)**2) - (2 * v0 + vf) / (tf - t0)
+        a3 = (-2 * (qf - q0) / (tf - t0)**3) + (v0 + vf) / (tf - t0)**2
+        return a0 + a1 * (t - t0) + a2 * (t - t0)**2 + a3 * (t - t0)**3
+
+    def ptraj(self, initial, final, t):
+        # Cubic polynomial interpolation function
+        t0 = 0.0   # Start time
+        tf = t     # End time
+        v0 = 0.0   # Initial velocity
+        vf = 0.0   # Final velocity
+        self.time_steps = np.linspace(t0, tf, 100)
+        q = [[initial[i],final[i]] for i in range(self.__num_of_joints)]
+        trajectory = [[self.cubic_trajectory(t0, tf, q[i], v0, vf, t) for t in self.time_steps] for i in range(self.__num_of_joints)]
+        return trajectory
+        
+
+    def plot(self, trajectory):
+
+        plt.figure(figsize=(8, 6))
+        plt.grid(color='#a65628', linestyle='--')
+        plt.grid(True)
+
+        for i in range(self.__num_of_joints):
+
+            colors = ['#377eb8', '#ff7f00', '#4daf4a', '#e41a1c', '#984ea3',  '#ffff33', '#a65628', '#f781bf']
+        
+            plt.plot(self.time_steps, np.degrees(trajectory[i]), label=f"q{i+1} Traj" ,color=colors[i])
+
+            plt.annotate(f'initial ({np.round(np.degrees(trajectory[i][1]),0)})', xy=(self.time_steps[0], np.degrees(trajectory[i])[0]), xytext=(self.time_steps[0], np.degrees(trajectory[i])[0]+ 0.5),
+               arrowprops=dict(facecolor=colors[i], shrink=0.05))
+            
+            plt.annotate(f'final ({np.round(np.degrees(trajectory[i][-1]),0)})', xy=(self.time_steps[-1], np.degrees(trajectory[i])[-1]), xytext=(self.time_steps[-1], np.degrees(trajectory[i])[-1] + 0.5),
+                ha='right', arrowprops=dict(facecolor=colors[i], shrink=0.05,))
+                    
+            plt.title(f"{self.__robot_name} Cubic Trajectory")
+            plt.xlabel('Time [s]')
+            plt.ylabel('Joint angles [deg]')
+
+            plt.legend()
+        plt.show()

@@ -1,7 +1,7 @@
 """
 Author: Silas Udofia
 Date: 2024-08-02
-Description: This script performs kinematics analysis for a SCARA-Cobra600 robot.
+Description: This script performs kinematics analysis for a 4DOF robot.
 
 GitHub: https://github.com/Silas-U/Robot-Kinematics-lib/tree/main
 
@@ -19,15 +19,15 @@ limitations under the License.
 """
 
 
-'''DH TABLE FOR SAMPLE SCARA ROBOT'''
+'''DH TABLE FOR SAMPLE 4DOF ROBOT'''
 '''---------+-------------+--------------+---------------+--------------+
 |    Link   | Link Length |  Link Twist  |  Joint Offset |     Theta    |
 ------------+-------------+--------------+---------------+--------------+
 |     1     |      a1     |      0 deg   |       d1      |    theta1    |
 |     2     |      a2     |      0 deg   |       d2      |    theta2    |
 |     3     |      a3     |      0 deg   |       d3      |    theta3    |
+|     4     |      a4     |      0 deg   |       d4      |    theta4    |
 +-----------+-------------+--------------+---------------+------------'''
-
 
 
 from Libs.RoboKinematics import CreateKinematicModel
@@ -37,14 +37,14 @@ from timeit import default_timer as timer
 
 
 # Creates a kinematic model of the SCARA robot
-Cobra600 = CreateKinematicModel(
+rb = CreateKinematicModel(
     [
-        ("frame0", "r", 0.325,  0.0,  0.387, 0.0),
-        ("frame1", "r", 0.275,  π,    0.0,   0.0),
-        ("frame2", "p", 0.0,    0.0,  0.0,   0.0),
-        ("frame3", "r", 0.0,    0.0,  0.0,   0.0),
+        ("frame0", "r", 0.0,   90.0,  0.1,   0.0),
+        ("frame1", "r", 0.14,  0.0,   0.0,   0.0),
+        ("frame2", "r", 0.14,  90.0,  0.0,   0.0),
+        ("frame3", "r", 0.0,   0.0,   0.0,   0.0),
     ],
-    robot_name="Cobra600", link_twist_in_rads=True, #joint_lim_enable=True
+    robot_name="4DOF",
 )
 
 
@@ -52,21 +52,15 @@ Cobra600 = CreateKinematicModel(
 If joint vars are provided in radians then the min and max limit should be set in radians: 
 Default min and max limits are set in degrees
 """
-Cobra600.set_joint_limit(
-    [
-        (-90, 90), #min max j1
-        (-90, 90), #min max j2
-        (0, 5), #min max j3
-        (-90, 90), #min max j4
-    ]
-)
 
-qr = Cobra600.set_joints([0, 0, 0, 0]) # 60, 30, 0.2, 0
-t = Cobra600.f_kin(qr)
+qr = rb.set_joints([-50, 90, -90, 50]) # Default configuration
+t = rb.f_kin(qr)
+home = rb.get_joint_states(rads=True)
 start = timer()
-p= Cobra600.i_kin([0.1625, 0.55645826, 0.187,  3.14159265, 0, 1.57079633]) # x,y,z,roll,pitch,yaw
-print(p)
+target= rb.i_kin([0.24248711, 0, 0.1,  3.14159265, 0.52359878, 0]) # x,y,z,roll,pitch,yaw
+trj = rb.ptraj(home, target , 0.1)
 end = timer()
-print('It took %.5f s. to execute.' % (end - start)) 
+rb.plot(trj)
+print('It took %.5f s. to execute.' % (end - start))
 
 

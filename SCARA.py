@@ -60,7 +60,7 @@ scara.set_joint_limit(
 qr = scara.set_joints([30, 60, 0.1])
 t = scara.f_kin(qr)
 start = timer()
-p= scara.i_kin([0.13155697,  0.04788282, -0.1,  3.14159265,  0,  0.34906585]) # x,y,z,roll,pitch,yaw
+p= scara.i_kin([0.1315,  0.0479, -0.1,  3.1416,  0,  0.3491]) # x,y,z,roll,pitch,yaw
 print(p)
 end = timer()
 print('It took %.5f s. to execute.' % (end - start)) 
