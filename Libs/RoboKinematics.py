@@ -465,17 +465,25 @@ class CreateKinematicModel:
         a1 = v0
         a2 = (3 * (qf - q0) / (tf - t0)**2) - (2 * v0 + vf) / (tf - t0)
         a3 = (-2 * (qf - q0) / (tf - t0)**3) + (v0 + vf) / (tf - t0)**2
-        return a0 + a1 * (t - t0) + a2 * (t - t0)**2 + a3 * (t - t0)**3
-
-    def ptraj(self, initial, final, t):
+        pos = a0 + a1 * (t - t0) + a2 * (t - t0)**2 + a3 * (t - t0)**3
+        vel = a1 + 2 * a2 * (t - t0) + 3 * a3 * (t - t0)**2
+        accel = 2 * a2 + 6 * a3 * (t - t0)
+        pva = [pos, vel, accel]
+        return pva
+    
+   
+    def ptraj(self, initial, final, t, pva):
         # Cubic polynomial interpolation function
+        if pva > 2 or pva < 0:
+            pva = 0
+        self.pva = pva
         t0 = 0.0   # Start time
         tf = t     # End time
         v0 = 0.0   # Initial velocity
         vf = 0.0   # Final velocity
         self.time_steps = np.linspace(t0, tf, 100)
         q = [[initial[i],final[i]] for i in range(self.__num_of_joints)]
-        trajectory = [[self.cubic_trajectory(t0, tf, q[i], v0, vf, t) for t in self.time_steps] for i in range(self.__num_of_joints)]
+        trajectory = [[self.cubic_trajectory(t0, tf, q[i], v0, vf, t)[pva] for t in self.time_steps] for i in range(self.__num_of_joints)]
         return trajectory
         
 
@@ -485,21 +493,36 @@ class CreateKinematicModel:
         plt.grid(color='#a65628', linestyle='--')
         plt.grid(True)
 
-        for i in range(self.__num_of_joints):
-
-            colors = ['#377eb8', '#ff7f00', '#4daf4a', '#e41a1c', '#984ea3',  '#ffff33', '#a65628', '#f781bf']
-        
-            plt.plot(self.time_steps, np.degrees(trajectory[i]), label=f"q{i+1} Traj" ,color=colors[i])
-
-            plt.annotate(f'initial ({np.round(np.degrees(trajectory[i][1]),0)})', xy=(self.time_steps[0], np.degrees(trajectory[i])[0]), xytext=(self.time_steps[0], np.degrees(trajectory[i])[0]+ 0.5),
-              bbox=dict(boxstyle='round,pad=0.5', fc='white', alpha=0.2), arrowprops=dict(facecolor=colors[i], shrink=0.05))
-            
-            plt.annotate(f'final ({np.round(np.degrees(trajectory[i][-1]),0)})', xy=(self.time_steps[-1], np.degrees(trajectory[i])[-1]), xytext=(self.time_steps[-1], np.degrees(trajectory[i])[-1] + 0.5),
-                bbox=dict(boxstyle='round,pad=0.5', fc='white', alpha=0.2) , ha='right', arrowprops=dict(facecolor=colors[i], shrink=0.05,))
+        colors = ['#377eb8', '#ff7f00', '#4daf4a', '#e41a1c', '#984ea3',  '#ffff33', '#a65628', '#f781bf'] 
+        if self.__num_of_joints > len(colors):
+                for i in range(self.__num_of_joints):
+                    colors.append(f'#1d2fb1',)
                     
-            plt.title(f"{self.__robot_name} Cubic Trajectory")
-            plt.xlabel('Time [s]')
-            plt.ylabel('Joint angles [deg]')
+        for i in range(self.__num_of_joints):
+            if self.pva == 0:
+                plt.plot(self.time_steps, np.degrees(trajectory[i]), label=f"q{i+1} pos" ,color=colors[i])
 
-            plt.legend()
+                plt.annotate(f'initial ({np.round(np.degrees(trajectory[i][1]),0)})', xy=(self.time_steps[0], np.degrees(trajectory[i])[0]), xytext=(self.time_steps[0], np.degrees(trajectory[i])[0]+ 0.5),
+                bbox=dict(boxstyle='round,pad=0.5', fc='white', alpha=0.2), arrowprops=dict(facecolor=colors[i], shrink=0.05))
+                
+                plt.annotate(f'final ({np.round(np.degrees(trajectory[i][-1]),0)})', xy=(self.time_steps[-1], np.degrees(trajectory[i])[-1]), xytext=(self.time_steps[-1], np.degrees(trajectory[i])[-1] + 0.5),
+                    bbox=dict(boxstyle='round,pad=0.5', fc='white', alpha=0.2) , ha='right', arrowprops=dict(facecolor=colors[i], shrink=0.05,))
+                        
+                plt.title(f"{self.__robot_name} Cubic Trajectory (Position)")
+                plt.xlabel('Time [s]')
+                plt.ylabel('Position [deg]')
+                plt.legend()
+            elif self.pva == 1:
+                plt.plot(self.time_steps, trajectory[i], label=f"q{i+1} vel" ,color=colors[i])   
+                plt.title(f"{self.__robot_name} Cubic Trajectory (Velocity)")
+                plt.xlabel('Time [s]')
+                plt.ylabel('Velocity [m]')
+                plt.legend()
+            elif self.pva == 2:
+                plt.plot(self.time_steps, trajectory[i], label=f"q{i+1} accel" ,color=colors[i])   
+                plt.title(f"{self.__robot_name} Cubic Trajectory (Acceleration)")
+                plt.xlabel('Time [s]')
+                plt.ylabel('Acceleration [m]')
+                plt.legend()
+        
         plt.show()

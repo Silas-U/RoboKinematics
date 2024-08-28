@@ -54,13 +54,12 @@ scara.set_joint_limit(
     ]
 )
 
-#theta1_start, theta1_goal,theta2_start, theta2_goal
-qr = scara.set_joints([80, 0])
+qr = scara.set_joints([20, 0])
 t = scara.f_kin(qr)
 start = scara.get_joint_states(rads=True)
 start_t = timer()
 goal = scara.i_kin([1.12972504, 1.61341457, 0, 0, 0, 1.13446401])
-traj = scara.ptraj(start, goal, 5)
+traj = scara.ptraj(start, goal, 5, 0)
 end = timer()
 scara.plot(traj)
 print('It took %.5f s. to execute.' % (end - start_t)) 

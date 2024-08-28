@@ -58,7 +58,7 @@ t = rb.f_kin(qr)
 home = rb.get_joint_states(rads=True)
 start = timer()
 target= rb.i_kin([0.24248711, 0, 0.1,  3.14159265, 0.52359878, 0]) # x,y,z,roll,pitch,yaw
-trj = rb.ptraj(home, target , 0.1)
+trj = rb.ptraj(home, target , 0.1, 0)
 end = timer()
 rb.plot(trj)
 print('It took %.5f s. to execute.' % (end - start))
