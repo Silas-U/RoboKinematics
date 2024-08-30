@@ -37,26 +37,58 @@ Joint 6     0               0       0           0
 
 robot = CreateKinematicModel(
     [
-        ("frame0", "r", 0.05,  90,   0.0,   0.0),
-        ("frame1", "r", 0.14,  0,    0.0,   0.0),
-        ("frame2", "r", 0.17,  90,   0.0,   0.0),
-        ("frame3", "r", 0.0,  -90,   0.0,   0.0),
-        ("frame4", "r", 0.0,   90,   0.0,   0.0),
-        ("frame5", "r", 0.0,   0,    0.0,   0.0)
+        {
+         'frame_name': 'frame0', 
+         'joint_type':'r', 
+         'link_length': 0.05, 
+         'twist': 90.0, 
+         'offset':0.0, 
+         'theta': 0.0
+        },
+        {
+         'frame_name': 'frame1', 
+         'joint_type':'r', 
+         'link_length': 0.14, 
+         'twist': 0.0, 
+         'offset':0.0, 
+         'theta': 0.0
+        },
+        {
+         'frame_name': 'frame2', 
+         'joint_type':'r', 
+         'link_length': 0.17, 
+         'twist': 90.0, 
+         'offset':0.0, 
+         'theta': 0.0
+        },
+        {
+         'frame_name': 'frame3', 
+         'joint_type':'r', 
+         'link_length': 0.0, 
+         'twist': -90.0, 
+         'offset':0.0, 
+         'theta': 0.0
+        },
+        {
+         'frame_name': 'frame4', 
+         'joint_type':'r', 
+         'link_length': 0.0, 
+         'twist': 90.0, 
+         'offset':0.0, 
+         'theta': 0.0
+        },
+        {
+         'frame_name': 'frame5', 
+         'joint_type':'r', 
+         'link_length': 0.0, 
+         'twist': 0.0, 
+         'offset':0.0, 
+         'theta': 0.0
+        },
+        
     ]
-    , robot_name="6DOF", joint_lim_enable=False)
+    , robot_name="6DOF")
 
-
-robot.set_joint_limit(
-    [
-        (-90, 90),  # min max j1
-        (-90, 90),  # min max j2
-        (-90, 90),  # min max j3
-        (-90, 90),  # min max j4
-        (-90, 90),  # min max j5
-        (-90, 90),  # min max j6
-    ]
-)
 
 #Set initial joint angles, print A0_6, compute jacobian
 qr = robot.set_joints([0, 0, 0, 0, 0, 0])
@@ -64,7 +96,8 @@ t = robot.f_kin(qr)
 home = robot.get_joint_states(rads=True)
 start = timer()
 target = robot.i_kin([0.08757394,  0.24060742,  0.20617347, -1.49372705, -0.2124074,  -0.55325521])
-trajectory = robot.ptraj(home, target, 1, 2)
+trajectory = robot.ptraj(home, target, 1, 0)
 end = timer()
 print('It took %.5f s. to execute.' % (end - start)) 
 robot.plot(trajectory)
+print(robot.get_dh_table())

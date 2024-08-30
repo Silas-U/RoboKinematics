@@ -32,36 +32,41 @@ from Libs.RoboKinematics import CreateKinematicModel
 from math import pi as π
 from time import sleep
 from timeit import default_timer as timer
+import numpy as np
 
 
 # Creates a kinematic model of the SCARA robot
 scara = CreateKinematicModel(
     [
-        ("frame0", "r", 0.0,  0.0,  0.4, 0.0),
-        ("frame1", "r", 0.14,  π,   0.0, 0.0),
-        ("frame2", "p", 0.0,  0.0,  0.0, 0.0),
+        {
+         'frame_name': 'frame0', 
+         'joint_type':'r', 
+         'link_length': 0.0, 
+         'twist': 0.0, 
+         'offset':0.4, 
+         'theta': 0.0
+        },
+        {'frame_name': 'frame1', 
+         'joint_type':'r', 
+         'link_length': 0.14,
+         'twist': π,   
+         'offset':0.0, 
+         'theta': 0.0
+         },
+        {'frame_name': 'frame2', 
+         'joint_type':'p', 
+         'link_length':0.0, 
+         'twist': 0.0, 
+         'offset':0.0, 
+         'theta': 0.0
+         }
     ],
-    robot_name="SCARA", link_twist_in_rads=True, joint_lim_enable=True
+    robot_name="SCARA", link_twist_in_rads=True, #joint_lim_enable=True
 )
 
-
-"""
-If joint vars are provided in radians then the min and max limit should be set in radians: 
-Default min and max limits are set in degrees
-"""
-scara.set_joint_limit(
-    [
-        (-90, 90), #min max j1
-        (-90, 90), #min max j2
-        (0, 5), #min max j3
-    ]
-)
-
-qr = scara.set_joints([30, 60, 0.1])
+qr = scara.set_joints([10, -90, 0.1])
+start = scara.get_joint_states(rads=True)
 t = scara.f_kin(qr)
-start = timer()
-p= scara.i_kin([0.1315,  0.0479, -0.1,  3.1416,  0,  0.3491]) # x,y,z,roll,pitch,yaw
-print(p)
-end = timer()
-print('It took %.5f s. to execute.' % (end - start)) 
-
+goal = scara.i_kin([0.1315,  0.0479, -0.1,  3.1416,  0,  0.3491])
+traj = scara.ptraj(start, goal, 5, 0)
+scara.plot(traj)

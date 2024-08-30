@@ -24,7 +24,6 @@ from scipy.spatial.transform import Rotation as R
 import matplotlib.pyplot as plt
 
 
-
 class CreateKinematicModel:
     def __init__(self, args, robot_name, link_twist_in_rads=False, joint_lim_enable=False):
         self.__args = args
@@ -46,18 +45,25 @@ class CreateKinematicModel:
         self.__joint_type_info = []
         self.__jacobian = []
         self.__singuarities = []
-        
-   
+
+    def get_dh_table(self):
+        dh_params_list = []
+        for x in range(len(self.__args)):
+            for items in self.__args[x].items():
+                dh_params_list.append(items)
+        dh_table = np.array(np.split(np.array(dh_params_list),len(self.__args)))
+        return dh_table
+
     def set_joints(self, joint_vars, rads=False):
         self.__set_to_rads = rads
         try:
             dh_params_list = []
             for x in range(len(self.__args)):
-                for y in range(self.__n_dh_params):
-                    dh_params_list.append(self.__args[x][y])
-                    
-            self.__n_links = int(len(dh_params_list)/self.__n_dh_params)
+                for items in self.__args[x].items():
+                    dh_params_list.append(items[1])
 
+            self.__n_links =  len(self.__args)
+        
             chunk_size = 6
             dh_param_g_list = [dh_params_list[i:i + chunk_size] for i in range(0, len(dh_params_list), chunk_size)]
             
@@ -68,13 +74,13 @@ class CreateKinematicModel:
                 for i in range(len(self.__args)):
                     if joint_vars[i] > lims[i][1]:
                         raise ValueError(f"Joint {i+1} above maximum range : Verify that the software limits are "
-                                         f"correctly set\nand match the physical constraints of the robot.")
+                                        f"correctly set\nand match the physical constraints of the robot.")
                     elif joint_vars[i] < lims[i][0]:
                         raise ValueError(f"Joint {i+1} below minimum range : Verify that the software limits are "
-                                         f"correctly set\nand match the physical constraints of the robot.")
+                                        f"correctly set\nand match the physical constraints of the robot.")
                     elif len(joint_vars) > len(self.__args):
                         raise ValueError(f"Joint {i+1} above maximum range : Verify that the software limits are "
-                                         f"correctly set\nand match the physical constraints of the robot.")
+                                        f"correctly set\nand match the physical constraints of the robot.")
 
 
             self.__num_of_joints = len(joint_type_arr)
@@ -82,11 +88,11 @@ class CreateKinematicModel:
 
             if len(joint_vars) > self.__num_of_joints:
                 raise ValueError(f"Joint variables out of range: Your {self.__robot_name} robot has only "
-                                 f"{self.__num_of_joints} joints of type: {joint_type_arr}")
+                                f"{self.__num_of_joints} joints of type: {joint_type_arr}")
             elif len(joint_vars) < self.__num_of_joints:
                 raise ValueError(f"Joint variables insufficient: Your {self.__robot_name} robot has only "
-                                 f"{self.__num_of_joints} joints of type: {joint_type_arr}")
-           
+                                f"{self.__num_of_joints} joints of type: {joint_type_arr}")
+        
             for i in range(self.__num_of_joints):
                 if dh_param_g_list[i][1] == "r":
                     dh_param_g_list[i][5] = float(joint_vars[i])
@@ -497,15 +503,23 @@ class CreateKinematicModel:
         if self.__num_of_joints > len(colors):
                 for i in range(self.__num_of_joints):
                     colors.append(f'#1d2fb1',)
-                    
-        for i in range(self.__num_of_joints):
-            if self.pva == 0:
-                plt.plot(self.time_steps, np.degrees(trajectory[i]), label=f"q{i+1} pos" ,color=colors[i])
 
-                plt.annotate(f'initial ({np.round(np.degrees(trajectory[i][1]),0)})', xy=(self.time_steps[0], np.degrees(trajectory[i])[0]), xytext=(self.time_steps[0], np.degrees(trajectory[i])[0]+ 0.5),
+        new_traj =  []
+        for i in range(self.__num_of_joints):
+
+            if  self.__joint_type_info[i] == "r":
+                new_traj.append(np.degrees(trajectory[i]))
+            elif self.__joint_type_info[i] == "p":
+                new_traj.append(trajectory[i])
+            
+            if self.pva == 0:
+
+                plt.plot(self.time_steps, new_traj[i], label=f"q{i+1} pos" ,color=colors[i])
+               
+                plt.annotate(f'initial ({np.round(new_traj[i][1],0)})', xy=(self.time_steps[0], new_traj[i][0]), xytext=(self.time_steps[0], new_traj[i][0]),
                 bbox=dict(boxstyle='round,pad=0.5', fc='white', alpha=0.2), arrowprops=dict(facecolor=colors[i], shrink=0.05))
                 
-                plt.annotate(f'final ({np.round(np.degrees(trajectory[i][-1]),0)})', xy=(self.time_steps[-1], np.degrees(trajectory[i])[-1]), xytext=(self.time_steps[-1], np.degrees(trajectory[i])[-1] + 0.5),
+                plt.annotate(f'final ({np.round(new_traj[i][-1],1)})', xy=(self.time_steps[-1], new_traj[i][-1]), xytext=(self.time_steps[-1], new_traj[i][-1]),
                     bbox=dict(boxstyle='round,pad=0.5', fc='white', alpha=0.2) , ha='right', arrowprops=dict(facecolor=colors[i], shrink=0.05,))
                         
                 plt.title(f"{self.__robot_name} Cubic Trajectory (Position)")
@@ -513,13 +527,13 @@ class CreateKinematicModel:
                 plt.ylabel('Position [deg]')
                 plt.legend()
             elif self.pva == 1:
-                plt.plot(self.time_steps, trajectory[i], label=f"q{i+1} vel" ,color=colors[i])   
+                plt.plot(self.time_steps, new_traj[i], label=f"q{i+1} vel" ,color=colors[i])   
                 plt.title(f"{self.__robot_name} Cubic Trajectory (Velocity)")
                 plt.xlabel('Time [s]')
                 plt.ylabel('Velocity [m]')
                 plt.legend()
             elif self.pva == 2:
-                plt.plot(self.time_steps, trajectory[i], label=f"q{i+1} accel" ,color=colors[i])   
+                plt.plot(self.time_steps, new_traj[i], label=f"q{i+1} accel" ,color=colors[i])   
                 plt.title(f"{self.__robot_name} Cubic Trajectory (Acceleration)")
                 plt.xlabel('Time [s]')
                 plt.ylabel('Acceleration [m]')

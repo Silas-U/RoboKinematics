@@ -37,24 +37,26 @@ from timeit import default_timer as timer
 # Creates a kinematic model of the SCARA robot
 scara = CreateKinematicModel(
     [
-        ("frame0", "r", 1.0, 0.0,  0.0, 0.0),
-        ("frame1", "r", 1.0, 0.0,  0.0, 0.0),
+        {
+         'frame_name': 'frame0', 
+         'joint_type':'r', 
+         'link_length': 1.0, 
+         'twist': 0.0, 
+         'offset':0.0, 
+         'theta': 0.0
+        },
+        {'frame_name': 'frame1', 
+         'joint_type':'r', 
+         'link_length': 1.0,
+         'twist': 0.0,   
+         'offset':0.0, 
+         'theta': 0.0
+         },
     ],
-    robot_name="SCARA", link_twist_in_rads=True, joint_lim_enable=True
+    robot_name="SCARA", link_twist_in_rads=True
 )
 
-"""
-If joint vars are provided in radians then the min and max limit should be set in radians: 
-Default min and max limits are set in degrees
-"""
-scara.set_joint_limit(
-    [
-        (-90, 90), #min max j1
-        (-90, 90), #min max j2
-    ]
-)
-
-qr = scara.set_joints([20, 0])
+qr = scara.set_joints([0, -90])
 t = scara.f_kin(qr)
 start = scara.get_joint_states(rads=True)
 start_t = timer()

@@ -37,24 +37,66 @@ Joint 6     0               0       0           0
 
 # Creates a kinematic model of the Puma560 robot
 Puma560 = CreateKinematicModel(
-    [
-        ("frame0", "r", 0,       90,    0,      0.0),
-        ("frame1", "r", 0.4318,   0,    0,      0.0),
-        ("frame2", "r", 0.0203, -90,    0.15,   0.0),
-        ("frame3", "r", 0,       90,    0.4318, 0.0),
-        ("frame4", "r", 0,      -90,    0.0,    0.0),
-        ("frame5", "r", 0,        0,    0.0,    0.0)
+     [        
+        {
+         'frame_name': 'frame0', 
+         'joint_type':'r', 
+         'link_length': 0.0, 
+         'twist': 90.0, 
+         'offset':0.0, 
+         'theta': 0.0
+        },
+        {
+         'frame_name': 'frame1', 
+         'joint_type':'r', 
+         'link_length': 0.4318, 
+         'twist': 0.0, 
+         'offset':0.0, 
+         'theta': 0.0
+        },
+        {
+         'frame_name': 'frame2', 
+         'joint_type':'r', 
+         'link_length': 0.0203, 
+         'twist': -90.0, 
+         'offset':0.15, 
+         'theta': 0.0
+        },
+        {
+         'frame_name': 'frame3', 
+         'joint_type':'r', 
+         'link_length': 0.0, 
+         'twist': 90.0, 
+         'offset':0.4318, 
+         'theta': 0.0
+        },
+        {
+         'frame_name': 'frame4', 
+         'joint_type':'r', 
+         'link_length': 0.0, 
+         'twist': -90.0, 
+         'offset':0.0, 
+         'theta': 0.0
+        },
+        {
+         'frame_name': 'frame5', 
+         'joint_type':'r', 
+         'link_length': 0.0, 
+         'twist': 0.0, 
+         'offset':0.0, 
+         'theta': 0.0
+        }
     ]
     , robot_name="Puma560")
 
-
 #Set initial joint angles, print A0_6, compute jacobian
-qr = Puma560.set_joints([0, 0, 0, 0, 0, 0])
+qr = Puma560.set_joints([0, 45, -90, 30, 0, 0])
 t = Puma560.f_kin(qr)
+home = Puma560.get_joint_states(rads=True)
 start = timer()
-p = Puma560.i_kin([0.26453836, -0.06334258,  0.45908105, -0.35924867, -0.7797434,  1.07086644])
-print(p)
+target = Puma560.i_kin([0.26453836, -0.06334258,  0.45908105, -0.35924867, -0.7797434,  1.07086644])
+trajectory = Puma560.ptraj(home, target, 1, 0)
 end = timer()
 print('It took %.5f s. to execute.' % (end - start)) 
-
+Puma560.plot(trajectory)
 

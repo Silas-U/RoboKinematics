@@ -29,7 +29,6 @@ limitations under the License.
 |     4     |      a4     |      0 deg   |       d4      |    theta4    |
 +-----------+-------------+--------------+---------------+------------'''
 
-
 from Libs.RoboKinematics import CreateKinematicModel
 from math import pi as π
 from time import sleep
@@ -39,21 +38,44 @@ from timeit import default_timer as timer
 # Creates a kinematic model of the SCARA robot
 rb = CreateKinematicModel(
     [
-        ("frame0", "r", 0.0,   90.0,  0.1,   0.0),
-        ("frame1", "r", 0.14,  0.0,   0.0,   0.0),
-        ("frame2", "r", 0.14,  90.0,  0.0,   0.0),
-        ("frame3", "r", 0.0,   0.0,   0.0,   0.0),
+        {
+         'frame_name': 'frame0', 
+         'joint_type':'r', 
+         'link_length': 0.0, 
+         'twist': 90.0, 
+         'offset':0.1, 
+         'theta': 0.0
+        },
+        {
+         'frame_name': 'frame1', 
+         'joint_type':'r', 
+         'link_length': 0.14, 
+         'twist': 0.0, 
+         'offset':0.0, 
+         'theta': 0.0
+        },
+        {
+         'frame_name': 'frame2', 
+         'joint_type':'r', 
+         'link_length': 0.14, 
+         'twist': 90.0, 
+         'offset':0.0, 
+         'theta': 0.0
+        },
+        {
+         'frame_name': 'frame3', 
+         'joint_type':'r', 
+         'link_length': 0.0, 
+         'twist': 0.0, 
+         'offset':0.0, 
+         'theta': 0.0
+        },
+        
     ],
     robot_name="4DOF",
 )
 
-
-"""
-If joint vars are provided in radians then the min and max limit should be set in radians: 
-Default min and max limits are set in degrees
-"""
-
-qr = rb.set_joints([-50, 90, -90, 50]) # Default configuration
+qr = rb.set_joints([10, 90, -90, 50]) # Default configuration
 t = rb.f_kin(qr)
 home = rb.get_joint_states(rads=True)
 start = timer()
