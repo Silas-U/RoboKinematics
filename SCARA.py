@@ -17,7 +17,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
+from Libs.RoboKinematics import CreateKinematicModel
+from math import pi
 
 '''DH TABLE FOR SAMPLE SCARA ROBOT'''
 '''---------+-------------+--------------+---------------+--------------+
@@ -28,40 +29,33 @@ limitations under the License.
 |     3     |      a3     |      0 deg   |       d3      |    theta3    |
 +-----------+-------------+--------------+---------------+------------'''
 
-from Libs.RoboKinematics import CreateKinematicModel
-from math import pi as π
-from time import sleep
-from timeit import default_timer as timer
-import numpy as np
-
-
 # Creates a kinematic model of the SCARA robot
 scara = CreateKinematicModel(
     [
         {
          'frame_name': 'frame0', 
-         'joint_type':'r', 
+         'joint_type': 'r',
          'link_length': 0.0, 
-         'twist': 0.0, 
-         'offset':0.4, 
+         'twist': 0.0,
+         'offset': 0.4,
          'theta': 0.0
         },
         {'frame_name': 'frame1', 
-         'joint_type':'r', 
+         'joint_type': 'r',
          'link_length': 0.14,
-         'twist': π,   
-         'offset':0.0, 
+         'twist': pi,
+         'offset': 0.0,
          'theta': 0.0
          },
         {'frame_name': 'frame2', 
-         'joint_type':'p', 
-         'link_length':0.0, 
+         'joint_type': 'p',
+         'link_length': 0.0,
          'twist': 0.0, 
-         'offset':0.0, 
+         'offset': 0.0,
          'theta': 0.0
          }
     ],
-    robot_name="SCARA", link_twist_in_rads=True, #joint_lim_enable=True
+    robot_name="SCARA", link_twist_in_rads=True,  # joint_lim_enable=True
 )
 
 qr = scara.set_joints([10, -90, 0.1])

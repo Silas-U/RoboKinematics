@@ -17,7 +17,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
+from Libs.RoboKinematics import CreateKinematicModel
+from timeit import default_timer as timer
 
 '''DH TABLE FOR SAMPLE 4DOF ROBOT'''
 '''---------+-------------+--------------+---------------+--------------+
@@ -29,45 +30,39 @@ limitations under the License.
 |     4     |      a4     |      0 deg   |       d4      |    theta4    |
 +-----------+-------------+--------------+---------------+------------'''
 
-from Libs.RoboKinematics import CreateKinematicModel
-from math import pi as π
-from time import sleep
-from timeit import default_timer as timer
-
-
 # Creates a kinematic model of the SCARA robot
 rb = CreateKinematicModel(
     [
         {
          'frame_name': 'frame0', 
-         'joint_type':'r', 
+         'joint_type': 'r',
          'link_length': 0.0, 
          'twist': 90.0, 
-         'offset':0.1, 
+         'offset': 0.1,
          'theta': 0.0
         },
         {
          'frame_name': 'frame1', 
-         'joint_type':'r', 
+         'joint_type': 'r',
          'link_length': 0.14, 
          'twist': 0.0, 
-         'offset':0.0, 
+         'offset': 0.0,
          'theta': 0.0
         },
         {
          'frame_name': 'frame2', 
-         'joint_type':'r', 
+         'joint_type': 'r',
          'link_length': 0.14, 
          'twist': 90.0, 
-         'offset':0.0, 
+         'offset': 0.0,
          'theta': 0.0
         },
         {
          'frame_name': 'frame3', 
-         'joint_type':'r', 
+         'joint_type': 'r',
          'link_length': 0.0, 
          'twist': 0.0, 
-         'offset':0.0, 
+         'offset': 0.0,
          'theta': 0.0
         },
         
@@ -75,14 +70,12 @@ rb = CreateKinematicModel(
     robot_name="4DOF",
 )
 
-qr = rb.set_joints([10, 90, -90, 50]) # Default configuration
+qr = rb.set_joints([10, 90, -90, 50])  # Default configuration
 t = rb.f_kin(qr)
 home = rb.get_joint_states(rads=True)
 start = timer()
-target= rb.i_kin([0.24248711, 0, 0.1,  3.14159265, 0.52359878, 0]) # x,y,z,roll,pitch,yaw
-trj = rb.ptraj(home, target , 0.1, 0)
+target = rb.i_kin([0.24248711, 0, 0.1,  3.14159265, 0.52359878, 0])  # x,y,z,roll,pitch,yaw
+trj = rb.ptraj(home, target, 0.1, 0)
 end = timer()
 rb.plot(trj)
 print('It took %.5f s. to execute.' % (end - start))
-
-

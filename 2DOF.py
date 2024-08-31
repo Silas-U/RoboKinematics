@@ -17,7 +17,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
+from Libs.RoboKinematics import CreateKinematicModel
+import numpy as np
 
 '''DH TABLE FOR SAMPLE 2DOF ROBOT'''
 '''---------+-------------+--------------+---------------+--------------+
@@ -27,29 +28,23 @@ limitations under the License.
 |     2     |      a2     |      0 deg   |       d2      |    theta2    |
 +-----------+-------------+--------------+---------------+------------'''
 
-import os
-from Libs.RoboKinematics import CreateKinematicModel
-from math import pi as π
-from time import sleep
-from timeit import default_timer as timer
-
 
 # Creates a kinematic model of the SCARA robot
 scara = CreateKinematicModel(
     [
         {
          'frame_name': 'frame0', 
-         'joint_type':'r', 
+         'joint_type': 'r',
          'link_length': 1.0, 
          'twist': 0.0, 
-         'offset':0.0, 
+         'offset': 0.0,
          'theta': 0.0
         },
         {'frame_name': 'frame1', 
-         'joint_type':'r', 
+         'joint_type': 'r',
          'link_length': 1.0,
          'twist': 0.0,   
-         'offset':0.0, 
+         'offset': 0.0,
          'theta': 0.0
          },
     ],
@@ -64,5 +59,5 @@ goal = scara.i_kin([1.12972504, 1.61341457, 0, 0, 0, 1.13446401])
 traj = scara.ptraj(start, goal, 5, 0)
 end = timer()
 scara.plot(traj)
-print('It took %.5f s. to execute.' % (end - start_t)) 
+print('It took %.5f s. to execute.' % (end - start_t))
 
