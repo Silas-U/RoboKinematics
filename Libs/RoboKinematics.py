@@ -479,19 +479,38 @@ class CreateKinematicModel:
         return pva
 
     def ptraj(self, initial, final, t, pva):
-        # Cubic polynomial interpolation function
-        if pva > 2 or pva < 0:
-            pva = 0
-        self.pva = pva
-        t0 = 0.0  # Start time
-        tf = t  # End time
-        v0 = 0.0  # Initial velocity
-        vf = 0.0  # Final velocity
-        self.time_steps = np.linspace(t0, tf, 100)
-        q = [[initial[i], final[i]] for i in range(self.__num_of_joints)]
-        trajectory = [[self.cubic_trajectory(t0, tf, q[i], v0, vf, t)[pva] for t in self.time_steps] for i in
-                      range(self.__num_of_joints)]
-        return trajectory
+        try:
+            # Cubic polynomial interpolation function
+            if type(initial) is not np.ndarray:
+                for item in initial:
+                    if type(item) not in [int, float]:
+                        raise TypeError("input must be of type integer, float or numpy.ndarray")
+
+            if type(final) is not np.ndarray:
+                for item in final:
+                    if type(item) not in [int, float]:
+                        raise TypeError("input must be of type integer, float or numpy.ndarray")
+
+            if len(initial) > self.__num_of_joints or  len(initial) < self.__num_of_joints or len(initial) == 0:
+                raise IndexError("index out of range")
+
+            if len(final) > self.__num_of_joints or len(final) < self.__num_of_joints or len(final) == 0:
+                raise IndexError("index out of range")
+
+            if pva > 2 or pva < 0:
+                pva = 0
+            self.pva = pva
+            t0 = 0.0  # Start time
+            tf = t  # End time
+            v0 = 0.0  # Initial velocity
+            vf = 0.0  # Final velocity
+            self.time_steps = np.linspace(t0, tf, 100)
+            q = [[initial[i], final[i]] for i in range(self.__num_of_joints)]
+            trajectory = [[self.cubic_trajectory(t0, tf, q[i], v0, vf, t)[pva] for t in self.time_steps] for i in
+                          range(self.__num_of_joints)]
+            return trajectory
+        except ValueError as e:
+            print(f"Error: {e}")
 
     def plot(self, trajectory):
 

@@ -19,8 +19,6 @@ limitations under the License.
 """
 
 from Libs.RoboKinematics import CreateKinematicModel
-from math import pi
-from time import sleep
 from timeit import default_timer as timer
 
 """
@@ -40,56 +38,56 @@ Puma560 = CreateKinematicModel(
      [        
         {
          'frame_name': 'frame0', 
-         'joint_type':'r', 
+         'joint_type': 'r',
          'link_length': 0.0, 
          'twist': 90.0, 
-         'offset':0.0, 
+         'offset': 0.0,
          'theta': 0.0
         },
         {
          'frame_name': 'frame1', 
-         'joint_type':'r', 
+         'joint_type': 'r',
          'link_length': 0.4318, 
          'twist': 0.0, 
-         'offset':0.0, 
+         'offset': 0.0,
          'theta': 0.0
         },
         {
          'frame_name': 'frame2', 
-         'joint_type':'r', 
+         'joint_type': 'r',
          'link_length': 0.0203, 
          'twist': -90.0, 
-         'offset':0.15, 
+         'offset': 0.15,
          'theta': 0.0
         },
         {
          'frame_name': 'frame3', 
-         'joint_type':'r', 
+         'joint_type': 'r',
          'link_length': 0.0, 
          'twist': 90.0, 
-         'offset':0.4318, 
+         'offset': 0.4318,
          'theta': 0.0
         },
         {
          'frame_name': 'frame4', 
-         'joint_type':'r', 
+         'joint_type': 'r',
          'link_length': 0.0, 
          'twist': -90.0, 
-         'offset':0.0, 
+         'offset': 0.0,
          'theta': 0.0
         },
         {
          'frame_name': 'frame5', 
-         'joint_type':'r', 
+         'joint_type': 'r',
          'link_length': 0.0, 
          'twist': 0.0, 
-         'offset':0.0, 
+         'offset': 0.0,
          'theta': 0.0
         }
-    ]
-    , robot_name="Puma560")
+     ],
+     robot_name="Puma560")
 
-#Set initial joint angles, print A0_6, compute jacobian
+# Set initial joint angles, print A0_6, compute jacobian
 qr = Puma560.set_joints([0, 45, -90, 30, 0, 0])
 t = Puma560.f_kin(qr)
 home = Puma560.get_joint_states(rads=True)
@@ -99,4 +97,3 @@ trajectory = Puma560.ptraj(home, target, 1, 0)
 end = timer()
 print('It took %.5f s. to execute.' % (end - start)) 
 Puma560.plot(trajectory)
-

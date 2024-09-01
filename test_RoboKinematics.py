@@ -134,6 +134,26 @@ class TestRoboKinematics(unittest.TestCase):
             t = self.scara.f_kin(qr)
             goal = self.scara.i_kin([])
 
+    def test_ptraj(self):
+        with self.assertRaises(TypeError):
+            self.scara.ptraj(['0', 0, 0],[10, 20, 30], 1, 0)
+        with self.assertRaises(TypeError):
+            self.scara.ptraj(['0', 0, 0],[10, '20', 30], 1, 0)
+        with self.assertRaises(IndexError):
+            self.scara.ptraj([0, 0],[10, 20, 30], 1, 0)
+        with self.assertRaises(IndexError):
+            self.scara.ptraj([0, 0, 0],[10, 20], 1, 0)
+        with self.assertRaises(IndexError):
+            self.scara.ptraj([0, 0, 0, 0],[10, 20, 30], 1, 0)
+        with self.assertRaises(IndexError):
+            self.scara.ptraj([0, 0, 0],[10, 20, 30, 40], 1, 0)
+        with self.assertRaises(IndexError):
+            self.scara.ptraj([],[10, 20, 30], 1, 0)
+        with self.assertRaises(IndexError):
+            self.scara.ptraj([0, 0, 0],[], 1, 0)
+        with self.assertRaises(IndexError):
+            self.scara.ptraj([],[], 1, 0)
+
 
 if __name__ == '__main__':
     unittest.main()
