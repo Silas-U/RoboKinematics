@@ -1,7 +1,7 @@
 """
 Author: Silas Udofia
 Date: 2024-08-02
-Description: This script performs kinematics analysis for a 2DOF robot.
+Description: This script performs kinematics analysis for a SCARA robot.
 
 GitHub: https://github.com/Silas-U/Robot-Kinematics-lib/tree/main
 
@@ -17,18 +17,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import numpy as np
 
 from Libs.RoboKinematics import CreateKinematicModel
-from timeit import default_timer as timer
+from math import pi
 
-'''DH TABLE FOR SAMPLE 2DOF ROBOT'''
+'''DH TABLE FOR SAMPLE SCARA ROBOT'''
 '''---------+-------------+--------------+---------------+--------------+
 |    Link   | Link Length |  Link Twist  |  Joint Offset |     Theta    |
 ------------+-------------+--------------+---------------+--------------+
 |     1     |      a1     |      0 deg   |       d1      |    theta1    |
 |     2     |      a2     |      0 deg   |       d2      |    theta2    |
+|     3     |      a3     |      0 deg   |       d3      |    theta3    |
 +-----------+-------------+--------------+---------------+------------'''
-
 
 # Creates a kinematic model of the SCARA robot
 scara = CreateKinematicModel(
@@ -36,29 +37,34 @@ scara = CreateKinematicModel(
         {
          'frame_name': 'frame0', 
          'joint_type': 'r',
-         'link_length': 1.0, 
-         'twist': 0.0, 
-         'offset': 0.0,
+         'link_length': 0.0, 
+         'twist': 0.0,
+         'offset': 0.4,
          'theta': 0.0
         },
         {'frame_name': 'frame1', 
          'joint_type': 'r',
-         'link_length': 1.0,
-         'twist': 0.0,   
+         'link_length': 0.14,
+         'twist': pi,
          'offset': 0.0,
          'theta': 0.0
          },
+        {'frame_name': 'frame2', 
+         'joint_type': 'p',
+         'link_length': 0.0,
+         'twist': 0.0, 
+         'offset': 0.0,
+         'theta': 0.0
+         }
     ],
-    robot_name="SCARA", link_twist_in_rads=True
+    robot_name="SCARA", link_twist_in_rads=True,  # joint_lim_enable=True
 )
 
-qr = scara.set_joints([0, -90])
-t = scara.f_kin(qr)
+qr = scara.set_joints([60, 30, 0])
 start = scara.get_joint_states(rads=True)
-start_t = timer()
-goal = scara.i_kin([1.12972504, 1.61341457, 0, 0, 0, 1.13446401])
-traj = scara.ptraj(start, goal, 5, 0)
-end = timer()
+t = scara.f_kin(qr)
+goal = scara.i_kin([0.1315,  0.0479, -0.1,  3.1416,  0,  0.3491])
+traj = scara.ptraj(start, goal, 1, 0)
 scara.plot(traj)
-print('It took %.5f s. to execute.' % (end - start_t))
+
 

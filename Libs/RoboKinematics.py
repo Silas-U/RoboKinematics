@@ -26,10 +26,13 @@ import matplotlib.pyplot as plt
 
 class CreateKinematicModel:
     def __init__(self, args, robot_name, link_twist_in_rads=False, joint_lim_enable=False):
+
+        if len(args) == 0:
+            raise ValueError("non descriptive model, DH params list cannot be empty")
+        
         self.time_steps = None
         self.pva = None
         self.success = None
-        self.text = "No singularities found *** \n"
         self.__args = args
         self.__robot_name = robot_name
         self.__n_links = 0
@@ -62,6 +65,11 @@ class CreateKinematicModel:
     def set_joints(self, joint_vars, rads=False):
         self.__set_to_rads = rads
         try:
+            if type(joint_vars) is not np.ndarray:
+                for item in joint_vars:
+                    if type(item) not in [int, float]:
+                        raise TypeError("input must be of type integer, float or numpy.ndarray")
+                    
             dh_params_list = []
             for x in range(len(self.__args)):
                 for items in self.__args[x].items():
@@ -91,10 +99,10 @@ class CreateKinematicModel:
             self.__joint_type_info = joint_type_arr
 
             if len(joint_vars) > self.__num_of_joints:
-                raise ValueError(f"Joint variables out of range: Your {self.__robot_name} robot has only "
+                raise IndexError(f"Joint variables out of range: Your {self.__robot_name} robot has only "
                                  f"{self.__num_of_joints} joints of type: {joint_type_arr}")
             elif len(joint_vars) < self.__num_of_joints:
-                raise ValueError(f"Joint variables insufficient: Your {self.__robot_name} robot has only "
+                raise IndexError(f"Joint variables insufficient: Your {self.__robot_name} robot has only "
                                  f"{self.__num_of_joints} joints of type: {joint_type_arr}")
 
             for i in range(self.__num_of_joints):
@@ -117,10 +125,9 @@ class CreateKinematicModel:
             cumulative_list_row3_data = []
             cumulative_list_row4_data = []
 
-            if dh_params is None:
-                raise ValueError(
-                    f"Could not calculate fk for {self.__robot_name}. Ensure inputed joint values are within "
-                    f"the set limits")
+            if len(dh_params) == 0:
+                raise TypeError(
+                    f"Could not calculate fk for {self.__robot_name}, expected {self.__robot_name} joint params")
             for col_index in range(len(dh_params)):
                 self.__link_length = float(dh_params[col_index][2])
                 self.__joint_offset = float(dh_params[col_index][4])
@@ -183,57 +190,38 @@ class CreateKinematicModel:
         f = ['{:.3f}'.format(float(item)) for item in x]
         return f
 
-    def get_transforms(self, stop_index=1):
+    def get_transforms(self, stop_index=3, real=False):
         h_t_matrix = self.__homogeneous_t_matrix_
         try:
-            if len(h_t_matrix) == 0:
-                raise ValueError(f"Could not generate transforms for {self.__robot_name}")
-            elif stop_index <= 0:
-                raise ValueError(f"Valid inputs range from 1 - {self.__n_links}")
+            if stop_index <= 0:
+                raise IndexError(f"valid inputs range from 1 - {self.__n_links}")
             elif stop_index > self.__n_links:
-                raise ValueError(f"{self.__robot_name} has only {self.__n_links} "
-                                 f"Joints, try values from 1 - {self.__n_links}")
+                raise IndexError(f"{self.__robot_name} has only {self.__n_links} "
+                                 f"joints, try values from 1 - {self.__n_links}")
+            if len(h_t_matrix) == 0:
+                raise IndexError(f"no fk calculations were implemented:cannot generate fk transforms for {self.__robot_name}")
 
             new = [h_t_matrix[i] for i in range(stop_index)]
-            result = reduce(np.dot, new)
-            np.set_printoptions(suppress=True)
+            result = reduce(np.dot, np.array(new))
+            if real:
+                np.set_printoptions(suppress=True)
             return result
         except ValueError as e:
             print(f"Error: {e}")
 
     def get_tcp(self):
         t_matrix = self.get_transforms(self.__n_links)
-        try:
-            if len(t_matrix) == 0:
-                raise ValueError(f"Could not generate transforms for {self.__robot_name}")
-            displacement_vector = [t_matrix[i][3] for i in range(3)]
-            return displacement_vector
-        except ValueError as err:
-            print(f"Error: {err}")
+        displacement_vector = [t_matrix[i][3] for i in range(3)]
+        return displacement_vector
 
     def get_j_origin(self, index):
-        try:
-            res = self.__homogeneous_t_matrix_
-            if index > self.__n_links or index <= 0 or len(res) == 0:
-                raise ValueError(
-                    f"Error: {self.__robot_name} joint origin {index} does not exist, be sure the fk solution has "
-                    f"been generated")
-            new = [res[i] for i in range(index)]
-            t_matrix = reduce(np.dot, new)
-            displacement_vector = [t_matrix[i][3] for i in range(3)]
-            return displacement_vector
-        except ValueError as e:
-            print(f'{e}')
+        t_matrix = self.get_transforms(index)
+        displacement_vector = [t_matrix[i][3] for i in range(3)]
+        return displacement_vector
 
     def get_r_matrix(self, index):
         r_matrix = []
-        res = self.__homogeneous_t_matrix_
-        if index > self.__n_links or index <= 0 or len(res) == 0:
-            raise ValueError(
-                f"Error: {self.__robot_name} joint origin {index} does not exist, be sure the fk solution "
-                f"has been generated")
-        new = [res[i] for i in range(index)]
-        t_matrix = reduce(np.dot, new)
+        t_matrix = self.get_transforms(index,real=True)
         try:
             for i in range(3):
                 for j in range(3):
@@ -293,36 +281,32 @@ class CreateKinematicModel:
         o_n = self.get_j_origin(self.__num_of_joints)
         z_axis_vec, z0, o0 = [0, 0, 1], [0, 0, 1], [0, 0, 0]
         jv, jw, jac, zi = [], [], [], []
-        try:
-            if o_n is None:
-                raise ValueError(f"Could not calculate jacobian for {self.__robot_name}")
-            for i in range(self.__num_of_joints):
-                if i == 0 and self.__joint_type_info[i] == "r":
-                    dt = self.mul_mat_vec(self.skew(z0), [float(o_n[r]) - o0[r] for r in range(len(o_n))])
-                    jv.append(dt)
-                    jw.append(z0)
-                elif i == 0 and self.__joint_type_info[i] == "p":
-                    jv.append(z0)
-                    jw.append([0, 0, 0])
-                elif self.__joint_type_info[i] == "r":
-                    zi = self.mul_mat_vec(self.get_r_matrix(i), z_axis_vec)
-                    dt = self.mul_mat_vec(self.skew(zi),
-                                          [round(float(o_n[r]) - float(self.get_j_origin(i)[r]), 5) for r in
-                                           range(len(o_n))])
-                    jv.append(dt)
-                    jw.append(zi)
-                elif self.__joint_type_info[i] == "p":
-                    zi = self.mul_mat_vec(self.get_r_matrix(i), z_axis_vec)
-                    jv.append(zi)
-                    jw.append([0, 0, 0])
+        for i in range(self.__num_of_joints):
+            if i == 0 and self.__joint_type_info[i] == "r":
+                dt = np.matmul(self.skew(z0), [float(o_n[r]) - o0[r] for r in range(len(o_n))])
+                jv.append(dt)
+                jw.append(z0)
+            elif i == 0 and self.__joint_type_info[i] == "p":
+                jv.append(z0)
+                jw.append([0, 0, 0])
+            elif self.__joint_type_info[i] == "r":
+                zi = np.matmul(self.get_r_matrix(i), z_axis_vec)
+                dt = np.matmul(self.skew(zi),
+                                      [round(float(o_n[r]) - float(self.get_j_origin(i)[r]), 5) for r in
+                                       range(len(o_n))])
+                jv.append(dt)
+                jw.append(zi)
+            elif self.__joint_type_info[i] == "p":
+                zi = np.matmul(self.get_r_matrix(i), z_axis_vec)
+                jv.append(zi)
+                jw.append([0, 0, 0])
 
-            vt = np.transpose(np.array(jv))
-            wt = np.transpose(np.array(jw))
-            jac = np.vstack([vt, wt])
-            self.__jacobian = jac
-            return jac
-        except ValueError as e:
-            print(f"Error: {e}")
+        vt = np.transpose(np.array(jv))
+        wt = np.transpose(np.array(jw))
+        jac = np.vstack([vt, wt])
+        self.__jacobian = jac
+        return jac
+
 
     def get_joint_states(self, rads=False):
         joint_state = []
@@ -341,7 +325,6 @@ class CreateKinematicModel:
     # Searches for singular configurations
     def singular_configs_check(self):
         sing = False
-        self.text = ""
         jac = self.jacobian()
         mrank = np.linalg.matrix_rank(np.array(jac))
         if mrank < self.__num_of_joints:
@@ -352,23 +335,38 @@ class CreateKinematicModel:
             print("Checking for singularities >> \n")
             print("found singularity at : \n")
             print(np.array(self.__singuarities), '\n')
-            self.text = " "
         elif not sing:
-            print(self.text)
+            print("No singularities found *** \n")
 
-    def end_eff_linangvel(self, joint_vels):
-        eff_velocity = np.matmul(np.array(self.__jacobian), np.array(joint_vels))
+    def lin_ang_velocity(self, joint_vels):
+        if len(joint_vels) != self.__num_of_joints:
+            raise ValueError(f"input index out of range : max n joint is {self.__num_of_joints}")
+        elif type(joint_vels) is not np.ndarray:
+            for item in joint_vels:
+                if type(item) not in [int, float]:
+                    raise TypeError("input must be of type integer, float or numpy.ndarray")
+        eff_velocity = np.matmul(np.array(self.jacobian()), np.array(joint_vels))
         return eff_velocity
 
     def joint_vels(self, end_eff_vels):
-        jvel = np.linalg.pinv(self.__jacobian)
-        result = np.matmul(jvel, end_eff_vels)
+        if len(end_eff_vels) != 6:
+            raise ValueError(f"index out of range: expected linear 3: angular 3: "
+                             f"total:6, example [ linear_values, angular_values ]")
+        if type(end_eff_vels) is not np.ndarray:
+            for item in end_eff_vels:
+                if type(item) not in [int, float]:
+                    raise TypeError("input must be of type integer, float or numpy.ndarray")
+        jvel = np.linalg.pinv(np.array(self.jacobian()))
+        result = np.matmul(jvel, np.array(end_eff_vels))
         return result
 
     def SE3(self, T):
         try:
-            if len(T) == 0:
-                raise ValueError(f"invalid robot parameters")
+            if type(T) is not np.ndarray:
+                for item in T:
+                    if type(item) not in [int, float]:
+                        raise TypeError("input must be of type integer, float or "
+                                        "numpy.ndarray with shape (3, 3) or (N, 3, 3)")
             # Extract the position (x, y, z)
             position = T[:3, 3]
             # Extract the rotation matrix and convert to Euler angles (roll, pitch, yaw)
@@ -376,84 +374,96 @@ class CreateKinematicModel:
             r = R.from_matrix(rotation_matrix)
             euler_angles = r.as_euler('xyz', degrees=False)  # angles in radians
             self.quartenion = r.as_quat(canonical=False)
-            # Combine position and orientation into a 1x6 vector
+            # Combine position and orientation into a 1x6 array (vector)
             vector = np.array([position, euler_angles])
             return vector
         except ValueError as e:
             print(f"Error: {e}")
 
     def i_kin(self, target_position):
-        # Maximum iterations and tolerance 1e-4
-        TOL = 1e-4
-        IT_MAX = 1000
-        damp = 1e-4
-        zero_vals = np.zeros(self.__num_of_joints)
+        try:
+            if type(target_position) is not np.ndarray:
+                for item in target_position:
+                    if type(item) not in [int, float]:
+                        raise TypeError("input must be of type integer, float or numpy.ndarray")
+            if len(target_position) > 6:
+                raise IndexError("index out of range")
+            if len(target_position) == 0:
+                raise IndexError("list cannot be empty: index out of range")
 
-        # Initial value of theta
-        th = np.zeros(self.__num_of_joints)
-        final_conv_error = 0
+            # Maximum iterations and tolerance 1e-4
+            TOL = 1e-4
+            IT_MAX = 1000
+            damp = 1e-4
+            zero_vals = np.zeros(self.__num_of_joints)
 
-        i = 0
-        while True:
-            # Current end-effector position
-            fk = self.get_transforms(self.__num_of_joints)
-            current_position = self.SE3(fk)  # index 0 = position_vector, 1=eular_angles zyx
+            # Initial value of theta
+            th = np.zeros(self.__num_of_joints)
+            final_conv_error = 0
 
-            SE3 = [target_position[i:i + 3] for i in range(0, 4, 3)]
+            i = 0
+            while True:
+                # Current end-effector position
+                fk = self.get_transforms(self.__num_of_joints)
+                current_position = self.SE3(fk)  # index 0 = position_vector, 1=eular_angles zyx
 
-            p_desired = SE3[0]
-            r_desired = SE3[1]
-            p_current = current_position[0]
-            r_current = current_position[1]
+                SE3 = [target_position[i:i + 3] for i in range(0, 4, 3)]
 
-            # Calculates the position error
-            e_position = p_desired - p_current
+                p_desired = SE3[0]
+                r_desired = SE3[1]
+                p_current = current_position[0]
+                r_current = current_position[1]
 
-            q_desired = R.from_euler('xyz', r_desired, degrees=False).as_quat(canonical=False)  # desired quaternion
-            q_current = R.from_euler('xyz', r_current, degrees=False).as_quat(canonical=False)  # current quaternion
+                # Calculates the position error
+                e_position = p_desired - p_current
 
-            # Calculates the quaternion error
-            R_error = R.from_quat(q_desired) * R.from_quat(q_current).inv()
-            # Convert the error quaternion to a rotation vector (axis-angle representation)
-            e_orientation = R_error.as_rotvec()
+                q_desired = R.from_euler('xyz', r_desired, degrees=False).as_quat(canonical=False)  # desired quaternion
+                q_current = R.from_euler('xyz', r_current, degrees=False).as_quat(canonical=False)  # current quaternion
 
-            # Combine the position and orientation errors into a 6D error vector
-            error = np.concatenate((e_position, e_orientation))
+                # Calculates the quaternion error
+                R_error = R.from_quat(q_desired) * R.from_quat(q_current).inv()
+                # Convert the error quaternion to a rotation vector (axis-angle representation)
+                e_orientation = R_error.as_rotvec()
 
-            # Checks if the error is within the tolerance
-            if np.linalg.norm(error) < TOL:
-                self.success = True
-                break
-            if i >= IT_MAX:
-                self.success = False
-                break
+                # Combine the position and orientation errors into a 6D error vector
+                error = np.concatenate((e_position, e_orientation))
 
-            jc = self.jacobian()
+                # Checks if the error is within the tolerance
+                if np.linalg.norm(error) < TOL:
+                    self.success = True
+                    break
+                if i >= IT_MAX:
+                    self.success = False
+                    break
 
-            # Calculates the rate of change in the joint angles using the Jacobian pseudoinverse
-            d_theta = -np.dot(np.transpose(-jc),
-                              (np.linalg.solve(np.dot(jc, (np.transpose(jc))) + damp * np.eye(6), error)))
+                jc = self.jacobian()
 
-            # Update joint states
-            th += d_theta
-            self.f_kin(self.set_joints(th, rads=True))
+                # Calculates the rate of change in the joint angles using the Jacobian pseudoinverse
+                d_theta = -np.dot(np.transpose(-jc),
+                                  (np.linalg.solve(np.dot(jc, (np.transpose(jc))) + damp * np.eye(6), error)))
 
-            # self.f_kin(self.set_joints(zero_vals, rads=True))
-            if not i % 10:
-                print('iteration %d: CONV error = %s' % (i, np.linalg.norm(error)))
+                # Update joint states
+                th += d_theta
+                self.f_kin(self.set_joints(th, rads=True))
 
-            final_conv_error = f"{np.linalg.norm(error):.6f}"
+                # self.f_kin(self.set_joints(zero_vals, rads=True))
+                if not i % 10:
+                    print('iteration %d: CONV error = %s' % (i, np.linalg.norm(error)))
 
-            i += 1
+                final_conv_error = f"{np.linalg.norm(error):.6f}"
 
-        if self.success:
-            print(f"Convergence achieved in iteration <{i}> : CONV error {final_conv_error}")
-            j_states = self.get_joint_states()
-            self.f_kin(self.set_joints(zero_vals, rads=True))  # reset joint states to [0, 0, 0, 0, 0, 0].
-            return j_states
-        else:
-            self.f_kin(self.set_joints(zero_vals, rads=True))
-            print("\nWarning: the iterative algorithm has not reached convergence to the desired precision")
+                i += 1
+
+            if self.success:
+                print(f"Convergence achieved in iteration <{i}> : CONV error {final_conv_error}")
+                j_states = self.get_joint_states()
+                self.f_kin(self.set_joints(zero_vals, rads=True))  # reset joint states to [0, 0, 0, 0, 0, 0].
+                return j_states
+            else:
+                self.f_kin(self.set_joints(zero_vals, rads=True))
+                print("\nWarning: the iterative algorithm has not reached convergence to the desired precision")
+        except ValueError as e:
+            print(f"Error: {e}")
 
     @staticmethod
     def cubic_trajectory(t0, tf, q, v0, vf, t):
@@ -534,3 +544,7 @@ class CreateKinematicModel:
                 plt.legend()
 
         plt.show()
+
+
+    def get_num_of_joints(self):
+        return self.__num_of_joints

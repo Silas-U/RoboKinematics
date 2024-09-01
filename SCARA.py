@@ -19,6 +19,7 @@ limitations under the License.
 """
 from Libs.RoboKinematics import CreateKinematicModel
 from math import pi
+import numpy  as np
 
 '''DH TABLE FOR SAMPLE SCARA ROBOT'''
 '''---------+-------------+--------------+---------------+--------------+
@@ -58,7 +59,7 @@ scara = CreateKinematicModel(
     robot_name="SCARA", link_twist_in_rads=True,  # joint_lim_enable=True
 )
 
-qr = scara.set_joints([10, -90, 0.1])
+qr = scara.set_joints([20,0,0])
 start = scara.get_joint_states(rads=True)
 t = scara.f_kin(qr)
 goal = scara.i_kin([0.1315,  0.0479, -0.1,  3.1416,  0,  0.3491])
