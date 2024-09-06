@@ -20,6 +20,8 @@ limitations under the License.
 
 from Libs.RoboKinematics import CreateKinematicModel
 from timeit import default_timer as timer
+import numpy as np
+import matplotlib.pyplot as plt
 
 """
 The Denavit–Hartenberg parameters for 6DOF  robot is shown below.
@@ -40,7 +42,7 @@ robot = CreateKinematicModel(
          'joint_type': 'r',
          'link_length': 0.05, 
          'twist': 90.0, 
-         'offset': 0.0,
+         'offset': 0.105,
          'theta': 0.0
         },
         {
@@ -80,21 +82,21 @@ robot = CreateKinematicModel(
          'joint_type': 'r',
          'link_length': 0.0, 
          'twist': 0.0, 
-         'offset': 0.0,
+         'offset': 0.02,
          'theta': 0.0
         },
     ],
     robot_name="6DOF")
 
 
-# Set initial joint angles, print A0_6, compute jacobian
-qr = robot.set_joints([0, 0, 0, 0, 0, 0])
-t = robot.f_kin(qr)
-home = robot.get_joint_states(rads=True)
-start = timer()
-target = robot.i_kin([0.08757394,  0.24060742,  0.20617347, -1.49372705, -0.2124074,  -0.55325521])
-trajectory = robot.ptraj(home, target, 1, 0)
-end = timer()
-print('It took %.5f s. to execute.' % (end - start)) 
-robot.plot(trajectory)
-print(robot.get_dh_table())
+way_points  = [
+    [3.60000000e-01, -2.44929360e-18,  8.50000000e-02, 3.14159265e+00,  0.00000000e+00,  0.00000000e+00],
+    [2.20000000e-01,  6.12323400e-18,  2.25000000e-01, 3.14159265e+00,  0.00000000e+00, -5.23598776e-01],
+    [0.16,   0.24248711,  0.21624356,-2.15879893, -0.4478324,  -1.8133602],
+]
+
+trj_time = [1,2]
+t =  robot.f_kin([0, 0, 0, 0, 0, 0])# Start forward kinematics
+joint_space = [robot.i_kin(way_point) for way_point in way_points]
+trajectory = robot.traj_gen(joint_space, trj_time, 0, plot=True)
+

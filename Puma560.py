@@ -87,13 +87,18 @@ Puma560 = CreateKinematicModel(
      ],
      robot_name="Puma560")
 
-# Set initial joint angles, print A0_6, compute jacobian
-qr = Puma560.set_joints([0, 45, -90, 30, 0, 0])
-t = Puma560.f_kin(qr)
-home = Puma560.get_joint_states(rads=True)
+
 start = timer()
-target = Puma560.i_kin([0.26453836, -0.06334258,  0.45908105, -0.35924867, -0.7797434,  1.07086644])
-trajectory = Puma560.ptraj(home, target, 1, 0)
+trj_time = [5]
+t =  Puma560.f_kin([0, 45, -90, 30, 0, 0])
+home = Puma560.get_joint_states(rads=True)
+target_1 = Puma560.i_kin([0.26453836, -0.06334258,  0.45908105, -0.35924867, -0.7797434,  1.07086644])
+
+jq = [
+    home,
+    target_1
+]
+
+trajectory = Puma560.traj_gen(jq, trj_time, 0, plot=True)
 end = timer()
-print('It took %.5f s. to execute.' % (end - start)) 
-Puma560.plot(trajectory)
+print('It took %.5f s. to execute.' % (end - start))

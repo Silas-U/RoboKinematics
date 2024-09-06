@@ -52,13 +52,19 @@ scara = CreateKinematicModel(
     robot_name="SCARA", link_twist_in_rads=True
 )
 
-qr = scara.set_joints([0, -90])
-t = scara.f_kin(qr)
-start = scara.get_joint_states(rads=True)
-start_t = timer()
-goal = scara.i_kin([1.12972504, 1.61341457, 0, 0, 0, 1.13446401])
-traj = scara.ptraj(start, goal, 5, 0)
+
+start = timer()
+trj_time = [5]
+t =  scara.f_kin([0, 0])
+home = scara.get_joint_states(rads=True)
+target_1 = scara.i_kin([1,  -1,   0,   0,   0, -90], euler_in_deg=True)
+
+jq = [
+    home,
+    target_1
+]
+
+trajectory = scara.traj_gen(jq, trj_time, 0, plot=True)
 end = timer()
-scara.plot(traj)
-print('It took %.5f s. to execute.' % (end - start_t))
+print('It took %.5f s. to execute.' % (end - start))
 

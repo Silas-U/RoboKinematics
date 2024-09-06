@@ -118,8 +118,10 @@ class CreateKinematicModel:
     def get_dh_params(self):
         return self.__dh_param_grouped_list
 
-    def f_kin(self, dh_params):
+    def f_kin(self, qn, rads=False):     #dh_params
         try:
+            dh_params = self.set_joints(joint_vars=qn, rads=rads)
+
             cumulative_list_row1_data = []
             cumulative_list_row2_data = []
             cumulative_list_row3_data = []
@@ -171,9 +173,6 @@ class CreateKinematicModel:
             chunk_size2 = 4
             transformation_mtrxs = [all_hm[i:i + chunk_size2] for i in range(0, len(all_hm), chunk_size2)]
             self.__homogeneous_t_matrix_ = transformation_mtrxs
-            new = [transformation_mtrxs[i] for i in range(self.__n_links)]
-            result = reduce(np.dot, np.array(new))
-            return result
         except ValueError as e:
             print(f"Error: {e}")
 
@@ -190,7 +189,7 @@ class CreateKinematicModel:
         f = ['{:.3f}'.format(float(item)) for item in x]
         return f
 
-    def get_transforms(self, stop_index=3, real=False):
+    def get_transforms(self, stop_index=0, real=False):
         h_t_matrix = self.__homogeneous_t_matrix_
         try:
             if stop_index <= 0:
@@ -360,7 +359,7 @@ class CreateKinematicModel:
         result = np.matmul(jvel, np.array(end_eff_vels))
         return result
 
-    def SE3(self, T):
+    def SE3(self, T, deg=False):
         try:
             if type(T) is not np.ndarray:
                 for item in T:
@@ -372,15 +371,15 @@ class CreateKinematicModel:
             # Extract the rotation matrix and convert to Euler angles (roll, pitch, yaw)
             rotation_matrix = T[:3, :3]
             r = R.from_matrix(rotation_matrix)
-            euler_angles = r.as_euler('xyz', degrees=False)  # angles in radians
-            self.quartenion = r.as_quat(canonical=False)
+            euler_angles = r.as_euler('xyz', degrees=deg)  # angles in radians
+            self.quartenion = r.as_quat()
             # Combine position and orientation into a 1x6 array (vector)
             vector = np.array([position, euler_angles])
             return vector
         except ValueError as e:
             print(f"Error: {e}")
 
-    def i_kin(self, target_position):
+    def i_kin(self, target_position, euler_in_deg=False):
         try:
             if type(target_position) is not np.ndarray:
                 for item in target_position:
@@ -390,35 +389,42 @@ class CreateKinematicModel:
                 raise IndexError("index out of range")
             if len(target_position) == 0:
                 raise IndexError("list cannot be empty: index out of range")
-
+            
             # Maximum iterations and tolerance 1e-4
-            TOL = 1e-4
+            TOL = 1e-6
             IT_MAX = 1000
-            damp = 1e-4
-            zero_vals = np.zeros(self.__num_of_joints)
-
+            damp = 1e-2
+           
             # Initial value of theta
             th = np.zeros(self.__num_of_joints)
             final_conv_error = 0
 
             i = 0
+            
             while True:
                 # Current end-effector position
+                
                 fk = self.get_transforms(self.__num_of_joints)
+
                 current_position = self.SE3(fk)  # index 0 = position_vector, 1=eular_angles zyx
 
                 SE3 = [target_position[i:i + 3] for i in range(0, 4, 3)]
 
                 p_desired = SE3[0]
-                r_desired = SE3[1]
+
+                if euler_in_deg:
+                    r_desired = [(r / 180) * m.pi for r in SE3[1]]
+                else:
+                    r_desired = SE3[1]
+
                 p_current = current_position[0]
                 r_current = current_position[1]
 
                 # Calculates the position error
                 e_position = p_desired - p_current
 
-                q_desired = R.from_euler('xyz', r_desired, degrees=False).as_quat(canonical=False)  # desired quaternion
-                q_current = R.from_euler('xyz', r_current, degrees=False).as_quat(canonical=False)  # current quaternion
+                q_desired = R.from_euler('xyz', r_desired, degrees=False).as_quat()  # desired quaternion
+                q_current = R.from_euler('xyz', r_current, degrees=False).as_quat()  # current quaternion
 
                 # Calculates the quaternion error
                 R_error = R.from_quat(q_desired) * R.from_quat(q_current).inv()
@@ -444,7 +450,9 @@ class CreateKinematicModel:
 
                 # Update joint states
                 th += d_theta
-                self.f_kin(self.set_joints(th, rads=True))
+
+                # self.set_joints(th, rads=True)
+                self.f_kin(th, rads=True)
 
                 # self.f_kin(self.set_joints(zero_vals, rads=True))
                 if not i % 10:
@@ -457,13 +465,19 @@ class CreateKinematicModel:
             if self.success:
                 print(f"Convergence achieved in iteration <{i}> : CONV error {final_conv_error}")
                 j_states = self.get_joint_states()
-                self.f_kin(self.set_joints(zero_vals, rads=True))  # reset joint states to [0, 0, 0, 0, 0, 0].
+
+                # self.set_joints(zero_vals, rads=True)
+                self.f_kin(np.zeros(self.__num_of_joints), rads=True)  # reset joint states to [0, 0, 0, 0, 0, 0].
+
                 return j_states
             else:
-                self.f_kin(self.set_joints(zero_vals, rads=True))
+                # self.set_joints(zero_vals, rads=True)
+                self.f_kin(np.zeros(self.__num_of_joints), rads=True)
                 print("\nWarning: the iterative algorithm has not reached convergence to the desired precision")
+                return np.zeros(self.__num_of_joints)
         except ValueError as e:
             print(f"Error: {e}")
+
 
     @staticmethod
     def cubic_trajectory(t0, tf, q, v0, vf, t):
@@ -478,7 +492,7 @@ class CreateKinematicModel:
         pva = [pos, vel, accel]
         return pva
 
-    def ptraj(self, initial, final, t, pva):
+    def ptraj(self, initial, final, tq, time_steps, pva):
         try:
             # Cubic polynomial interpolation function
             if type(initial) is not np.ndarray:
@@ -499,20 +513,22 @@ class CreateKinematicModel:
 
             if pva > 2 or pva < 0:
                 pva = 0
-            self.pva = pva
-            t0 = 0.0  # Start time
-            tf = t  # End time
-            v0 = 0.0  # Initial velocity
-            vf = 0.0  # Final velocity
-            self.time_steps = np.linspace(t0, tf, 100)
+
+            self.pva = pva #position velocity and acceleration
+
+            t0 = 0.0    # Start time
+            tf = tq     # End time
+            v0 = 0.0    # Initial velocity
+            vf = 0.0    # Final velocity  
+
             q = [[initial[i], final[i]] for i in range(self.__num_of_joints)]
-            trajectory = [[self.cubic_trajectory(t0, tf, q[i], v0, vf, t)[pva] for t in self.time_steps] for i in
+            trajectory = [[self.cubic_trajectory(t0, tf, q[i], v0, vf, t)[pva] for t in time_steps] for i in
                           range(self.__num_of_joints)]
             return trajectory
         except ValueError as e:
             print(f"Error: {e}")
 
-    def plot(self, trajectory):
+    def plot(self, trajectory, time_steps):
 
         plt.figure(figsize=(8, 6))
         plt.grid(color='#a65628', linestyle='--')
@@ -521,7 +537,7 @@ class CreateKinematicModel:
         colors = ['#377eb8', '#ff7f00', '#4daf4a', '#e41a1c', '#984ea3', '#ffff33', '#a65628', '#f781bf']
         if self.__num_of_joints > len(colors):
             for i in range(self.__num_of_joints):
-                colors.append(f'#1d2fb1', )
+                colors.append(f'#1d2fb1')
 
         new_traj = []
         for i in range(self.__num_of_joints):
@@ -531,17 +547,18 @@ class CreateKinematicModel:
             elif self.__joint_type_info[i] == "p":
                 new_traj.append(trajectory[i])
 
+
             if self.pva == 0:
 
-                plt.plot(self.time_steps, new_traj[i], label=f"q{i + 1} pos", color=colors[i])
+                plt.plot(time_steps, new_traj[i], label=f"q{i + 1} pos", color=colors[i])
 
-                plt.annotate(f'initial ({np.round(new_traj[i][1], 0)})', xy=(self.time_steps[0], new_traj[i][0]),
-                             xytext=(self.time_steps[0], new_traj[i][0]),
+                plt.annotate(f'initial ({np.round(new_traj[i][1], 0)})', xy=(time_steps[0], new_traj[i][0]),
+                             xytext=(time_steps[0], new_traj[i][0]),
                              bbox=dict(boxstyle='round,pad=0.5', fc='white', alpha=0.2),
                              arrowprops=dict(facecolor=colors[i], shrink=0.05))
 
-                plt.annotate(f'final ({np.round(new_traj[i][-1], 1)})', xy=(self.time_steps[-1], new_traj[i][-1]),
-                             xytext=(self.time_steps[-1], new_traj[i][-1]),
+                plt.annotate(f'final ({np.round(new_traj[i][-1], 1)})', xy=(time_steps[-1], new_traj[i][-1]),
+                             xytext=(time_steps[-1], new_traj[i][-1]),
                              bbox=dict(boxstyle='round,pad=0.5', fc='white', alpha=0.2), ha='right',
                              arrowprops=dict(facecolor=colors[i], shrink=0.05, ))
 
@@ -550,13 +567,13 @@ class CreateKinematicModel:
                 plt.ylabel('Position [deg]')
                 plt.legend()
             elif self.pva == 1:
-                plt.plot(self.time_steps, new_traj[i], label=f"q{i + 1} vel", color=colors[i])
+                plt.plot(time_steps, new_traj[i], label=f"q{i + 1} vel", color=colors[i])
                 plt.title(f"{self.__robot_name} Cubic Trajectory (Velocity)")
                 plt.xlabel('Time [s]')
                 plt.ylabel('Velocity [m]')
                 plt.legend()
             elif self.pva == 2:
-                plt.plot(self.time_steps, new_traj[i], label=f"q{i + 1} accel", color=colors[i])
+                plt.plot(time_steps, new_traj[i], label=f"q{i + 1} accel", color=colors[i])
                 plt.title(f"{self.__robot_name} Cubic Trajectory (Acceleration)")
                 plt.xlabel('Time [s]')
                 plt.ylabel('Acceleration [m]')
@@ -565,5 +582,27 @@ class CreateKinematicModel:
         plt.show()
 
 
+    def traj_gen(self, tr_lst, trj_time, pva, plot=False):
+        lst = np.array(tr_lst)
+        time_steps = [np.linspace(0, t, 100) for t in trj_time]
+        trjlst = [[lst[i-1],lst[i]] for i in range(1,len(lst))]
+
+        if len(trjlst) < len(trj_time):
+            raise IndexError(f"Cannot generate trajectory : " 
+                             f"trajectory time > waypoints")
+        if len(trjlst) > len(trj_time):
+            raise IndexError(f"Cannot generate trajectory : " 
+                             f"trajectory time < waypoints")
+        
+        trajectory = [self.ptraj(trjlst[i][0], trjlst[i][1], trj_time[i], time_steps[i], pva) 
+                      for i in range(len(trjlst))]
+       
+        if plot:
+            for i in range(len(trajectory)):
+                self.plot(trajectory[i],time_steps[i])
+        return trajectory
+    
+
     def get_num_of_joints(self):
         return self.__num_of_joints
+                                                                                              

@@ -19,7 +19,7 @@ limitations under the License.
 """
 from Libs.RoboKinematics import CreateKinematicModel
 from math import pi
-import numpy  as np
+from timeit import default_timer as timer
 
 '''DH TABLE FOR SAMPLE SCARA ROBOT'''
 '''---------+-------------+--------------+---------------+--------------+
@@ -36,7 +36,7 @@ scara = CreateKinematicModel(
         {
          'frame_name': 'frame0', 
          'joint_type': 'r',
-         'link_length': 0.0, 
+         'link_length': 0.14, 
          'twist': 0.0,
          'offset': 0.4,
          'theta': 0.0
@@ -52,16 +52,26 @@ scara = CreateKinematicModel(
          'joint_type': 'p',
          'link_length': 0.0,
          'twist': 0.0, 
-         'offset': 0.0,
+         'offset': 0.2,
          'theta': 0.0
          }
     ],
     robot_name="SCARA", link_twist_in_rads=True,  # joint_lim_enable=True
 )
 
-qr = scara.set_joints([20,0,0])
-start = scara.get_joint_states(rads=True)
-t = scara.f_kin(qr)
-goal = scara.i_kin([0.1315,  0.0479, -0.1,  3.1416,  0,  0.3491])
-traj = scara.ptraj(start, goal, 5, 0)
-scara.plot(traj)
+
+start = timer()
+trj_time = [1]
+t =  scara.f_kin([90, 0, 0])
+home = scara.get_joint_states(rads=True)
+target_1 = scara.i_kin([0.08367415, 0.17943979, 0.4, 3.14159265, 0, 1.91986218])
+
+jq = [
+    home,
+    target_1
+]
+
+trajectory = scara.traj_gen(jq, trj_time, 0, plot=True)
+end = timer()
+print('It took %.5f s. to execute.' % (end - start))
+
