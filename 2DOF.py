@@ -54,7 +54,9 @@ scara = CreateKinematicModel(
 
 
 start = timer()
+
 trj_time = [5]
+
 t =  scara.f_kin([0, 0])
 home = scara.get_joint_states(rads=True)
 target_1 = scara.i_kin([1,  -1,   0,   0,   0, -90], euler_in_deg=True)

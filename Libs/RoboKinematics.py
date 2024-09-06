@@ -54,6 +54,7 @@ class CreateKinematicModel:
         self.__singuarities = []
         self.quartenion = []
 
+
     def get_dh_table(self):
         dh_params_list = []
         for x in range(len(self.__args)):
@@ -61,6 +62,7 @@ class CreateKinematicModel:
                 dh_params_list.append(items)
         dh_table = np.array(np.split(np.array(dh_params_list), len(self.__args)))
         return dh_table
+    
 
     def set_joints(self, joint_vars, rads=False):
         self.__set_to_rads = rads
@@ -115,8 +117,10 @@ class CreateKinematicModel:
         except ValueError as e:
             print(f"Error: {e}")
 
+
     def get_dh_params(self):
         return self.__dh_param_grouped_list
+    
 
     def f_kin(self, qn, rads=False):     #dh_params
         try:
@@ -176,18 +180,22 @@ class CreateKinematicModel:
         except ValueError as e:
             print(f"Error: {e}")
 
+
     def get_homogeneous_t_matrixes(self):
         print(np.array(self.__homogeneous_t_matrix_))
+
 
     @staticmethod
     def mul(matrix_a, matrix_b):
         result = [[sum(a * b for a, b in zip(A_row, B_col)) for B_col in zip(*matrix_b)] for A_row in matrix_a]
         return result
+    
 
     @staticmethod
     def format(x):
         f = ['{:.3f}'.format(float(item)) for item in x]
         return f
+    
 
     def get_transforms(self, stop_index=0, real=False):
         h_t_matrix = self.__homogeneous_t_matrix_
@@ -208,15 +216,18 @@ class CreateKinematicModel:
         except ValueError as e:
             print(f"Error: {e}")
 
+
     def get_tcp(self):
         t_matrix = self.get_transforms(self.__n_links)
         displacement_vector = [t_matrix[i][3] for i in range(3)]
         return displacement_vector
+    
 
     def get_j_origin(self, index):
         t_matrix = self.get_transforms(index)
         displacement_vector = [t_matrix[i][3] for i in range(3)]
         return displacement_vector
+    
 
     def get_r_matrix(self, index):
         r_matrix = []
@@ -231,6 +242,7 @@ class CreateKinematicModel:
         except ValueError as e:
             print(f"{e}")
 
+
     def set_joint_limit(self, join_limits):
         self.__joint_limits = join_limits
         try:
@@ -240,6 +252,7 @@ class CreateKinematicModel:
         except ValueError as e:
             print(f"Error: {e}")
         return self.__joint_limits
+    
 
     def get_joint_limits(self):
         return self.__joint_limits
@@ -264,6 +277,7 @@ class CreateKinematicModel:
         skewd[2][0] = yb_s
         skewd[1][0] = zb_s
         return skewd
+    
 
     @staticmethod
     def mul_mat_vec(mat, vec):
@@ -275,6 +289,7 @@ class CreateKinematicModel:
         res = [a[i:i + chunk_size3] for i in range(0, len(a), chunk_size3)]
         b = [reduce(lambda ai, bi: ai + bi, res[i]) for i in range(len(res))]
         return b
+    
 
     def jacobian(self):
         o_n = self.get_j_origin(self.__num_of_joints)
@@ -319,7 +334,6 @@ class CreateKinematicModel:
                 joint_state.append(self.get_dh_params()[i][4])
         return joint_state
 
-    # Inverse kinematics solutions
 
     # Searches for singular configurations
     def singular_configs_check(self):
@@ -337,6 +351,7 @@ class CreateKinematicModel:
         elif not sing:
             print("No singularities found *** \n")
 
+
     def lin_ang_velocity(self, joint_vels):
         if len(joint_vels) != self.__num_of_joints:
             raise ValueError(f"input index out of range : max n joint is {self.__num_of_joints}")
@@ -346,6 +361,7 @@ class CreateKinematicModel:
                     raise TypeError("input must be of type integer, float or numpy.ndarray")
         eff_velocity = np.matmul(np.array(self.jacobian()), np.array(joint_vels))
         return eff_velocity
+    
 
     def joint_vels(self, end_eff_vels):
         if len(end_eff_vels) != 6:
@@ -358,6 +374,7 @@ class CreateKinematicModel:
         jvel = np.linalg.pinv(np.array(self.jacobian()))
         result = np.matmul(jvel, np.array(end_eff_vels))
         return result
+    
 
     def SE3(self, T, deg=False):
         try:
@@ -378,6 +395,7 @@ class CreateKinematicModel:
             return vector
         except ValueError as e:
             print(f"Error: {e}")
+            
 
     def i_kin(self, target_position, euler_in_deg=False):
         try:
@@ -491,6 +509,7 @@ class CreateKinematicModel:
         accel = 2 * a2 + 6 * a3 * (t - t0)
         pva = [pos, vel, accel]
         return pva
+    
 
     def ptraj(self, initial, final, tq, time_steps, pva):
         try:
@@ -527,6 +546,7 @@ class CreateKinematicModel:
             return trajectory
         except ValueError as e:
             print(f"Error: {e}")
+
 
     def plot(self, trajectory, time_steps):
 

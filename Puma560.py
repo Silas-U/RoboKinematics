@@ -89,7 +89,9 @@ Puma560 = CreateKinematicModel(
 
 
 start = timer()
+
 trj_time = [5]
+
 t =  Puma560.f_kin([0, 45, -90, 30, 0, 0])
 home = Puma560.get_joint_states(rads=True)
 target_1 = Puma560.i_kin([0.26453836, -0.06334258,  0.45908105, -0.35924867, -0.7797434,  1.07086644])
