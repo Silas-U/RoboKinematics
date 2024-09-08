@@ -637,4 +637,4 @@ class CreateKinematicModel:
 
     def get_num_of_joints(self):
         return self.__num_of_joints
-                                                                                              
+                                                                                             

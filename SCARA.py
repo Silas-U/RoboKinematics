@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from Libs.RoboKinematics import CreateKinematicModel
+from testlib import CreateKinematicModel
 from math import pi
 from timeit import default_timer as timer
 
@@ -56,21 +56,32 @@ scara = CreateKinematicModel(
          'theta': 0.0
          }
     ],
-    robot_name="SCARA", link_twist_in_rads=True,  # joint_lim_enable=True
+    robot_name="SCARA", link_twist_in_rads=True,  joint_lim_enable=True
 )
 
+scara.set_joint_limit(
+    [
+        [0, 90],
+        [0, 90],
+        [0, 0.9]
+    ]
+)
 
 start = timer()
 
-trj_time = [1]
+trj_time = [1,2]
 
-t =  scara.f_kin([90, 0, 0])
+scara.f_kin([20, 20, 0])#90, 30, 0.5 |  10, 30, 0.5
+
 home = scara.get_joint_states(rads=True)
-target_1 = scara.i_kin([0.08367415, 0.17943979, 0.4, 3.14159265, 0, 1.91986218])
+
+target_1 = scara.i_kin([-0.07, 0.26124356, -0.1,  3.14159265,  0,  2.0943951])
+target_2 = scara.i_kin([ 0.24511931, 0.11430101, -0.1, 3.14159265,  0,  0.6981317])
 
 jq = [
     home,
-    target_1
+    target_1,
+    target_2
 ]
 
 trajectory = scara.traj_gen(jq, trj_time, 0, plot=True)
