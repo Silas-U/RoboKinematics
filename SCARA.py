@@ -71,7 +71,7 @@ start = timer()
 
 trj_time = [1,2]
 
-scara.f_kin([20, 20, 0])#90, 30, 0.5 |  10, 30, 0.5
+scara.f_kin([20, 20, 0])# 90, 30, 0.5 |  10, 30, 0.5
 
 home = scara.get_joint_states(rads=True)
 
