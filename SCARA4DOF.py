@@ -29,6 +29,7 @@ import numpy as np
 |     1     |      a1     |      0 deg   |       d1      |    theta1    |
 |     2     |      a2     |      0 deg   |       d2      |    theta2    |
 |     3     |      a3     |      0 deg   |       d3      |    theta3    |
+|     4     |      a4     |      0 deg   |       d4      |    theta4    |
 +-----------+-------------+--------------+---------------+------------'''
 
 # Creates a kinematic model of the SCARA robot
@@ -77,11 +78,8 @@ scara.set_joint_limit(
 )
 
 trj_time = [1]
-
-scara.f_kin([10,20,30,0])
-
+scara.f_kin([30,20,0,0])
 home = scara.get_joint_states(rads=True)
-
 target_1 = scara.i_kin([0.325, 0.275, 0.387, 0, 0, 1.39626342 ], mask=[1,1,1,0,0,1])
 
 jq = [

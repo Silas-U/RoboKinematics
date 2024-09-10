@@ -72,9 +72,7 @@ rb = CreateKinematicModel(
 
 
 start = timer()
-
-trj_time = [1]
-                                                                                                                                                                                                                                       
+trj_time = [1]                                                                                                                                                                                                                                      
 t =  rb.f_kin([10, 90, -90, 50])
 home = rb.get_joint_states(rads=True)
 target_1 = rb.i_kin([0.24248711, 0, 0.1,  3.14159265, 0.52359878, 0])

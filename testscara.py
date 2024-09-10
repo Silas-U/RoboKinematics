@@ -68,11 +68,8 @@ scara.set_joint_limit(
 )
 
 start = timer()
-
 trj_time = [1,5]
-
 scara.f_kin([45, 20, 0.2])# 90, 30, 0.5 |  10, 30, 0.5
-
 home = scara.get_joint_states(rads=True)
 
 target_1 = scara.i_kin([-0.07, 0.26124356, -0.1,  0,  0,  2.0943951], mask=[1,1,1,0,0,1],it_max=100)
