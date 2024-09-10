@@ -411,7 +411,7 @@ class CreateKinematicModel:
             print(f"Error: {e}")
             
 
-    def i_kin(self, target_position, tol=1e-6, it_max=1000, _damp=1e-2, euler_in_deg=False):
+    def i_kin(self, target_position, mask=[1,1,1,1,1,1], tol=1e-6, it_max=100, _damp=1e-2, euler_in_deg=False):
         try:
             if type(target_position) is not np.ndarray:
                 for item in target_position:
@@ -431,6 +431,9 @@ class CreateKinematicModel:
             th = np.zeros(self.__num_of_joints)
             final_conv_error = 0
 
+            mask_p = np.array(mask[:3])     
+            mask_r = np.array(mask[-3:])
+
             i = 0
             
             while True:
@@ -445,26 +448,27 @@ class CreateKinematicModel:
                 p_desired = SE3[0]
 
                 if euler_in_deg:
-                    r_desired = [(r / 180) * m.pi for r in SE3[1]] #Convert to rads
+                    r_desired = np.array([(r / 180) * m.pi for r in SE3[1]]) #Convert to rads
                 else:
-                    r_desired = SE3[1]
+                    pass
+                    r_desired = np.array(SE3[1])
 
                 p_current = current_position[0]
-                r_current = current_position[1]
+                r_current = np.array(current_position[1])
 
                 # Calculates the position error
-                e_position = p_desired - p_current
+                e_position = (p_desired - p_current)*mask_p
 
-                q_desired = R.from_euler('xyz', r_desired, degrees=False).as_quat()  # desired quaternion
-                q_current = R.from_euler('xyz', r_current, degrees=False).as_quat()  # current quaternion
-
+                q_desired = R.from_euler('xyz', r_desired*mask_r, degrees=False).as_quat()  # desired quaternion
+                q_current = R.from_euler('xyz', r_current*mask_r, degrees=False).as_quat()  # current quaternion
+                
                 # Calculates the quaternion error
                 R_error = R.from_quat(q_desired) * R.from_quat(q_current).inv()
                 # Convert the error quaternion to a rotation vector (axis-angle representation)
                 e_orientation = R_error.as_rotvec()
 
                 # Combine the position and orientation errors into a 6D error vector
-                error = np.concatenate((e_position, e_orientation))
+                error = (np.concatenate((e_position, e_orientation)))
 
                 # Checks if the error is within the tolerance
                 if np.linalg.norm(error) < TOL:

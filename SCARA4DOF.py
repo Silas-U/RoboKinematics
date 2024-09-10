@@ -20,6 +20,7 @@ limitations under the License.
 from Libs.RoboKinematics import CreateKinematicModel
 from math import pi
 from timeit import default_timer as timer
+import numpy as np
 
 '''DH TABLE FOR SAMPLE SCARA ROBOT'''
 '''---------+-------------+--------------+---------------+--------------+
@@ -32,19 +33,19 @@ from timeit import default_timer as timer
 
 # Creates a kinematic model of the SCARA robot
 scara = CreateKinematicModel(
-    [
+    [   #   eforce dictionary key names
         {
          'frame_name': 'frame0', 
          'joint_type': 'r',
-         'link_length': 0.14, 
+         'link_length': 0.325, 
          'twist': 0.0,
-         'offset': 0.4,
+         'offset': 0.387,
          'theta': 0.0
         },
         {'frame_name': 'frame1', 
          'joint_type': 'r',
-         'link_length': 0.14,
-         'twist': pi,
+         'link_length': 0.275,
+         'twist': 3.142,
          'offset': 0.0,
          'theta': 0.0
          },
@@ -52,7 +53,14 @@ scara = CreateKinematicModel(
          'joint_type': 'p',
          'link_length': 0.0,
          'twist': 0.0, 
-         'offset': 0.2,
+         'offset': 0.0,
+         'theta': 0.0
+         },
+         {'frame_name': 'frame3', 
+         'joint_type': 'r',
+         'link_length': 0.0,
+         'twist': 0.0, 
+         'offset': 0.0,
          'theta': 0.0
          }
     ],
@@ -61,21 +69,20 @@ scara = CreateKinematicModel(
 
 scara.set_joint_limit(
     [
-        [0, 90],
-        [0, 90],
-        [0, 1]
+        [-90, 90],
+        [-90, 90],
+        [0, 5],
+        [0, 90]
     ]
 )
 
-start = timer()
-
 trj_time = [1]
 
-scara.f_kin([45, 20, 0.2])
+scara.f_kin([10,20,30,0])
 
 home = scara.get_joint_states(rads=True)
 
-target_1 = scara.i_kin([-0.07, 0.26124356, -0.1,  0,  0,  2.0943951], mask=[1,1,1,0,0,1],it_max=100)
+target_1 = scara.i_kin([0.325, 0.275, 0.387, 0, 0, 1.39626342 ], mask=[1,1,1,0,0,1])
 
 jq = [
     home,
@@ -83,5 +90,4 @@ jq = [
 ]
 
 trajectory = scara.traj_gen(jq, trj_time, 0, plot=True)
-end = timer()
-print('It took %.5f s. to execute.' % (end - start))
+

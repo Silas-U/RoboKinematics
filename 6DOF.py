@@ -18,7 +18,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from testlib import CreateKinematicModel
+from Libs.RoboKinematics import CreateKinematicModel
 from timeit import default_timer as timer
 import numpy as np
 import matplotlib.pyplot as plt

@@ -69,19 +69,19 @@ scara.set_joint_limit(
 
 start = timer()
 
-trj_time = [1]
+trj_time = [1,5]
 
 scara.f_kin([45, 20, 0.2])# 90, 30, 0.5 |  10, 30, 0.5
 
 home = scara.get_joint_states(rads=True)
 
-target_1 = scara.i_kin([-0.07, 0.26124356, -0.1,  3.14159265,  0,  2.0943951],it_max=100)
-# target_2 = scara.i_kin([ 0.24511931, 0.11430101, -0.1, 3.14159265,  0,  0.6981317],it_max=100)
+target_1 = scara.i_kin([-0.07, 0.26124356, -0.1,  0,  0,  2.0943951], mask=[1,1,1,0,0,1],it_max=100)
+target_2 = scara.i_kin([ 0.24511931, 0.11430101, -0.1, 0,  0,  0.6981317],mask=[1,1,1,0,0,1],it_max=100)
 
 jq = [
     home,
     target_1,
-    # target_2
+    target_2
 ]
 
 trajectory = scara.traj_gen(jq, trj_time, 0, plot=True)
