@@ -34,7 +34,7 @@ import numpy as np
 
 # Creates a kinematic model of the SCARA robot
 scara = CreateKinematicModel(
-    [   #   eforce dictionary key names
+    [   
         {
          'frame_name': 'frame0', 
          'joint_type': 'r',

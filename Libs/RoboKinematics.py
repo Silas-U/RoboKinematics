@@ -54,13 +54,21 @@ class CreateKinematicModel:
         self.quartenion = []
 
 
+    def validate_keys(self, data):
+        allowed_keys = ['frame_name', 'joint_type', 'link_length', 'twist', 'offset', 'theta']
+        if not all(key in allowed_keys for key in data):
+            raise KeyError(f"Dictionary contains invalid keys. Allowed keys are: {allowed_keys}")
+        return data
+    
+
     def get_dh_table(self):
         dh_params_list = []
         for x in range(len(self.__args)):
-            for items in self.__args[x].items():
+            for items in self.validate_keys(self.__args[x]).items():
                 dh_params_list.append(items)
         dh_table = np.array(np.split(np.array(dh_params_list), len(self.__args)))
         return dh_table
+    
     
     @staticmethod
     def clamp(value, min_value, max_value):
@@ -69,7 +77,7 @@ class CreateKinematicModel:
     def get_joint_type(self):
         joint_t = []
         for i in range(len(self.__args)):
-            for items in self.__args[i]['joint_type']:
+            for items in self.validate_keys(self.__args[i])['joint_type']:
                 joint_t.append(items)
         return joint_t
 
@@ -98,7 +106,7 @@ class CreateKinematicModel:
                 
             dh_params_list = []
             for x in range(len(self.__args)):
-                for items in self.__args[x].items():
+                for items in self.validate_keys(self.__args[x]).items():
                     dh_params_list.append(items[1])
 
             self.__n_links = len(self.__args)

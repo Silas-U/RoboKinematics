@@ -81,7 +81,7 @@ jq = [
     target_2
 ]
 
-trajectory = scara.traj_gen(jq, trj_time, 0, plot=True)
+trajectory = scara.traj_gen(jq, trj_time, 0, plot=False)
 end = timer()
 print('It took %.5f s. to execute.' % (end - start))
 
