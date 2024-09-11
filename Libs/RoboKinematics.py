@@ -142,15 +142,12 @@ class CreateKinematicModel:
         return self.__dh_param_grouped_list
     
 
-    def f_kin(self, qn, rads=False):     #dh_params
+    def f_kin(self, qn, rads=False):
         try:
             dh_params = self.set_joints(qn, rads)
 
-            cumulative_list_row1_data = []
-            cumulative_list_row2_data = []
-            cumulative_list_row3_data = []
-            cumulative_list_row4_data = []
-
+            all_row1, all_row2, all_row3, all_row4 = [],[],[],[]
+            
             if len(dh_params) == 0:
                 raise TypeError(
                     f"Could not calculate fk for {self.__robot_name}, expected {self.__robot_name} joint params")
@@ -168,37 +165,21 @@ class CreateKinematicModel:
                 else:
                     self.__theta = (float(dh_params[col_index][5]) / 180) * m.pi
 
-                # General Homogeneous Transformation Matrix (Formular)
-                row1 = [m.cos(self.__theta), -m.sin(self.__theta) * m.cos(self.__link_twist),
-                        m.sin(self.__theta) * m.sin(self.__link_twist), self.__link_length * m.cos(self.__theta)]
-                row2 = [m.sin(self.__theta), m.cos(self.__theta) * m.cos(self.__link_twist),
-                        -m.cos(self.__theta) * m.sin(self.__link_twist), self.__link_length * m.sin(self.__theta)]
-                row3 = [0.0, m.sin(self.__link_twist), m.cos(self.__link_twist), self.__joint_offset]
-                row4 = [0.0, 0.0, 0.0, 1.0]
+                htm = [[m.cos(self.__theta), -m.sin(self.__theta) * m.cos(self.__link_twist),
+                        m.sin(self.__theta) * m.sin(self.__link_twist), self.__link_length * m.cos(self.__theta)],
+                        [m.sin(self.__theta), m.cos(self.__theta) * m.cos(self.__link_twist),
+                        -m.cos(self.__theta) * m.sin(self.__link_twist), self.__link_length * m.sin(self.__theta)],
+                        [0.0, m.sin(self.__link_twist), m.cos(self.__link_twist), self.__joint_offset],
+                        [0.0, 0.0, 0.0, 1.0]]
 
-                cumulative_list_row1_data.append(row1)
-                cumulative_list_row2_data.append(row2)
-                cumulative_list_row3_data.append(row3)
-                cumulative_list_row4_data.append(row4)
-
-            h_m = [
-                cumulative_list_row1_data,
-                cumulative_list_row2_data,
-                cumulative_list_row3_data,
-                cumulative_list_row4_data
-            ]
-
-            all_hm = []
-
-            for i in range(self.__n_links):
-                all_hm.append(h_m[0][i])
-                all_hm.append(h_m[1][i])
-                all_hm.append(h_m[2][i])
-                all_hm.append(h_m[3][i])
-
-            chunk_size2 = 4
-            transformation_mtrxs = [all_hm[i:i + chunk_size2] for i in range(0, len(all_hm), chunk_size2)]
+                all_row1.append(htm[0])
+                all_row2.append(htm[1])
+                all_row3.append(htm[2])
+                all_row4.append(htm[3])
+                
+            transformation_mtrxs  = [(all_row1[i] ,all_row2[i],all_row3[i], all_row4[i]) for i in range(self.__n_links)]
             self.__homogeneous_t_matrix_ = transformation_mtrxs
+            return transformation_mtrxs
         except ValueError as e:
             print(f"Error: {e}")
 
@@ -280,8 +261,6 @@ class CreateKinematicModel:
         return self.__joint_limits
 
     # ---------------------------------JA--------------------------------------- #
-
-    # ROBOT JACOBIAN ALGORITHM
     @staticmethod
     def skew(vector):
         skew = [[0, -1, 1], [1, 0, -1], [-1, 1, 0]]
@@ -357,7 +336,7 @@ class CreateKinematicModel:
         return joint_state
 
 
-    # Searches for singular configurations
+    # checks for singular configurations
     def singular_configs_check(self):
         sing = False
         jac = self.jacobian()
@@ -557,7 +536,7 @@ class CreateKinematicModel:
             if pva > 2 or pva < 0:
                 pva = 0
 
-            self.pva = pva #position velocity and acceleration
+            self.pva = pva # position velocity and acceleration
 
             t0 = 0.0    # Start time
             tf = tq     # End time

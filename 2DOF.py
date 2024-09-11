@@ -34,19 +34,20 @@ from timeit import default_timer as timer
 scara = CreateKinematicModel(
     [
         {
-         'frame_name': 'frame0', 
-         'joint_type': 'r',
-         'link_length': 1.0, 
-         'twist': 0.0, 
-         'offset': 0.0,
-         'theta': 0.0
+             'frame_name': 'frame0',
+             'joint_type': 'r',
+             'link_length': 1.0,
+             'twist': 0.0,
+             'offset': 0.0,
+             'theta': 0.0
         },
-        {'frame_name': 'frame1', 
-         'joint_type': 'r',
-         'link_length': 1.0,
-         'twist': 0.0,   
-         'offset': 0.0,
-         'theta': 0.0
+        {
+             'frame_name': 'frame1',
+             'joint_type': 'r',
+             'link_length': 1.0,
+             'twist': 0.0,
+             'offset': 0.0,
+             'theta': 0.0
          },
     ],
     robot_name="SCARA", link_twist_in_rads=True
@@ -55,9 +56,9 @@ scara = CreateKinematicModel(
 
 start = timer()
 trj_time = [5]
-t =  scara.f_kin([-25, 25])
+t = scara.f_kin([-25, 25])
 home = scara.get_joint_states(rads=True)
-target_1 = scara.i_kin([1,  -1,   0,   0,   0,  0], mask=[1,1,1,0,0,0], euler_in_deg=True)
+target_1 = scara.i_kin([1,  -1,   0,   0,   0,  0], mask=[1, 1, 1, 0, 0, 0], euler_in_deg=True)
 
 jq = [
     home,
@@ -66,5 +67,4 @@ jq = [
 
 trajectory = scara.traj_gen(jq, trj_time, 0, plot=True)
 end = timer()
-print('It took %.5f s. to execute.' % (end - start))
-
+# print('It took %.5f s. to execute.' % (end - start)) # set plot to False before uncommenting

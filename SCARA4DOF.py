@@ -18,9 +18,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from Libs.RoboKinematics import CreateKinematicModel
-from math import pi
-from timeit import default_timer as timer
-import numpy as np
 
 '''DH TABLE FOR SAMPLE SCARA ROBOT'''
 '''---------+-------------+--------------+---------------+--------------+
@@ -36,33 +33,36 @@ import numpy as np
 scara = CreateKinematicModel(
     [   
         {
-         'frame_name': 'frame0', 
-         'joint_type': 'r',
-         'link_length': 0.325, 
-         'twist': 0.0,
-         'offset': 0.387,
-         'theta': 0.0
+             'frame_name': 'frame0',
+             'joint_type': 'r',
+             'link_length': 0.325,
+             'twist': 0.0,
+             'offset': 0.387,
+             'theta': 0.0
         },
-        {'frame_name': 'frame1', 
-         'joint_type': 'r',
-         'link_length': 0.275,
-         'twist': 3.142,
-         'offset': 0.0,
-         'theta': 0.0
+        {
+             'frame_name': 'frame1',
+             'joint_type': 'r',
+             'link_length': 0.275,
+             'twist': 3.142,
+             'offset': 0.0,
+             'theta': 0.0
          },
-        {'frame_name': 'frame2', 
-         'joint_type': 'p',
-         'link_length': 0.0,
-         'twist': 0.0, 
-         'offset': 0.0,
-         'theta': 0.0
+        {
+             'frame_name': 'frame2',
+             'joint_type': 'p',
+             'link_length': 0.0,
+             'twist': 0.0,
+             'offset': 0.0,
+             'theta': 0.0
          },
-         {'frame_name': 'frame3', 
-         'joint_type': 'r',
-         'link_length': 0.0,
-         'twist': 0.0, 
-         'offset': 0.0,
-         'theta': 0.0
+        {
+             'frame_name': 'frame3',
+             'joint_type': 'r',
+             'link_length': 0.0,
+             'twist': 0.0,
+             'offset': 0.0,
+             'theta': 0.0
          }
     ],
     robot_name="SCARA", link_twist_in_rads=True,  joint_lim_enable=True
@@ -78,9 +78,9 @@ scara.set_joint_limit(
 )
 
 trj_time = [1]
-scara.f_kin([30,20,0,0])
+scara.f_kin([30, 20, 0, 0])
 home = scara.get_joint_states(rads=True)
-target_1 = scara.i_kin([0.325, 0.275, 0.387, 0, 0, 1.39626342 ], mask=[1,1,1,0,0,1])
+target_1 = scara.i_kin([0.325, 0.275, 0.387, 0, 0, 1.39626342], mask=[1, 1, 1, 0, 0, 1])
 
 jq = [
     home,
@@ -88,4 +88,3 @@ jq = [
 ]
 
 trajectory = scara.traj_gen(jq, trj_time, 0, plot=True)
-
