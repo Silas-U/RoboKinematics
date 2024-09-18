@@ -142,17 +142,6 @@ This is the main class in the library, which encapsulates all the functionalitie
   - `link_twist_in_rads`: If `True`, treats the twist angles in radians.
   - `joint_lim_enable`: If `True`, enforces joint limits.
 
-#### **`get_dh_table()`**
-- **Description**: Generates the DH parameter table for the robot based on the input arguments.
-- **Returns**: A NumPy array representing the DH parameters.
-
-#### **`set_joints(joint_vars, rads=False)`**
-- **Description**: Sets the joint variables (either angles for revolute joints or distances for prismatic joints).
-- **Parameters**:
-  - `joint_vars`: A list of joint values (angles or displacements).
-  - `rads`: If `True`, treats input angles in radians; otherwise, treats them in degrees.
-- **Returns**: Updated DH parameter list with the new joint values.
-
 #### **`f_kin(qn, rads=False)`**
 - **Description**: Computes the forward kinematics, i.e., the transformation matrices for each link of the robot.
 - **Parameters**:
@@ -207,6 +196,49 @@ This is the main class in the library, which encapsulates all the functionalitie
 - **Description**: Returns the number of joints in the robot model.
 - **Returns**: Integer representing the number of joints.
 
+
+The `traj_gen()` method in your Python library generates a trajectory based on a list of waypoints and corresponding time intervals for each segment. Here's a more detailed introspection for the `traj_gen()` method.
+
+### **`traj_gen(tr_lst, trj_time, pva, plot=False)`**
+
+#### **Description**:
+The `traj_gen()` method generates a complete trajectory between multiple waypoints (positions) over a specified time for each segment. It allows you to define cubic trajectories for position, velocity, or acceleration, and optionally plot the results.
+
+#### **Parameters**:
+- **`tr_lst`**: A list of waypoints, where each waypoint is a list of joint positions. For example, `[[0, 45, 90], [90, 45, 0]]` represents two waypoints for a 3-joint robot.
+- **`trj_time`**: A list of time intervals for each segment of the trajectory. For example, `[1, 2]` specifies that it will take 1 second to move from the first waypoint to the second, and 2 seconds to move from the second to the third.
+- **`pva`**: A flag indicating whether to generate a trajectory for **position** (`pva = 0`), **velocity** (`pva = 1`), or **acceleration** (`pva = 2`).
+- **`plot`**: A boolean (`True/False`). If `True`, the generated trajectory is plotted.
+
+#### **Returns**:
+- **`trajectory`**: A list of generated trajectories for each joint over time. Each element in the list corresponds to a segment of the full trajectory between two waypoints.
+
+#### **Exceptions**:
+- Raises an `IndexError` if the number of waypoints does not match the number of time intervals.
+- Raises an `IndexError` if either the waypoints list or the time intervals list is empty.
+- Raises a `TypeError` if invalid types are passed as input parameters.
+
+#### **Usage Example**:
+
+```python
+# Define waypoints (joint configurations) and corresponding time intervals
+waypoints = [[0, 45, 90], [90, 45, 0], [45, 90, 45]]
+time_intervals = [1, 2]  # time to move between each pair of waypoints
+
+# Generate a cubic trajectory for position (pva=0) and plot the results
+robot = CreateKinematicModel(dh_params, robot_name="3DOF Robot")
+trajectory = robot.traj_gen(waypoints, time_intervals, pva=0, plot=True)
+```
+
+#### **How It Works**:
+1. **Waypoints and Time Intervals**: The method first checks if the number of waypoints is consistent with the time intervals.
+2. **Segment-wise Trajectory Generation**: For each pair of consecutive waypoints, it generates a cubic trajectory using the `ptraj()` method (position, velocity, or acceleration).
+3. **Optional Plotting**: If `plot=True`, it calls the `plot()` method to visualize the trajectory over time.
+
+#### **Notes**:
+- You can use `traj_gen()` to generate and visualize complex multi-segment trajectories for a robot with multiple joints.
+- The `pva` parameter allows you to specify whether you want the trajectory for position, velocity, or acceleration.
+- **Example Plot**: The method can plot cubic trajectories showing the robot joint positions (or velocities/accelerations) over time for each segment.
 
 ## License
 
