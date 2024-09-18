@@ -19,6 +19,78 @@ To install the required dependencies, you can use the following command:
 pip install numpy scipy matplotlib
 ```
 
+## Usage Examples
+
+### Forward Kinematics Example
+
+```python
+from Libs.RoboKinematics import CreateKinematicModel
+
+# Define Denavit-Hartenberg (DH) parameters for a 2-joint robot
+dh_params = [
+    {"frame_name": "link1", "joint_type": "r", "link_length": 0.5, "twist": 90, "offset": 0.2, "theta": 45},
+    {"frame_name": "link2", "joint_type": "r", "link_length": 0.3, "twist": 0, "offset": 0.1, "theta": 30}
+]
+
+# Create the kinematic model
+robot = CreateKinematicModel(dh_params, robot_name="2DOF Robot")
+
+# Perform forward kinematics
+joint_angles = [45, 30]
+robot.f_kin(joint_angles)
+transformation_matrices = robot.get_transforms(2, real=True)
+jacobian = robot.jacobian()
+print(transformation_matrices,'\n')
+print(jacobian)
+```
+### The output of the program is the transformation matrix from the base frame to the end-effector frame
+### The jacobian can be computed using the - **jacobian()**: method (function)
+
+```python
+[[ 0.61237244 -0.35355339  0.70710678  0.6079758 ]
+ [ 0.61237244 -0.35355339 -0.70710678  0.46655444]
+ [ 0.5         0.8660254   0.          0.35      ]
+ [ 0.          0.          0.          1.        ]]
+
+[[-0.46655444 -0.10606602]
+ [ 0.6079758  -0.10606602]
+ [ 0.          0.25980517]
+ [ 0.          0.70710678]
+ [ 0.         -0.70710678]
+ [ 1.          0.        ]]
+```
+
+
+### Inverse Kinematics Example
+
+```python
+# Target position of the end-effector
+target_position = [0.4, 0.2, 0.3, 0, 0, 0]
+
+# Perform inverse kinematics
+joint_angles = robot.i_kin(target_position)
+print(joint_angles)
+```
+
+### Trajectory Generation Example
+
+```python
+# Generate a trajectory from an initial to a final joint configuration
+initial = [0, 45, 90]
+final = [90, 45, 0]
+time_steps = [0, 0.5, 1]
+
+trajectory = robot.ptraj(initial, final, tq=2, time_steps=[0, 0.5, 1], pva=0)
+robot.plot(trajectory, time_steps)
+```
+
+## Dependencies
+
+- **NumPy**: For matrix and array operations.
+- **SciPy**: For spatial transformations.
+- **Matplotlib**: For trajectory plotting.
+
+
 ## Class and Methods Overview
 
 ### `CreateKinematicModel`
@@ -98,76 +170,6 @@ This is the main class in the library, which encapsulates all the functionalitie
 - **Description**: Returns the number of joints in the robot model.
 - **Returns**: Integer representing the number of joints.
 
-## Usage Examples
-
-### Forward Kinematics Example
-
-```python
-from Libs.RoboKinematics import CreateKinematicModel
-
-# Define Denavit-Hartenberg (DH) parameters for a 2-joint robot
-dh_params = [
-    {"frame_name": "link1", "joint_type": "r", "link_length": 0.5, "twist": 90, "offset": 0.2, "theta": 45},
-    {"frame_name": "link2", "joint_type": "r", "link_length": 0.3, "twist": 0, "offset": 0.1, "theta": 30}
-]
-
-# Create the kinematic model
-robot = CreateKinematicModel(dh_params, robot_name="2DOF Robot")
-
-# Perform forward kinematics
-joint_angles = [45, 30]
-robot.f_kin(joint_angles)
-transformation_matrices = robot.get_transforms(2, real=True)
-jacobian = robot.jacobian()
-print(transformation_matrices,'\n')
-print(jacobian)
-```
-### The output of the program is the transformation matrix from the base frame to the end-effector frame
-### The jacobian can be computed using the - **jacobian()**: method (function)
-
-```python
-[[ 0.61237244 -0.35355339  0.70710678  0.6079758 ]
- [ 0.61237244 -0.35355339 -0.70710678  0.46655444]
- [ 0.5         0.8660254   0.          0.35      ]
- [ 0.          0.          0.          1.        ]]
-
-[[-0.46655444 -0.10606602]
- [ 0.6079758  -0.10606602]
- [ 0.          0.25980517]
- [ 0.          0.70710678]
- [ 0.         -0.70710678]
- [ 1.          0.        ]]
-```
-
-
-### Inverse Kinematics Example
-
-```python
-# Target position of the end-effector
-target_position = [0.4, 0.2, 0.3, 0, 0, 0]
-
-# Perform inverse kinematics
-joint_angles = robot.i_kin(target_position)
-print(joint_angles)
-```
-
-### Trajectory Generation Example
-
-```python
-# Generate a trajectory from an initial to a final joint configuration
-initial = [0, 45, 90]
-final = [90, 45, 0]
-time_steps = [0, 0.5, 1]
-
-trajectory = robot.ptraj(initial, final, tq=2, time_steps=[0, 0.5, 1], pva=0)
-robot.plot(trajectory, time_steps)
-```
-
-## Dependencies
-
-- **NumPy**: For matrix and array operations.
-- **SciPy**: For spatial transformations.
-- **Matplotlib**: For trajectory plotting.
 
 ## License
 
