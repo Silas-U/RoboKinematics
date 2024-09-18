@@ -25,6 +25,6 @@ target_position = [0.96592583, 1.67303261, 0, 0, 0, 1.30899694]
 
 # Perform inverse kinematics
 joint_angles = robot.i_kin(target_position)
-print(np.degrees(joint_angles))
+print(joint_angles)
 
 

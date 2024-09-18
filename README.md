@@ -73,11 +73,20 @@ target_position = [0.96592583, 1.67303261, 0, 0, 0, 1.30899694]
 joint_angles = robot.i_kin(target_position)
 print(joint_angles)
 ```
-Output: 
+Output in rads: 
+```python
+Convergence achieved in iteration <6> : CONV error 0.000007
+[0.7853977230082928, 0.5235994724051174]
+```
+Output in degrees:
+To convert the out put from rads to deg, we use the numpy.degrees function:
+print(np.degrees(joint_angles))
+
 ```python
 Convergence achieved in iteration <6> : CONV error 0.000007
 [44.99997477 30.00003992]
 ```
+
 ### Trajectory Generation Example
 
 ```python
