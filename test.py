@@ -17,11 +17,11 @@ jacobian = robot.jacobian()
 print(transformation_matrices,'\n')
 print(jacobian)
 
-# Target position of the end-effector
-target_position = [0.5, 0.5, 0, 0, 0, 0]
+# # Target position of the end-effector
+# target_position = [0.5, 0.5, 0, 0, 0, 0]
 
-# Perform inverse kinematics
-joint_angles = robot.i_kin(target_position, mask=[1,1,0,0,0,0])
-print(joint_angles)
+# # Perform inverse kinematics
+# joint_angles = robot.i_kin(target_position, mask=[1,1,0,0,0,0])
+# print(joint_angles)
 
 
