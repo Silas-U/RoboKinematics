@@ -46,7 +46,8 @@ print(transformation_matrices,'\n')
 print(jacobian)
 ```
 The output of the program is the transformation matrix from the base frame to the end-effector frame
-The jacobian can be computed using the **jacobian()*: method (function)
+
+The jacobian can be computed using the **jacobian(): method (function)
 
 ```python
 [[ 0.61237244 -0.35355339  0.70710678  0.6079758 ]
