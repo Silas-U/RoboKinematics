@@ -6,10 +6,9 @@
 <td style="border:0px">
 <img src="./images/robokinematics_logo.png" width="200"></td>
 <td style="border:0px">
-A Python implementation of the <a href="https://github.com/petercorke/robotics-toolbox-matlab">Robotics Toolbox for MATLAB<sup>&reg;</sup></a>
- <p>
+
  RoboKinematics is a Python library designed to perform kinematic analysis for an n-degree-of-freedom robot manipulator. This library supports both forward and inverse kinematics, trajectory generation, Jacobian computation, and other essential kinematic functions for robot control.
- </p>
+ 
 </td>
 </tr>
 </table>
