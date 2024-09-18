@@ -33,39 +33,10 @@ from timeit import default_timer as timer
 # Creates a kinematic model of the SCARA robot
 rb = CreateKinematicModel(
     [
-        {
-         'frame_name': 'frame0', 
-         'joint_type': 'r',
-         'link_length': 0.0, 
-         'twist': 90.0, 
-         'offset': 0.1,
-         'theta': 0.0
-        },
-        {
-         'frame_name': 'frame1', 
-         'joint_type': 'r',
-         'link_length': 0.14, 
-         'twist': 0.0, 
-         'offset': 0.0,
-         'theta': 0.0
-        },
-        {
-         'frame_name': 'frame2', 
-         'joint_type': 'r',
-         'link_length': 0.14, 
-         'twist': 90.0, 
-         'offset': 0.0,
-         'theta': 0.0
-        },
-        {
-         'frame_name': 'frame3', 
-         'joint_type': 'r',
-         'link_length': 0.0, 
-         'twist': 0.0, 
-         'offset': 0.0,
-         'theta': 0.0
-        },
-        
+        { 'frame_name': 'frame0', 'joint_type': 'r', 'link_length': 0.0, 'twist': 90.0,'offset': 0.1, 'theta': 0.0 },
+        { 'frame_name': 'frame1', 'joint_type': 'r', 'link_length': 0.14,'twist': 0.0, 'offset': 0.0, 'theta': 0.0 },
+        { 'frame_name': 'frame2', 'joint_type': 'r', 'link_length': 0.14,'twist': 90.0,'offset': 0.0, 'theta': 0.0 },
+        { 'frame_name': 'frame3', 'joint_type': 'r', 'link_length': 0.0, 'twist': 0.0, 'offset': 0.0, 'theta': 0.0 },
     ],
     robot_name="4DOF",
 )
@@ -85,6 +56,4 @@ jq = [
 trajectory = rb.traj_gen(jq, trj_time, 0, plot=True)
 end = timer()
 # print('It took %.5f s. to execute.' % (end - start)) # set plot to False before uncommenting
-
-
 

@@ -44,22 +44,8 @@ client_socket.connect((esp32_ip, port))
 # Creates a kinematic model of the SCARA robot
 scara = CreateKinematicModel(
     [
-        {
-             'frame_name': 'frame0',
-             'joint_type': 'r',
-             'link_length': 1.0,
-             'twist': 0.0,
-             'offset': 0.0,
-             'theta': 0.0
-        },
-        {
-             'frame_name': 'frame1',
-             'joint_type': 'r',
-             'link_length': 1.0,
-             'twist': 0.0,
-             'offset': 0.0,
-             'theta': 0.0
-         },
+        { 'frame_name': 'frame0', 'joint_type': 'r', 'link_length': 1.0, 'twist': 0.0, 'offset': 0.0, 'theta': 0.0 },
+        { 'frame_name': 'frame1', 'joint_type': 'r', 'link_length': 1.0, 'twist': 0.0, 'offset': 0.0, 'theta': 0.0 },
     ],
     robot_name="SCARA", link_twist_in_rads=True
 )

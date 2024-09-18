@@ -37,54 +37,12 @@ Joint 6     0               0       0           0
 
 robot = CreateKinematicModel(
     [
-        {
-         'frame_name': 'frame0',
-         'joint_type': 'r',
-         'link_length': 0.05, 
-         'twist': 90.0, 
-         'offset': 0.105,
-         'theta': 0.0
-        },
-        {
-         'frame_name': 'frame1', 
-         'joint_type': 'r',
-         'link_length': 0.14, 
-         'twist': 0.0, 
-         'offset': 0.0,
-         'theta': 0.0
-        },
-        {
-         'frame_name': 'frame2', 
-         'joint_type': 'r',
-         'link_length': 0.17, 
-         'twist': 90.0, 
-         'offset': 0.0,
-         'theta': 0.0
-        },
-        {
-         'frame_name': 'frame3', 
-         'joint_type': 'r',
-         'link_length': 0.0, 
-         'twist': -90.0, 
-         'offset': 0.0,
-         'theta': 0.0
-        },
-        {
-         'frame_name': 'frame4', 
-         'joint_type': 'r',
-         'link_length': 0.0, 
-         'twist': 90.0, 
-         'offset': 0.0,
-         'theta': 0.0
-        },
-        {
-         'frame_name': 'frame5', 
-         'joint_type': 'r',
-         'link_length': 0.0, 
-         'twist': 0.0, 
-         'offset': 0.02,
-         'theta': 0.0
-        },
+        { 'frame_name': 'frame0', 'joint_type': 'r', 'link_length': 0.05, 'twist': 90.0, 'offset': 0.105, 'theta': 0.0 },
+        { 'frame_name': 'frame1', 'joint_type': 'r', 'link_length': 0.14, 'twist': 0.0,  'offset': 0.0, 'theta': 0.0 },
+        { 'frame_name': 'frame2', 'joint_type': 'r', 'link_length': 0.17, 'twist': 90.0, 'offset': 0.0, 'theta': 0.0 },
+        { 'frame_name': 'frame3', 'joint_type': 'r', 'link_length': 0.0,  'twist': -90.0,'offset': 0.0, 'theta': 0.0 },
+        { 'frame_name': 'frame4', 'joint_type': 'r', 'link_length': 0.0,  'twist': 90.0, 'offset': 0.0, 'theta': 0.0 },
+        { 'frame_name': 'frame5', 'joint_type': 'r', 'link_length': 0.0,  'twist': 0.0,  'offset': 0.02,'theta': 0.0 },
     ],
     robot_name="6DOF")
 
