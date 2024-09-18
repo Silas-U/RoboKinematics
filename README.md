@@ -91,12 +91,35 @@ Convergence achieved in iteration <6> : CONV error 0.000007
 
 ```python
 # Generate a trajectory from an initial to a final joint configuration
-initial = [0, 45, 90]
-final = [90, 45, 0]
-time_steps = [0, 0.5, 1]
+from Libs.RoboKinematics import CreateKinematicModel
 
-trajectory = robot.ptraj(initial, final, tq=2, time_steps=[0, 0.5, 1], pva=0)
-robot.plot(trajectory, time_steps)
+# Define Denavit-Hartenberg (DH) parameters for a 2-joint robot
+dh_params = [
+    {"frame_name": "link1", "joint_type": "r", "link_length": 1.0, "twist": 0, "offset": 0, "theta": 0},
+    {"frame_name": "link2", "joint_type": "r", "link_length": 1.0, "twist": 0, "offset": 0, "theta": 0}
+]
+
+# Create the kinematic model
+robot = CreateKinematicModel(dh_params, robot_name="2DOF Robot")
+
+# Perform forward kinematics
+joint_angles = [0, 0]
+robot.f_kin(joint_angles)
+
+# Target position of the end-effector
+target_position = [0.96592583, 1.67303261, 0, 0, 0, 1.30899694]
+
+# Generate a trajectory from an initial to a final joint configuration
+initial = robot.get_joint_states(rads=True)
+final = robot.i_kin(target_position)
+
+jt = [
+       initial,
+       final 
+    ]
+time_steps = [1]
+
+trajectory = robot.traj_gen(jt, time_steps, 0, plot=True)
 ```
 
 ## Dependencies
