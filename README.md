@@ -196,7 +196,7 @@ This is the main class in the library, which encapsulates all the functionalitie
 - **Description**: Returns the number of joints in the robot model.
 - **Returns**: Integer representing the number of joints.
 
-### **`traj_gen(tr_lst, trj_time, pva, plot=False)`**
+#### **`traj_gen(tr_lst, trj_time, pva, plot=False)`**
 
 #### **Description**:
 The `traj_gen()` method generates a complete trajectory between multiple waypoints (positions) over a specified time for each segment. It allows you to define cubic trajectories for position, velocity, or acceleration, and optionally plot the results.
