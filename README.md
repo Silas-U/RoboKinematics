@@ -196,9 +196,6 @@ This is the main class in the library, which encapsulates all the functionalitie
 - **Description**: Returns the number of joints in the robot model.
 - **Returns**: Integer representing the number of joints.
 
-
-The `traj_gen()` method in your Python library generates a trajectory based on a list of waypoints and corresponding time intervals for each segment. Here's a more detailed introspection for the `traj_gen()` method.
-
 ### **`traj_gen(tr_lst, trj_time, pva, plot=False)`**
 
 #### **Description**:
@@ -212,11 +209,6 @@ The `traj_gen()` method generates a complete trajectory between multiple waypoin
 
 #### **Returns**:
 - **`trajectory`**: A list of generated trajectories for each joint over time. Each element in the list corresponds to a segment of the full trajectory between two waypoints.
-
-#### **Exceptions**:
-- Raises an `IndexError` if the number of waypoints does not match the number of time intervals.
-- Raises an `IndexError` if either the waypoints list or the time intervals list is empty.
-- Raises a `TypeError` if invalid types are passed as input parameters.
 
 #### **Usage Example**:
 
