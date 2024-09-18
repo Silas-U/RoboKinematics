@@ -10,7 +10,7 @@ dh_params = [
 robot = CreateKinematicModel(dh_params, robot_name="2DOF Robot")
 
 # Perform forward kinematics
-joint_angles = [0, 0]
+joint_angles = [20, 30]
 robot.f_kin(joint_angles)
 
 # Target position of the end-effector
@@ -25,7 +25,7 @@ jt = [
        final 
     ]
 
-trajectory = robot.traj_gen(jt, trj_time=[1], pva=0, plot=True)
+trajectory = robot.traj_gen(jt, trj_time=[1], pva=2, plot=True)
 
 
 

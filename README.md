@@ -210,6 +210,8 @@ trajectory = robot.traj_gen(waypoints, time_intervals, pva=0, plot=True)
 - The `pva` parameter allows you to specify whether you want the trajectory for position, velocity, or acceleration.
 - **Example Plot**: The method can plot cubic trajectories showing the robot joint positions (or velocities/accelerations) over time for each segment.
 
+![RoboKinematics Example](./images/2dof_Fig1.png)
+
 ## License
 
 This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](http://www.apache.org/licenses/LICENSE-2.0) file for details.
