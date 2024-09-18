@@ -4,7 +4,7 @@
 <table style="border:0px">
 <tr style="border:0px">
 <td style="border:0px">
-<img src="./images/robokinematics_logo.png" width="400"></td>
+<img src="./images/robokinematics_logo.png" width="500"></td>
 <td style="border:0px">
 
  RoboKinematics is a Python library designed to perform kinematic analysis for an n-degree-of-freedom robot manipulator. This library supports both forward and inverse kinematics, trajectory generation, Jacobian computation.
