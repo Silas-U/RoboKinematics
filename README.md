@@ -175,23 +175,6 @@ This is the main class in the library, which encapsulates all the functionalitie
 - **Description**: Checks for singular configurations, where the robot's Jacobian matrix loses rank, indicating potential issues in control.
 - **Returns**: Prints whether a singularity is found.
 
-#### **`ptraj(initial, final, tq, time_steps, pva)`**
-- **Description**: Generates a cubic polynomial trajectory between two joint configurations.
-- **Parameters**:
-  - `initial`: Initial joint configuration.
-  - `final`: Final joint configuration.
-  - `tq`: Total time for the trajectory.
-  - `time_steps`: Time points at which the trajectory is evaluated.
-  - `pva`: 0 for position, 1 for velocity, and 2 for acceleration trajectory.
-- **Returns**: Generated trajectory.
-
-#### **`plot(trajectory, time_steps)`**
-- **Description**: Plots the generated trajectory (position, velocity, or acceleration) over time.
-- **Parameters**:
-  - `trajectory`: The trajectory data to be plotted.
-  - `time_steps`: Time points at which the trajectory is evaluated.
-- **Returns**: A plot of the trajectory.
-
 #### **`get_num_of_joints()`**
 - **Description**: Returns the number of joints in the robot model.
 - **Returns**: Integer representing the number of joints.
@@ -221,11 +204,6 @@ time_intervals = [1, 2]  # time to move between each pair of waypoints
 robot = CreateKinematicModel(dh_params, robot_name="3DOF Robot")
 trajectory = robot.traj_gen(waypoints, time_intervals, pva=0, plot=True)
 ```
-
-#### **How It Works**:
-1. **Waypoints and Time Intervals**: The method first checks if the number of waypoints is consistent with the time intervals.
-2. **Segment-wise Trajectory Generation**: For each pair of consecutive waypoints, it generates a cubic trajectory using the `ptraj()` method (position, velocity, or acceleration).
-3. **Optional Plotting**: If `plot=True`, it calls the `plot()` method to visualize the trajectory over time.
 
 #### **Notes**:
 - You can use `traj_gen()` to generate and visualize complex multi-segment trajectories for a robot with multiple joints.
