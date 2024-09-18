@@ -79,7 +79,7 @@ Convergence achieved in iteration <6> : CONV error 0.000007
 [0.7853977230082928, 0.5235994724051174]
 ```
 Output in degrees:
-To convert the out put from rads to deg, we use the numpy.degrees function:
+To convert the output to deg, we use the numpy.degrees function:
 print(np.degrees(joint_angles))
 
 ```python
