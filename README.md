@@ -45,7 +45,7 @@ jacobian = robot.jacobian()
 print(transformation_matrices,'\n')
 print(jacobian)
 ```
-The output of the program is the transformation matrix from the base frame to the end-effector frame
+The output of the program is the transformation matrix from the base frame to the end-effector frame.
 The jacobian can be computed using the jacobian(): method (function)
 
 ```python
