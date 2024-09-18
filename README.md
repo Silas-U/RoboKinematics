@@ -62,20 +62,20 @@ robot.plot(trajectory, time_steps)
 ```
 ## Dependencies
 
-# numpy: Used for mathematical operations.
-# scipy: Utilized for transformations and solving matrices.
-# matplotlib: For plotting trajectories.
-# math: Built-in Python module for mathematical calculations.
+**numpy: Used for mathematical operations.**
+**scipy: Utilized for transformations and solving matrices.**
+**matplotlib: For plotting trajectories.**
+**math: Built-in Python module for mathematical calculations.**
 
 # License
 
-# This project is licensed under the Apache License, Version 2.0 - see the LICENSE file for details.
-# Contributing
+**This project is licensed under the Apache License, Version 2.0 - see the LICENSE file for details.**
+**Contributing**
 
-# Contributions are welcome! Please feel free to open an issue or submit a pull request on GitHub.
-# Author
+**Contributions are welcome! Please feel free to open an issue or submit a pull request on GitHub.**
+**Author**
 
-# Silas Udofia
+**Silas Udofia*
 
 ```bash
 
