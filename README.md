@@ -1,5 +1,4 @@
 
-```markdown
 # RoboKinematics Library
 
 RoboKinematics is a Python library designed to perform kinematic analysis for an n-degree-of-freedom robot manipulator. This library supports both forward and inverse kinematics, trajectory generation, Jacobian computation, and other essential kinematic functions for robot control.
