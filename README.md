@@ -36,7 +36,7 @@ To install the required dependencies, you will need Python >= 3.6
 To download the latest version of python, you can visit the [official python page](https://www.python.org/downloads/).
 
 
-You can use the following command:
+use the following command to download the required dependencies:
 ```bash
 pip install numpy scipy matplotlib
 ```
