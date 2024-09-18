@@ -1,4 +1,5 @@
 from Libs.RoboKinematics import CreateKinematicModel
+import numpy as np
 
 # Define Denavit-Hartenberg (DH) parameters for a 2-joint robot
 dh_params = [
@@ -10,18 +11,20 @@ dh_params = [
 robot = CreateKinematicModel(dh_params, robot_name="2DOF Robot")
 
 # Perform forward kinematics
-joint_angles = [45, 30]
+joint_angles = [0, 0]
 robot.f_kin(joint_angles)
 transformation_matrices = robot.get_transforms(2, real=True)
 jacobian = robot.jacobian()
 print(transformation_matrices,'\n')
 print(jacobian)
 
-# # Target position of the end-effector
-# target_position = [0.5, 0.5, 0, 0, 0, 0]
+# print(robot.SE3(transformation_matrices))
 
-# # Perform inverse kinematics
-# joint_angles = robot.i_kin(target_position, mask=[1,1,0,0,0,0])
-# print(joint_angles)
+# Target position of the end-effector
+target_position = [0.96592583, 1.67303261, 0, 0, 0, 1.30899694]
+
+# Perform inverse kinematics
+joint_angles = robot.i_kin(target_position)
+print(np.degrees(joint_angles))
 
 

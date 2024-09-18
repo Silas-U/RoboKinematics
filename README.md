@@ -67,13 +67,17 @@ The jacobian can be computed using the jacobian(): method (function)
 
 ```python
 # Target position of the end-effector
-target_position = [0.5, 0.5, 0, 0, 0, 0]
+target_position = [0.96592583, 1.67303261, 0, 0, 0, 1.30899694]
 
 # Perform inverse kinematics
-joint_angles = robot.i_kin(target_position, mask=[1,1,0,0,0,0])
+joint_angles = robot.i_kin(target_position)
 print(joint_angles)
 ```
-
+Output: 
+```python
+Convergence achieved in iteration <6> : CONV error 0.000007
+[44.99997477 30.00003992]
+```
 ### Trajectory Generation Example
 
 ```python
