@@ -2,7 +2,7 @@
 # RoboKinematics Library
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/roboticstoolbox-python.svg)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)
 
 <table style="border:0px">
 <tr style="border:0px">
