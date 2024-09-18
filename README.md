@@ -5,7 +5,6 @@
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![Downloads](https://img.shields.io/badge/downloads-100k-blue)
 
 
 <table style="border:0px">
@@ -32,8 +31,9 @@
 
 ## Installation
 
-To install the required dependencies, you can use the following command:
+To install the required dependencies, you will need Python >= 3.6
 
+You can use the following command:
 ```bash
 pip install numpy scipy matplotlib
 ```
