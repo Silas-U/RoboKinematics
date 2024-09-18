@@ -1,6 +1,24 @@
 
 # RoboKinematics Library
 
+<table style="border:0px">
+<tr style="border:0px">
+<td style="border:0px">
+<img src="./images/robokinematics_logo.png" width="200"></td>
+<td style="border:0px">
+A Python implementation of the <a href="https://github.com/petercorke/robotics-toolbox-matlab">Robotics Toolbox for MATLAB<sup>&reg;</sup></a>
+<ul>
+<li><a href="https://github.com/petercorke/robotics-toolbox-python">GitHub repository </a></li>
+<li><a href="https://petercorke.github.io/robotics-toolbox-python">Documentation</a></li>
+<li><a href="#6">ICRA Paper</a></li>
+<li><a href="https://github.com/petercorke/robotics-toolbox-python/wiki">Wiki (examples and details)</a></li>
+</ul>
+</td>
+</tr>
+</table>
+
+<!-- <br> -->
+
 RoboKinematics is a Python library designed to perform kinematic analysis for an n-degree-of-freedom robot manipulator. This library supports both forward and inverse kinematics, trajectory generation, Jacobian computation, and other essential kinematic functions for robot control.
 
 ## Features
@@ -229,3 +247,10 @@ Contributions are welcome! Please open an issue or submit a pull request on [Git
 ## Author
 
 **Silas Udofia (Silas-U)**
+
+
+
+
+
+
+
