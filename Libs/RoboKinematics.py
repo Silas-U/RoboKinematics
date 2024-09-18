@@ -437,7 +437,6 @@ class CreateKinematicModel:
                 if euler_in_deg:
                     r_desired = np.array([(r / 180) * m.pi for r in SE3[1]]) #Convert to rads
                 else:
-                    pass
                     r_desired = np.array(SE3[1])
 
                 p_current = current_position[0]
