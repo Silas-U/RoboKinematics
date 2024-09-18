@@ -118,15 +118,27 @@ robot = CreateKinematicModel(dh_params, robot_name="2DOF Robot")
 joint_angles = [45, 30]
 robot.f_kin(joint_angles)
 transformation_matrices = robot.get_transforms(2, real=True)
-print(transformation_matrices)
+jacobian = robot.jacobian()
+print(transformation_matrices,'\n')
+print(jacobian)
 ```
-### The output is the homogeneneous transformation matrix from the base frame to the end-effector frame
+### The output of the program is the transformation matrix from the base frame to the end-effector frame
+### The jacobian can be computed using the - **jacobian()**: method (function)
+
 ```python
 [[ 0.61237244 -0.35355339  0.70710678  0.6079758 ]
  [ 0.61237244 -0.35355339 -0.70710678  0.46655444]
  [ 0.5         0.8660254   0.          0.35      ]
  [ 0.          0.          0.          1.        ]]
+
+ [[-0.46655444 -0.10606602]
+ [ 0.6079758  -0.10606602]
+ [ 0.          0.25980517]
+ [ 0.          0.70710678]
+ [ 0.         -0.70710678]
+ [ 1.          0.        ]]
 ```
+
 
 ### Inverse Kinematics Example
 

@@ -13,4 +13,6 @@ robot = CreateKinematicModel(dh_params, robot_name="2DOF Robot")
 joint_angles = [45, 30]
 robot.f_kin(joint_angles)
 transformation_matrices = robot.get_transforms(2, real=True)
-print(transformation_matrices)
+jacobian = robot.jacobian()
+print(transformation_matrices,'\n')
+print(jacobian)
