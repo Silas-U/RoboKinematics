@@ -103,7 +103,7 @@ This is the main class in the library, which encapsulates all the functionalitie
 ### Forward Kinematics Example
 
 ```python
-from RoboKinematics import CreateKinematicModel
+from Libs.RoboKinematics import CreateKinematicModel
 
 # Define Denavit-Hartenberg (DH) parameters for a 2-joint robot
 dh_params = [
@@ -116,8 +116,16 @@ robot = CreateKinematicModel(dh_params, robot_name="2DOF Robot")
 
 # Perform forward kinematics
 joint_angles = [45, 30]
-transformation_matrices = robot.f_kin(joint_angles)
+robot.f_kin(joint_angles)
+transformation_matrices = robot.get_transforms(2, real=True)
 print(transformation_matrices)
+```
+### The output is the homogeneneous transformation matrix from the base frame to the end-effector frame
+```python
+[[ 0.61237244 -0.35355339  0.70710678  0.6079758 ]
+ [ 0.61237244 -0.35355339 -0.70710678  0.46655444]
+ [ 0.5         0.8660254   0.          0.35      ]
+ [ 0.          0.          0.          1.        ]]
 ```
 
 ### Inverse Kinematics Example
