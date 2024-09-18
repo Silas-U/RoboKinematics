@@ -214,6 +214,10 @@ trajectory = robot.traj_gen(waypoints, time_intervals, pva=0, plot=True)
 
 ![RoboKinematics Example](./images/2dof_Fig_2.png)
 
+![RoboKinematics Example](./images/2dof_Fig_1_velocity.png)
+
+![RoboKinematics Example](./images/2dof_fig1_accel.png)
+
 ## License
 
 This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](http://www.apache.org/licenses/LICENSE-2.0) file for details.
