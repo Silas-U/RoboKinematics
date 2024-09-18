@@ -45,8 +45,8 @@ jacobian = robot.jacobian()
 print(transformation_matrices,'\n')
 print(jacobian)
 ```
-### The output of the program is the transformation matrix from the base frame to the end-effector frame
-### The jacobian can be computed using the - **jacobian()**: method (function)
+The output of the program is the transformation matrix from the base frame to the end-effector frame
+The jacobian can be computed using the **jacobian()*: method (function)
 
 ```python
 [[ 0.61237244 -0.35355339  0.70710678  0.6079758 ]
@@ -70,7 +70,7 @@ print(jacobian)
 target_position = [0.5, 0.5, 0, 0, 0, 0]
 
 # Perform inverse kinematics
-joint_angles = robot.i_kin(target_position, mask=[1,1,1,0,0,0])
+joint_angles = robot.i_kin(target_position, mask=[1,1,0,0,0,0])
 print(joint_angles)
 ```
 
