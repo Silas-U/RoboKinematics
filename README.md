@@ -117,9 +117,8 @@ jt = [
        initial,
        final 
     ]
-time_steps = [1]
 
-trajectory = robot.traj_gen(jt, time_steps, 0, plot=True)
+trajectory = robot.traj_gen(jt, trj_time=[1], pva=0, plot=True)
 ```
 
 ## Dependencies
