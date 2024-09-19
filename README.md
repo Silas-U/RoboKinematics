@@ -10,7 +10,7 @@
 <table style="border:0px">
 <tr style="border:0px">
 <td style="border:0px">
-<img src="./images/robokinematics_logo.png" width="500"></td>
+<img src="./images/DALL·E 2024-09-19 11.06.05 - A modern, clean logo featuring only a blue robotic arm with a futuristic design. The arm should have smooth lines, a metallic sheen, and a high-tech f.webp" width="500"></td>
 <td style="border:0px">
 
  RoboKinematics is a Python library designed to perform kinematic analysis for an n-degree-of-freedom robot manipulator. This library supports both forward and inverse kinematics, trajectory generation, Jacobian computation.
