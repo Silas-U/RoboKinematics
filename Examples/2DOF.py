@@ -17,10 +17,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-
-from Libs.RoboKinematics import CreateKinematicModel
+from Src.RoboKinematics import CreateKinematicModel
 from timeit import default_timer as timer
 import numpy as np
+
 
 '''DH TABLE FOR SAMPLE 2DOF ROBOT'''
 '''---------+-------------+--------------+---------------+--------------+
@@ -29,9 +29,6 @@ import numpy as np
 |     1     |      a1     |      0 deg   |       d1      |    theta1    |
 |     2     |      a2     |      0 deg   |       d2      |    theta2    |
 +-----------+-------------+--------------+---------------+------------'''
-
-
-from Libs.RoboKinematics import CreateKinematicModel
 
 # Define Denavit-Hartenberg (DH) parameters for a 2-joint robot
 dh_params = [

@@ -1,4 +1,4 @@
-from Libs.RoboKinematics import CreateKinematicModel
+from Src.RoboKinematics import CreateKinematicModel
 
 # Define Denavit-Hartenberg (DH) parameters for a 2-joint robot
 dh_params = [

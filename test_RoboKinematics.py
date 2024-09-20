@@ -1,5 +1,5 @@
 import unittest
-from Libs.RoboKinematics import CreateKinematicModel
+from Src.RoboKinematics import CreateKinematicModel
 from math import pi
 import numpy as np
 from numpy.testing import assert_array_equal
@@ -176,7 +176,7 @@ class TestRoboKinematics(unittest.TestCase):
 
         final = self.scara.i_kin(t)
 
-        expected_final = [45.0, 20.0]
+        expected_final = np.deg2rad([45.0, 20.0])
 
         assert_array_equal(final, expected_final)
 

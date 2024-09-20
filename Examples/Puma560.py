@@ -18,7 +18,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from Libs.RoboKinematics import CreateKinematicModel
+from Src.RoboKinematics import CreateKinematicModel
 from timeit import default_timer as timer
 
 """

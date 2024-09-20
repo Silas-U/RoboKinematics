@@ -46,7 +46,7 @@ pip install numpy scipy matplotlib
 ### Forward Kinematics Example
 
 ```python
-from Libs.RoboKinematics import CreateKinematicModel
+from RoboKinematics import CreateKinematicModel
 
 # Define Denavit-Hartenberg (DH) parameters for a 2-joint robot
 dh_params = [
@@ -119,7 +119,7 @@ Convergence achieved in iteration <0> : CONV error 0.000007
 ### Trajectory Generation Example
 
 ```python
-from Libs.RoboKinematics import CreateKinematicModel
+from RoboKinematics import CreateKinematicModel
 
 # Define Denavit-Hartenberg (DH) parameters for a 2-joint robot
 dh_params = [
