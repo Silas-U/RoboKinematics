@@ -225,12 +225,23 @@ The `traj_gen()` method generates a complete trajectory between multiple waypoin
 
 ```python
 # Define waypoints (joint configurations) and corresponding time intervals
-waypoints = [[0, 45, 90], [90, 45, 0], [45, 90, 45]]
-time_intervals = [1, 2]  # time to move between each pair of waypoints
+way_points  = [
+    [3.60000000e-01, -2.44929360e-18,  8.50000000e-02, 3.14159265e+00,  0.00000000e+00,  0.00000000e+00],
+    [2.20000000e-01,  6.12323400e-18,  2.25000000e-01, 3.14159265e+00,  0.00000000e+00, -5.23598776e-01],
+    [0.16,   0.24248711,  0.21624356,-2.15879893, -0.4478324,  -1.8133602],
+    [2.20000000e-01,  6.12323400e-18,  2.25000000e-01, 3.14159265e+00,  0.00000000e+00, -5.23598776e-01],
+]
 
 # Generate a cubic trajectory for position (pva=0) and plot the results
-robot = CreateKinematicModel(dh_params, robot_name="3DOF Robot")
-trajectory = robot.traj_gen(waypoints, time_intervals, pva=0, plot=True)
+time_intervals = [1, 2, 3]  # time to move between each pair of waypoints
+
+robot = CreateKinematicModel(dh_params, robot_name="6DOF Robot")
+
+robot.f_kin([0, 0, 0, 0, 0, 0])
+
+q = [robot.i_kin(way_point, it_max=100) for way_point way_points]     
+
+trajectory = robot.traj_gen(q, time_intervals, 0, plot=True)
 ```
 
 #### **Notes**:
@@ -238,11 +249,25 @@ trajectory = robot.traj_gen(waypoints, time_intervals, pva=0, plot=True)
 - The `pva` parameter allows you to specify whether you want the trajectory for position, velocity, or acceleration.
 - **Example Plot**: The method can plot cubic trajectories showing the robot joint positions (or velocities/accelerations) over time for each segment.
 
-![RoboKinematics Example](./images/2dof_Fig1.png)
+<!-- ![RoboKinematics Example](./images/2dof_Fig1.png)
 
 ![RoboKinematics Example](./images/2dof_Fig_1_velocity.png)
 
-![RoboKinematics Example](./images/2dof_fig1_accel.png)
+![RoboKinematics Example](./images/2dof_fig1_accel.png) -->
+
+<table style="border:0px">
+<tr style="border:0px">
+<td style="border:0px">
+<img src="./images/2dof_Fig1.png" width="500">
+</td>
+<td style="border:0px">
+<img src="./images/2dof_Fig_1_velocity.png" width="500"></td>
+</td>
+<td style="border:0px">
+<img src="./images/2dof_fig1_accel.png" width="500">
+</td>
+</tr>
+</table>
 
 ## License
 
