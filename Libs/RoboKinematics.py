@@ -30,6 +30,10 @@ class CreateKinematicModel:
         if len(args) == 0:
             raise ValueError("non descriptive model, DH params list cannot be empty")
         
+        for x in range(len(args)):
+            for items in self.validate_keys(args[x]).items():
+                pass
+        
         self.time_steps = None
         self.pva = None
         self.success = None
@@ -120,12 +124,11 @@ class CreateKinematicModel:
             self.__joint_type_info = joint_type_arr
 
             if len(clamped_values) > self.__num_of_joints:
-                raise IndexError(f"Joint variables out of range: Your {self.__robot_name} robot has only "
-                                 f"{self.__num_of_joints} joints of type: {joint_type_arr}")
+                raise IndexError(f"Invalid input: the joint angles provided does not match the number of joints in the robot model.\n" 
+                                 f"Expected {self.__num_of_joints} but received {len(joint_vars)}.")
             elif len(clamped_values) < self.__num_of_joints:
-                raise IndexError(f"Joint variables insufficient: Your {self.__robot_name} robot has only "
-                                 f"{self.__num_of_joints} joints of type: {joint_type_arr}")
-
+                raise IndexError(f"Invalid input: the joint angles provided does not match the number of joints in the robot model.\n" 
+                                 f"Expected {self.__num_of_joints} but received {len(joint_vars)}.")
             for i in range(self.__num_of_joints):
                 if dh_param_g_list[i][1] == "r":
                     dh_param_g_list[i][5] = float(clamped_values[i])
@@ -377,7 +380,7 @@ class CreateKinematicModel:
         return result
     
 
-    def SE3(self, T, deg=False):
+    def SE3(self, T, deg=False, merge_res=False):
         try:
             if type(T) is not np.ndarray:
                 for item in T:
@@ -392,8 +395,10 @@ class CreateKinematicModel:
             euler_angles = r.as_euler('xyz', degrees=deg)  # angles in radians
             self.quartenion = r.as_quat()
             # Combine position and orientation into a 1x6 array (vector)
-            vector = np.array([position, euler_angles])
-            return vector
+            if merge_res:
+                return np.concatenate([position, euler_angles])
+            else:
+                return np.array([position, euler_angles])
         except ValueError as e:
             print(f"Error: {e}")
             
@@ -428,7 +433,7 @@ class CreateKinematicModel:
                 
                 fk = self.get_transforms(self.__num_of_joints)
 
-                current_position = self.SE3(fk)  # index 0 = position_vector, 1=eular_angles zyx
+                current_position = self.SE3(fk, merge_res=False)  # index 0 = position_vector, 1=eular_angles zyx
 
                 SE3 = [target_position[i:i + 3] for i in range(0, 4, 3)]
 
@@ -483,15 +488,18 @@ class CreateKinematicModel:
                 i += 1
 
             if self.success:
+                
                 print(f"Convergence achieved in iteration <{i}> : CONV error {final_conv_error}")
-                j_states = self.get_joint_states()
 
-                # self.set_joints(zero_vals, rads=True)
+                if i == 0:
+                    j_states = self.get_joint_states(rads=True)
+                else:
+                    j_states = self.get_joint_states(rads=False)
+
                 self.f_kin(np.zeros(self.__num_of_joints), rads=True)  # reset joint states to [0, 0, 0, 0, 0, 0].
 
                 return j_states
             else:
-                # self.set_joints(zero_vals, rads=True)
                 self.f_kin(np.zeros(self.__num_of_joints), rads=True)
                 print("\nWarning: the iterative algorithm has not reached convergence to the desired precision")
                 return np.zeros(self.__num_of_joints)
@@ -568,7 +576,6 @@ class CreateKinematicModel:
                 new_traj.append(np.degrees(trajectory[i]))
             elif self.__joint_type_info[i] == "p":
                 new_traj.append(trajectory[i])
-
 
             if self.pva == 0:
 

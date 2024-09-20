@@ -88,31 +88,37 @@ The jacobian can be computed using the jacobian(): method (function)
 ### Inverse Kinematics Example
 
 ```python
+...
+
 # Target position of the end-effector
-target_position = [0.96592583, 1.67303261, 0, 0, 0, 1.30899694]
+t = robot.SE3(robot.get_transforms(2), merge_res=True)
 
 # Perform inverse kinematics
-joint_angles = robot.i_kin(target_position)
+joint_angles = robot.i_kin(t)
+
 print(joint_angles)
 ```
+
 Output in rads: 
 ```python
-Convergence achieved in iteration <6> : CONV error 0.000007
-[0.7853977230082928, 0.5235994724051174]
+Convergence achieved in iteration <0> : CONV error 0.000007
+[0.7853981633974483, 0.5235987755982988]
 ```
 Output in degrees:
 To convert the output to deg, we use the numpy.degrees function:
-print(np.degrees(joint_angles))
 
 ```python
-Convergence achieved in iteration <6> : CONV error 0.000007
+print(np.degrees(joint_angles))
+```
+
+```python
+Convergence achieved in iteration <0> : CONV error 0.000007
 [44.99997477 30.00003992]
 ```
 
 ### Trajectory Generation Example
 
 ```python
-# Generate a trajectory from an initial to a final joint configuration
 from Libs.RoboKinematics import CreateKinematicModel
 
 # Define Denavit-Hartenberg (DH) parameters for a 2-joint robot
@@ -125,7 +131,7 @@ dh_params = [
 robot = CreateKinematicModel(dh_params, robot_name="2DOF Robot")
 
 # Perform forward kinematics
-joint_angles = [0, 0]
+joint_angles = [90, 0]
 robot.f_kin(joint_angles)
 
 # Target position of the end-effector
@@ -233,8 +239,6 @@ trajectory = robot.traj_gen(waypoints, time_intervals, pva=0, plot=True)
 - **Example Plot**: The method can plot cubic trajectories showing the robot joint positions (or velocities/accelerations) over time for each segment.
 
 ![RoboKinematics Example](./images/2dof_Fig1.png)
-
-![RoboKinematics Example](./images/2dof_Fig_2.png)
 
 ![RoboKinematics Example](./images/2dof_Fig_1_velocity.png)
 

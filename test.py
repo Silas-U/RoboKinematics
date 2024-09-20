@@ -25,7 +25,7 @@ jt = [
        final 
     ]
 
-trajectory = robot.traj_gen(jt, trj_time=[1], pva=2, plot=True)
+trajectory = robot.traj_gen(jt, trj_time=[1], pva=0, plot=True)
 
 
 

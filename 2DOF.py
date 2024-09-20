@@ -21,9 +21,6 @@ limitations under the License.
 from Libs.RoboKinematics import CreateKinematicModel
 from timeit import default_timer as timer
 import numpy as np
-import socket
-import time
-import json
 
 '''DH TABLE FOR SAMPLE 2DOF ROBOT'''
 '''---------+-------------+--------------+---------------+--------------+
@@ -33,48 +30,32 @@ import json
 |     2     |      a2     |      0 deg   |       d2      |    theta2    |
 +-----------+-------------+--------------+---------------+------------'''
 
-# Replace with the IP address of your ESP32
-esp32_ip = '192.168.43.5'
-port = 12345
 
-# Set up the socket
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect((esp32_ip, port))
+from Libs.RoboKinematics import CreateKinematicModel
 
-# Creates a kinematic model of the SCARA robot
-scara = CreateKinematicModel(
-    [
-        { 'frame_name': 'frame0', 'joint_type': 'r', 'link_length': 1.0, 'twist': 0.0, 'offset': 0.0, 'theta': 0.0 },
-        { 'frame_name': 'frame1', 'joint_type': 'r', 'link_length': 1.0, 'twist': 0.0, 'offset': 0.0, 'theta': 0.0 },
-    ],
-    robot_name="SCARA", link_twist_in_rads=True
-)
+# Define Denavit-Hartenberg (DH) parameters for a 2-joint robot
+dh_params = [
+    {"frame_name": "link1", "joint_type": "r", "link_length": 1.0, "twist": 0, "offset": 0, "theta": 0},
+    {"frame_name": "link2", "joint_type": "r", "link_length": 1.0, "twist": 0, "offset": 0, "theta": 0}
+]
 
+# Create the kinematic model
+robot = CreateKinematicModel(dh_params, robot_name="2DOF Robot")
 
-trj_time = [5]
+# Perform forward kinematics
+joint_angles = [90, 0]
+robot.f_kin(joint_angles)
 
-try:
-   
-    t = scara.f_kin([0, 0])
-    home = scara.get_joint_states(rads=True)
-    target_1 = scara.i_kin([1,  -1,   0,   0,   0,  0], mask=[1, 1, 1, 0, 0, 0], euler_in_deg=True)
+# Target position of the end-effector
+target_position = [0.96592583, 1.67303261, 0, 0, 0, 1.30899694]
 
-    jq = [
-        home,
-        target_1
+# Generate a trajectory from an initial to a final joint configuration
+initial = robot.get_joint_states(rads=True)
+final = robot.i_kin(target_position)
+
+jt = [
+       initial,
+       final 
     ]
 
-    trajectory = scara.traj_gen(jq, trj_time, 0, plot=False)
-
-    for i in range(scara.get_num_of_joints()):
-        # Serialize the list to a JSON-encoded string
-        message = json.dumps(trajectory[0][i])
-        client_socket.sendall(message.encode('utf-8'))
-        
-        # Receive the response (optional, if the server echoes back)
-        data = client_socket.recv(4096)
-        print(f"{data.decode()}")
-
-        time.sleep(0.2)  # Wait for 0.2 second before sending the next message
-finally:
-    client_socket.close()
+trajectory = robot.traj_gen(jt, trj_time=[1], pva=0, plot=True)

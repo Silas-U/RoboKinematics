@@ -46,7 +46,6 @@ robot = CreateKinematicModel(
     ],
     robot_name="6DOF")
 
-
 way_points  = [
     [3.60000000e-01, -2.44929360e-18,  8.50000000e-02, 3.14159265e+00,  0.00000000e+00,  0.00000000e+00],
     [2.20000000e-01,  6.12323400e-18,  2.25000000e-01, 3.14159265e+00,  0.00000000e+00, -5.23598776e-01],
@@ -56,7 +55,7 @@ way_points  = [
 
 trj_time = [1,2,3]
 
-t =  robot.f_kin([0, 0, 0, 0, 0, 0])
+robot.f_kin([0, 0, 0, 0, 0, 0])
 joint_space = [robot.i_kin(way_point,it_max=100) for way_point in way_points]                                                                          
 trajectory = robot.traj_gen(joint_space, trj_time, 0, plot=True)
 

@@ -20,6 +20,7 @@ limitations under the License.
 from Libs.RoboKinematics import CreateKinematicModel
 from math import pi
 from timeit import default_timer as timer
+import numpy as np
 
 '''DH TABLE FOR SAMPLE SCARA ROBOT'''
 '''---------+-------------+--------------+---------------+--------------+
@@ -49,10 +50,13 @@ scara.set_joint_limit(
 )
 
 start = timer()
+
 trj_time = [1]
-scara.f_kin([45, 20, 0.2])
+
+scara.f_kin([10, 20, 0.5])
+
 home = scara.get_joint_states(rads=True)
-target_1 = scara.i_kin([-0.07, 0.26124356, -0.1,  0,  0,  2.0943951], mask=[1,1,1,0,0,1],it_max=100)
+target_1 = scara.i_kin([0.19124356,  0.19124356, -0.1, 3.14159265,  0.,  1.04719755])
 
 jq = [
     home,
@@ -61,4 +65,4 @@ jq = [
 
 trajectory = scara.traj_gen(jq, trj_time, 0, plot=True)
 end = timer()
-print('It took %.5f s. to execute.' % (end - start))
+# print('It took %.5f s. to execute.' % (end - start))

@@ -41,12 +41,17 @@ rb = CreateKinematicModel(
     robot_name="4DOF",
 )
 
-
 start = timer()
-trj_time = [1]                                                                                                                                                                                                                                      
-t =  rb.f_kin([10, 90, -90, 50])
+
+trj_time = [1]        
+
+rb.f_kin([10, 90, -90, 50])
+
 home = rb.get_joint_states(rads=True)
-target_1 = rb.i_kin([0.24248711, 0, 0.1,  3.14159265, 0.52359878, 0])
+
+t = rb.SE3(rb.get_transforms(4), merge_res=True)
+
+target_1 = rb.i_kin(t)
 
 jq = [
     home,
