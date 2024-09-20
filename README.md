@@ -158,7 +158,7 @@ trajectory = robot.traj_gen(jt, trj_time=[1], pva=0, plot=True)
 
 ## Class and Methods Overview
 
-### `CreateKinematicModel`
+#### `CreateKinematicModel`
 
 This is the main class in the library, which encapsulates all the functionalities for kinematic analysis, including forward kinematics, inverse kinematics, Jacobian calculation, and trajectory generation.
 
