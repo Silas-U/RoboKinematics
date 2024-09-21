@@ -43,7 +43,7 @@ try:
         received_list = json.loads(str_data)
 
         dat.append(received_list)
-    git
+    
         # Echo back the received data
         client_socket.send(data)
 

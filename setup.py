@@ -11,10 +11,9 @@ setup(
     description="A Python library for robotics research and education",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Silas-U/Robot-Kinematics-lib/tree/main",
+    url="https://github.com/Silas-U/RoboKinematics/tree/main",
     project_urls={
-        "Documentation": "https://yourusername.github.io/your-repo",
-        "Bug Tracker": "https://github.com/Silas-U/Robot-Kinematics-lib/tree/main/issues",
+        "Bug Tracker": "https://github.com/Silas-U/RoboKinematics/tree/main/issues",
     },
     classifiers=[
         "Programming Language :: Python :: 3",
