@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from Src.RoboKinematics import CreateKinematicModel
+from RoboKinematics import CreateKinematicModel
 from math import pi
 from timeit import default_timer as timer
 import numpy as np

@@ -17,7 +17,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from Src.RoboKinematics import CreateKinematicModel
+from RoboKinematics import CreateKinematicModel
 from timeit import default_timer as timer
 
 '''DH TABLE FOR SAMPLE 4DOF ROBOT'''
@@ -61,4 +61,3 @@ jq = [
 trajectory = rb.traj_gen(jq, trj_time, 0, plot=True)
 end = timer()
 # print('It took %.5f s. to execute.' % (end - start)) # set plot to False before uncommenting
-

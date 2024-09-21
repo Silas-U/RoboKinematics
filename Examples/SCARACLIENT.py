@@ -18,7 +18,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from Src.RoboKinematics import CreateKinematicModel
+from RoboKinematics import CreateKinematicModel
 import socket
 import time
 import json

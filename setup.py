@@ -1,33 +1,43 @@
 from setuptools import setup, find_packages
 
-VERSION = '1.0' 
-DESCRIPTION = 'A Python package designed to perform kinematic analysis'
-LONG_DESCRIPTION = 'A Python package designed to perform kinematic analysis for an n-degree-of-freedom robot manipulator'
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
 
-# Setting up
 setup(
-       # the name must match the folder name 'verysimplemodule'
-        name="RoboKinematics", 
-        version=VERSION,
-        author="Silas Udofia",
-        author_email="<silasudofia469@gmail.com>",
-        description=DESCRIPTION,
-        long_description=LONG_DESCRIPTION,
-        packages=find_packages(),
+    name="RoboKinematics",
+    version="0.0.2",
+    author="Silas Udofia",
+    author_email="silasudofia469@gmail.com",
+    description="A Python library for robotics research and education",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/Silas-U/Robot-Kinematics-lib/tree/main",
+    project_urls={
+        "Documentation": "https://yourusername.github.io/your-repo",
+        "Bug Tracker": "https://github.com/Silas-U/Robot-Kinematics-lib/tree/main/issues",
+    },
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: OS Independent",
+    ],
+    packages=find_packages(),
+    python_requires='>=3.6',
+    install_requires=[  
+        "numpy",
+        "scipy",
+        "matplotlib"
+    ],
+    include_package_data=True,
+    license="Apache Version 2.0",
+    keywords=[
+        "python",
+        "robotics",
+        "robokinematics",
+        "kinematics",
+        "trajectory-generation",
+        "jacobian",
+        "robot-manipulator",
+    ]
 
-        install_requires=[
-            'numpy',
-            'scipy',
-            'matplotlib'
-        ],
-
-        keywords=['python', 'kinematics package'],
-
-        classifiers= [
-            "Programming Language :: Python :: 2",
-            "Programming Language :: Python :: 3",
-            "Operating System :: MacOS :: MacOS X",
-            "Operating System :: Microsoft :: Windows",
-            "Operating System :: POSIX :: Linux"
-        ]
 )

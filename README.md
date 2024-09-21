@@ -10,7 +10,7 @@
 <table style="border:0px">
 <tr style="border:0px">
 <td style="border:0px">
-<img src="./images/limg/RKLogo.webp" width="500"></td>
+<img src="/assets/limg/RKLogo.webp" width="500"></td>
 <td style="border:0px">
 
  RoboKinematics is a Python library designed to perform kinematic analysis for an n-degree-of-freedom robot manipulator. This library supports both forward and inverse kinematics, trajectory generation, Jacobian computation.
@@ -38,7 +38,7 @@ To download the latest version of python, you can visit the [official python pag
 
 Use the following command to download the required dependencies:
 ```bash
-pip install numpy scipy matplotlib
+pip install RoboKinematics
 ```
 
 ## Usage Examples
@@ -68,7 +68,7 @@ print(transformation_matrices,'\n')
 print(jacobian)
 ```
 The output of the program is the transformation matrix from the base frame to the end-effector frame.
-The jacobian can be computed using the jacobian(): method (function)
+The jacobian can be computed using the ```jacobian()```: method (function)
 
 ```python
 [[ 0.25881905 -0.96592583  0.          0.96592583]
@@ -258,13 +258,13 @@ trajectory = robot.traj_gen(q, time_intervals, 0, plot=True)
 <table style="border:0px">
 <tr style="border:0px">
 <td style="border:0px">
-<img src="./images/Figure_1_2dof_pos.png" width="500">
+<img src="/assets/plots/Figure_1_2dof_pos.png" width="500">
 </td>
 <td style="border:0px">
-<img src="./images/Figure_1_2dof_vel.png" width="500"></td>
+<img src="/assets/plots/Figure_1_2dof_vel.png" width="500"></td>
 </td>
 <td style="border:0px">
-<img src="./images/Figure_1_2dof_accel.png" width="500">
+<img src="/assets/plots/Figure_1_2dof_accel.png" width="500">
 </td>
 </tr>
 </table>

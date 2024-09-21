@@ -18,7 +18,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from Src.RoboKinematics import CreateKinematicModel
+from RoboKinematics import CreateKinematicModel
 from timeit import default_timer as timer
 import numpy as np
 import matplotlib.pyplot as plt
@@ -58,4 +58,3 @@ trj_time = [1,2,3]
 robot.f_kin([0, 0, 0, 0, 0, 0])
 joint_space = [robot.i_kin(way_point,it_max=100) for way_point in way_points]                                                                          
 trajectory = robot.traj_gen(joint_space, trj_time, 0, plot=True)
-
