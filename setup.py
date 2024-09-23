@@ -13,7 +13,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/Silas-U/RoboKinematics/tree/main",
     project_urls={
-        "Bug Tracker": "https://github.com/Silas-U/RoboKinematics/tree/main/issues",
+        "Bug Tracker": "https://github.com/Silas-U/RoboKinematics/issues",
     },
     classifiers=[
         "Programming Language :: Python :: 3",

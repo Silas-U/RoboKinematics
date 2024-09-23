@@ -36,7 +36,7 @@ To install the required dependencies, you will need Python >= 3.6
 To download the latest version of python, you can visit the [official python page](https://www.python.org/downloads/).
 
 
-Use the following command to download the required dependencies:
+To install the package, run:
 ```bash
 pip install RoboKinematics
 ```
@@ -224,24 +224,51 @@ The `traj_gen()` method generates a complete trajectory between multiple waypoin
 #### **Usage Example**:
 
 ```python
-# Define waypoints (joint configurations) and corresponding time intervals
-way_points  = [
-    [3.60000000e-01, -2.44929360e-18,  8.50000000e-02, 3.14159265e+00,  0.00000000e+00,  0.00000000e+00],
-    [2.20000000e-01,  6.12323400e-18,  2.25000000e-01, 3.14159265e+00,  0.00000000e+00, -5.23598776e-01],
-    [0.16,   0.24248711,  0.21624356,-2.15879893, -0.4478324,  -1.8133602],
-    [2.20000000e-01,  6.12323400e-18,  2.25000000e-01, 3.14159265e+00,  0.00000000e+00, -5.23598776e-01],
+
+from RoboKinematics import CreateKinematicModel
+from timeit import default_timer as timer
+
+"""
+The Denavit–Hartenberg parameters for Puma560  robot is shown below.
+
+Kinematics  theta [rad]     a [m]   d [m]   alpha [rad]
+Joint 1     0               0       0.6718      π/2
+Joint 2     0               0.4318    0           0
+Joint 3     0               0.0203  0.15        π/2
+Joint 4     0               0       0.4318      -π/2
+Joint 5     0               0       0           π/2
+Joint 6     0               0       0           0
+"""
+
+# Creates a kinematic model of the Puma560 robot
+Puma560 = CreateKinematicModel(
+     [        
+      { 'frame_name':'frame0','joint_type':'r','link_length':0.0,'twist':90.0,'offset':0.0,'theta':0.0 },
+      { 'frame_name':'frame1','joint_type':'r','link_length':0.4318,'twist':0.0,'offset':0.0,'theta':00 },
+      { 'frame_name':'frame2','joint_type':'r','link_length':0.0203,'twist':-90.0,'offset':0.15,'theta':0.0 },
+      { 'frame_name':'frame3','joint_type':'r','link_length':0.0,'twist':90.0,'offset':0.4318,'theta':0.0 },
+      { 'frame_name':'frame4','joint_type':'r','link_length':0.0,'twist':-90.0,'offset':0.0,'theta':0.0 },
+      { 'frame_name':'frame5','joint_type':'r','link_length':0.0,'twist': 0.0,'offset':0.0,'theta':0.0 }
+     ],
+     robot_name="Puma560")
+
+# Set the time interval, in this case, 5 seconds
+trj_time = [5]
+
+Puma560.f_kin([10, 20, 30, 40, 50, 60])
+
+home = Puma560.get_joint_states(rads=True)
+
+target = Puma560.i_kin([0.26453836, -0.06334258,  0.45908105, -0.35924867, -0.7797434,  1.07086644])
+
+# Define waypoints (joint configurations)
+waypoints = [
+    home,
+    target
 ]
 
 # Generate a cubic trajectory for position (pva=0) and plot the results
-time_intervals = [1, 2, 3]  # time to move between each pair of waypoints
-
-robot = CreateKinematicModel(dh_params, robot_name="6DOF Robot")
-
-robot.f_kin([0, 0, 0, 0, 0, 0])
-
-q = [robot.i_kin(way_point, it_max=100) for way_point way_points]     
-
-trajectory = robot.traj_gen(q, time_intervals, 0, plot=True)
+trajectory = Puma560.traj_gen(waypoints, trj_time, pva=2, tr_type="q", plot=True)
 ```
 
 #### **Notes**:
@@ -249,22 +276,17 @@ trajectory = robot.traj_gen(q, time_intervals, 0, plot=True)
 - The `pva` parameter allows you to specify whether you want the trajectory for position, velocity, or acceleration.
 - **Example Plot**: The method can plot cubic trajectories showing the robot joint positions (or velocities/accelerations) over time for each segment.
 
-<!-- ![RoboKinematics Example](./images/2dof_Fig1.png)
-
-![RoboKinematics Example](./images/2dof_Fig_1_velocity.png)
-
-![RoboKinematics Example](./images/2dof_fig1_accel.png) -->
 
 <table style="border:0px">
 <tr style="border:0px">
 <td style="border:0px">
-<img src="/assets/plots/Figure_1_2dof_pos.png" width="500">
+<img src="./assets/plots/Figure_1_puma_pos.png" width="500">
 </td>
 <td style="border:0px">
-<img src="/assets/plots/Figure_1_2dof_vel.png" width="500"></td>
+<img src="./assets/plots/Figure_1_puma_vel.png" width="500"></td>
 </td>
 <td style="border:0px">
-<img src="/assets/plots/Figure_1_2dof_accel.png" width="500">
+<img src="./assets/plots/Figure_1_puma_accel.png" width="500">
 </td>
 </tr>
 </table>

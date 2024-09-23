@@ -1,9 +1,9 @@
 """
 Author: Silas Udofia
 Date: 2024-08-02
-Description: This script performs kinematics analysis for an n_degree of freedom robot manipulator.
+Description: This module performs kinematics analysis for an n_degree of freedom robot manipulator.
 
-GitHub: https://github.com/Silas-U/Robot-Kinematics-lib/tree/main
+GitHub: https://github.com/Silas-U/RoboKinematics/tree/main
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ class CreateKinematicModel:
         self.__jacobian = []
         self.__singuarities = []
         self.quartenion = []
+        self.__tr_type = "c"
 
 
     def validate_keys(self, data):
@@ -515,16 +516,56 @@ class CreateKinematicModel:
         a1 = v0
         a2 = (3 * (qf - q0) / (tf - t0) ** 2) - (2 * v0 + vf) / (tf - t0)
         a3 = (-2 * (qf - q0) / (tf - t0) ** 3) + (v0 + vf) / (tf - t0) ** 2
+
         pos = a0 + a1 * (t - t0) + a2 * (t - t0) ** 2 + a3 * (t - t0) ** 3
         vel = a1 + 2 * a2 * (t - t0) + 3 * a3 * (t - t0) ** 2
         accel = 2 * a2 + 6 * a3 * (t - t0)
+
         pva = [pos, vel, accel]
+
         return pva
     
+#-------------------------------------------------------------
+    
+    def quintic_trajectory(self, t0, tf, q, v0, vf, a0, af, t):
+        """
+        t0: Initial time
+        tf: Final time
+        q0: Initial position
+        qf: Final position
+        v0: Initial velocity
+        vf: Final velocity
+        a0: Initial acceleration
+        af: Final acceleration
+        t: Array of time steps
+        """
+        q0, qf = q[0], q[1]
+
+        # Time duration
+        T = tf - t0
+
+        # Coefficients
+        a0_p = q0
+        a1_p = v0
+        a2_p = a0 / 2
+        a3_p = (20 * (qf - q0) - (8 * vf + 12 * v0) * T - (3 * af - a0) * T**2) / (2 * T**3)
+        a4_p = (-30 * (qf - q0) + (14 * vf + 16 * v0) * T + (3 * af - 2 * a0) * T**2) / (2 * T**4)
+        a5_p = (12 * (qf - q0) - 6 * (vf + v0) * T - (af - a0) * T**2) / (2 * T**5)
+        
+        # Generate position, velocity, and acceleration based on time
+        q = a0_p + a1_p * (t - t0) + a2_p * (t - t0)**2 + a3_p * (t - t0)**3 + a4_p * (t - t0)**4 + a5_p * (t - t0)**5
+        v = a1_p + 2 * a2_p * (t - t0) + 3 * a3_p * (t - t0)**2 + 4 * a4_p * (t - t0)**3 + 5 * a5_p * (t - t0)**4
+        a = 2 * a2_p + 6 * a3_p * (t - t0) + 12 * a4_p * (t - t0)**2 + 20 * a5_p * (t - t0)**3
+
+        pva = [q, v, a]
+
+        return pva
+    
+#------------------------------------------------------------------
+
 
     def ptraj(self, initial, final, tq, time_steps, pva):
         try:
-            # Cubic polynomial interpolation function
             if type(initial) is not np.ndarray:
                 for item in initial:
                     if type(item) not in [int, float]:
@@ -549,11 +590,19 @@ class CreateKinematicModel:
             t0 = 0.0    # Start time
             tf = tq     # End time
             v0 = 0.0    # Initial velocity
-            vf = 0.0    # Final velocity  
+            vf = 0.0    # Final velocity
+            a0 = 0.0
+            af = 0.0  
 
             q = [[initial[i], final[i]] for i in range(self.__num_of_joints)]
-            trajectory = [[self.cubic_trajectory(t0, tf, q[i], v0, vf, t)[pva] for t in time_steps] for i in
-                          range(self.__num_of_joints)]
+   
+            if self.__tr_type == "q":
+                trajectory = [[self.quintic_trajectory(t0, tf, q[i], v0, vf, a0, af, t)[pva] for t in time_steps] for i in
+                            range(self.__num_of_joints)]
+            else: 
+                trajectory = [[self.cubic_trajectory(t0, tf, q[i], v0, vf, t)[pva] for t in time_steps] for i in
+                            range(self.__num_of_joints)]
+            
             return trajectory
         except ValueError as e:
             print(f"Error: {e}")
@@ -565,7 +614,7 @@ class CreateKinematicModel:
         plt.grid(color='#a65628', linestyle='--')
         plt.grid(True)
 
-        colors = ['#377eb8', '#ff7f00', '#4daf4a', '#e41a1c', '#984ea3', '#ffff33', '#a65628', '#f781bf']
+        colors = ['#377eb8', '#ff7f00', '#4daf4a', '#e41a1c', '#984ea3', '#524eb3', '#a65628', '#f781bf']
         if self.__num_of_joints > len(colors):
             for i in range(self.__num_of_joints):
                 colors.append(f'#1d2fb1')
@@ -580,7 +629,7 @@ class CreateKinematicModel:
 
             if self.pva == 0:
 
-                plt.plot(time_steps, new_traj[i], label=f"q{i + 1} pos", color=colors[i])
+                plt.plot(time_steps, new_traj[i], label=f"joint{i + 1} position", color=colors[i])
 
                 plt.annotate(f'initial ({np.round(new_traj[i][1], 0)})', xy=(time_steps[0], new_traj[i][0]),
                              xytext=(time_steps[0], new_traj[i][0]),
@@ -592,27 +641,30 @@ class CreateKinematicModel:
                              bbox=dict(boxstyle='round,pad=0.5', fc='white', alpha=0.2), ha='right',
                              arrowprops=dict(facecolor=colors[i], shrink=0.05, ))
 
-                plt.title(f"{self.__robot_name} Cubic Trajectory (Position)")
+                plt.title(f"{self.__robot_name} Trajectory (Position)")
                 plt.xlabel('Time [s]')
                 plt.ylabel('Position [deg]')
                 plt.legend()
             elif self.pva == 1:
-                plt.plot(time_steps, new_traj[i], label=f"q{i + 1} vel", color=colors[i])
-                plt.title(f"{self.__robot_name} Cubic Trajectory (Velocity)")
+                plt.plot(time_steps, new_traj[i], label=f"joint{i + 1} velocity", color=colors[i])
+                plt.title(f"{self.__robot_name} Trajectory (Velocity)")
                 plt.xlabel('Time [s]')
-                plt.ylabel('Velocity [m]')
+                plt.ylabel('Velocity [m/s]')
                 plt.legend()
             elif self.pva == 2:
-                plt.plot(time_steps, new_traj[i], label=f"q{i + 1} accel", color=colors[i])
-                plt.title(f"{self.__robot_name} Cubic Trajectory (Acceleration)")
+                plt.plot(time_steps, new_traj[i], label=f"joint{i + 1} acceleration", color=colors[i])
+                plt.title(f"{self.__robot_name} Trajectory (Acceleration)")
                 plt.xlabel('Time [s]')
-                plt.ylabel('Acceleration [m]')
+                plt.ylabel('Acceleration [m/s²]')
                 plt.legend()
 
         plt.show()
 
 
-    def traj_gen(self, tr_lst, trj_time, pva, plot=False):
+    def traj_gen(self, tr_lst, trj_time, pva, tr_type, plot=False ):
+
+        self.__tr_type = tr_type
+
         lst = np.array(tr_lst)
         time_steps = [np.linspace(0, t, 100) for t in trj_time]
         trjlst = [[lst[i-1],lst[i]] for i in range(1,len(lst))]

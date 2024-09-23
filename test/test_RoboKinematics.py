@@ -1,5 +1,5 @@
 import unittest
-from Src.RoboKinematics import CreateKinematicModel
+from RoboKinematics import CreateKinematicModel
 from math import pi
 import numpy as np
 from numpy.testing import assert_array_equal
