@@ -1,5 +1,5 @@
 
-# RoboKinematics Library
+# RoboKinematics
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/roboticstoolbox-python.svg)
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)
@@ -10,10 +10,10 @@
 <table style="border:0px">
 <tr style="border:0px">
 <td style="border:0px">
-<img src="/assets/limg/RKLogo.webp" width="500"></td>
+<img src="./assets/limg/RKLogo.webp" width="500"></td>
 <td style="border:0px">
 
- RoboKinematics is a Python library designed to perform kinematic analysis for n-degree-of-freedom serial (open-loop) robot manipulators. This library supports both forward and inverse kinematics, trajectory generation, and Jacobian computation.
+ RoboKinematics is a Python package designed to perform kinematic analysis for n-degree-of-freedom serial (open-loop) robot manipulators. This package supports both forward and inverse kinematics, trajectory generation, and Jacobian computation.
  
 </td>
 </tr>
@@ -26,14 +26,14 @@
 - **Forward Kinematics**: Calculate the end-effector's position and orientation based on joint angles.
 - **Inverse Kinematics**: Compute joint angles for a desired end-effector position.
 - **Jacobian Computation**: Calculate the robot's Jacobian matrix for velocity and motion analysis.
-- **Trajectory Generation**: Create cubic trajectories for smooth motion between joint configurations.
+- **Trajectory Generation**: Create trajectories for smooth motion between joint configurations.
 - **Singularity Detection**: Detect and handle singular configurations in robot kinematics.
 
 ## Installation
 
-To install the required dependencies, you will need Python >= 3.6
+To install RoboKinematics, you will need Python >= 3.6
 
-To download the latest version of python, you can visit the [official python page](https://www.python.org/downloads/).
+To download the latest version of python, visit the [official python page](https://www.python.org/downloads/).
 
 
 To install the package, run:
@@ -146,7 +146,7 @@ jt = [
        final 
     ]
 
-trajectory = robot.traj_gen(jt, trj_time=[1], pva=0, plot=True)
+trajectory = robot.traj_gen(jt, trj_time=[1], pva=0, tr_type="q", plot=True)
 ```
 
 ## Dependencies
@@ -160,13 +160,13 @@ trajectory = robot.traj_gen(jt, trj_time=[1], pva=0, plot=True)
 
 #### `CreateKinematicModel`
 
-This is the main class in the library, which encapsulates all the functionalities for kinematic analysis, including forward kinematics, inverse kinematics, Jacobian calculation, and trajectory generation.
+This is the main class which encapsulates all the functionalities for kinematic analysis, including forward kinematics, inverse kinematics, Jacobian calculation, and trajectory generation.
 
 #### **Constructor: `__init__(args, robot_name, link_twist_in_rads=False, joint_lim_enable=False)`**
 
 - **Parameters**:
   - `args`: List of Denavit-Hartenberg (DH) parameters in the form of dictionaries.
-  - `robot_name`: Name of the robot (used for display purposes).
+  - `robot_name`: Name of the robot.
   - `link_twist_in_rads`: If `True`, treats the twist angles in radians.
   - `joint_lim_enable`: If `True`, enforces joint limits.
 
@@ -207,16 +207,25 @@ This is the main class in the library, which encapsulates all the functionalitie
 - **Description**: Returns the number of joints in the robot model.
 - **Returns**: Integer representing the number of joints.
 
-#### **`traj_gen(tr_lst, trj_time, pva, plot=False)`**
+#### **`traj_gen(tr_lst, trj_time, pva, tr_type, plot=False )`**
 
 #### **Description**:
 The `traj_gen()` method generates a complete trajectory between multiple waypoints (positions) over a specified time for each segment. It allows you to define cubic trajectories for position, velocity, or acceleration, and optionally plot the results.
 
 #### **Parameters**:
-- **`tr_lst`**: A list of waypoints, where each waypoint is a list of joint positions. For example, `[[0, 45, 90], [90, 45, 0]]` represents two waypoints for a 3-joint robot.
+- **`tr_lst`**: A list of waypoints, where each waypoint is a list of joint positions. For example, [q0, q1, q2, ..., qn] where q0 is the starting point and qn is the final point.
+
 - **`trj_time`**: A list of time intervals for each segment of the trajectory. For example, `[1, 2]` specifies that it will take 1 second to move from the first waypoint to the second, and 2 seconds to move from the second to the third.
+
 - **`pva`**: A flag indicating whether to generate a trajectory for **position** (`pva = 0`), **velocity** (`pva = 1`), or **acceleration** (`pva = 2`).
+
 - **`plot`**: A boolean (`True/False`). If `True`, the generated trajectory is plotted.
+
+- **`tr_type`**:
+    Defines the type of trajectory to be generated.
+    "q": represents a quintic polynomial trajectory (5th-degree), ensuring smooth position, velocity, and acceleration transitions.
+    You may also support a cubic trajectory by passing a different value, like "c" for cubic.
+
 
 #### **Returns**:
 - **`trajectory`**: A list of generated trajectories for each joint over time. Each element in the list corresponds to a segment of the full trajectory between two waypoints.
@@ -226,7 +235,6 @@ The `traj_gen()` method generates a complete trajectory between multiple waypoin
 ```python
 
 from RoboKinematics import CreateKinematicModel
-from timeit import default_timer as timer
 
 """
 The Denavit–Hartenberg parameters for Puma560  robot is shown below.
@@ -274,7 +282,7 @@ trajectory = Puma560.traj_gen(waypoints, trj_time, pva=2, tr_type="q", plot=True
 #### **Notes**:
 - You can use `traj_gen()` to generate and visualize complex multi-segment trajectories for a robot with multiple joints.
 - The `pva` parameter allows you to specify whether you want the trajectory for position, velocity, or acceleration.
-- **Example Plot**: The method can plot cubic trajectories showing the robot joint positions (or velocities/accelerations) over time for each segment.
+- **Example Plot**: The method can plot trajectories showing the robot joint positions (or velocities/accelerations) over time for each segment.
 
 
 <table style="border:0px">

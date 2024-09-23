@@ -58,6 +58,11 @@ class CreateKinematicModel:
         self.__singuarities = []
         self.quartenion = []
         self.__tr_type = "c"
+        self.__init_vel = 0.0
+        self.__final_vel = 0.0
+        self.__init_accel = 0.0
+        self.__final_accel = 0.0
+        self.__init_time = 0.0
 
 
     def validate_keys(self, data):
@@ -587,12 +592,12 @@ class CreateKinematicModel:
 
             self.pva = pva # position velocity and acceleration
 
-            t0 = 0.0    # Start time
+            t0 = self.__init_time    # Start time
             tf = tq     # End time
-            v0 = 0.0    # Initial velocity
-            vf = 0.0    # Final velocity
-            a0 = 0.0
-            af = 0.0  
+            v0 = self.__init_vel    # Initial velocity
+            vf = self.__final_vel   # Final velocity
+            a0 = self.__init_accel    # Initial acceleration 
+            af = self.__final_accel    # Final acceleration 
 
             q = [[initial[i], final[i]] for i in range(self.__num_of_joints)]
    
@@ -687,4 +692,20 @@ class CreateKinematicModel:
 
     def get_num_of_joints(self):
         return self.__num_of_joints
-                                                                                             
+    
+    
+    def velocity(self, init, final):
+        if type(init) not in [int, float] or type(final) not in [int, float]:
+                raise TypeError("input must be of type integer or float")
+        self.__init_vel = init
+        self.__final_vel = final
+
+    def accel(self, init, final):
+        if type(init) not in [int, float] or type(final) not in [int, float]:
+                raise TypeError("input must be of type integer or float")
+        self.__init_accel = init
+        self.__final_accel = final
+
+    def init_time(self, t):
+        self.__init_time = t    
+                                                                                           
