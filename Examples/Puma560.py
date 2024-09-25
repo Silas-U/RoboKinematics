@@ -3,7 +3,7 @@ Author: Silas Udofia
 Date: 2024-08-02
 Description: This script performs kinematics analysis for a 6DOF robot.
 
-GitHub: https://github.com/Silas-U/Robot-Kinematics-lib/tree/main
+GitHub: "https://github.com/Silas-U/RoboKinematics/tree/main"
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -61,6 +61,6 @@ jq = [
     target_1
 ]
 
-trajectory = Puma560.traj_gen(jq, trj_time, 0, plot=True)
+trajectory = Puma560.traj_gen(jq, trj_time, pva=0, tr_type="q", plot=True)
 end = timer()
 # print('It took %.5f s. to execute.' % (end - start)) # set plot to False before uncommenting

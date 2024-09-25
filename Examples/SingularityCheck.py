@@ -19,6 +19,8 @@ limitations under the License.
 """
 
 from RoboKinematics import CreateKinematicModel
+from os import system
+from time import sleep
 
 """
 The Denavit–Hartenberg parameters for 6DOF  robot is shown below.
@@ -43,15 +45,11 @@ robot = CreateKinematicModel(
     ],
     robot_name="6DOF")
 
-way_points  = [
-    [3.60000000e-01, -2.44929360e-18,  8.50000000e-02, 3.14159265e+00,  0.00000000e+00,  0.00000000e+00],
-    [2.20000000e-01,  6.12323400e-18,  2.25000000e-01, 3.14159265e+00,  0.00000000e+00, -5.23598776e-01],
-    [0.16,   0.24248711,  0.21624356,-2.15879893, -0.4478324,  -1.8133602],
-    [2.20000000e-01,  6.12323400e-18,  2.25000000e-01, 3.14159265e+00,  0.00000000e+00, -5.23598776e-01],
-]
-
-trj_time = [1,2,3]
-
-robot.f_kin([0, 0, 0, 0, 0, 0])
-joint_space = [robot.i_kin(way_point,it_max=100) for way_point in way_points]                                                                          
-trajectory = robot.traj_gen(joint_space, trj_time, pva=0, tr_type="q", plot=True)
+for i in range(0, 91, 1):
+    system('clear')
+    robot.f_kin([i, 90, -90, i, 45, i])
+    print(robot.get_transforms(6, real=True),'\n')
+    print(robot.jacobian())
+    print(robot.get_joint_states(),'\n')
+    robot.singular_configs_check()
+    sleep(0.02)

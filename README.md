@@ -305,7 +305,7 @@ This project is licensed under the Apache License, Version 2.0 - see the [LICENS
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/Silas-U/Robot-Kinematics-lib/tree/main).
+Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/Silas-U/RoboKinematics/tree/main)
 
 ## Author
 

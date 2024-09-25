@@ -179,6 +179,84 @@ class TestRoboKinematics(unittest.TestCase):
         expected_final = np.deg2rad([45.0, 20.0])
 
         assert_array_equal(final, expected_final)
+    
+    def test_traj_gen(self):
+
+        with self.assertRaises(TypeError):
+
+            joint_angles = [90, 0]
+            self.scara.f_kin(joint_angles)
+
+            # Target position of the end-effector
+            target_position = [0.96592583, 1.67303261, 0, 0, 0, 1.30899694]
+
+            # Generate a trajectory from an initial to a final joint configuration
+            initial = self.scara.get_joint_states(rads=True)
+            final = self.scara.i_kin(target_position)
+
+            jt = [
+                initial,
+                final 
+                ]
+
+            trajectory = self.scara.traj_gen(5, trj_time=[1], pva=0, tr_type="q", plot=False)
+        
+        with self.assertRaises(TypeError):
+
+            joint_angles = [90, 0]
+            self.scara.f_kin(joint_angles)
+
+            # Target position of the end-effector
+            target_position = [0.96592583, 1.67303261, 0, 0, 0, 1.30899694]
+
+            # Generate a trajectory from an initial to a final joint configuration
+            initial = self.scara.get_joint_states(rads=True)
+            final = self.scara.i_kin(target_position)
+
+            jt = [
+                initial,
+                final 
+                ]
+
+            trajectory = self.scara.traj_gen(jt, trj_time=5, pva=0, tr_type="q", plot=False)
+
+        with self.assertRaises(TypeError):
+
+            joint_angles = [90, 0]
+            self.scara.f_kin(joint_angles)
+
+            # Target position of the end-effector
+            target_position = [0.96592583, 1.67303261, 0, 0, 0, 1.30899694]
+
+            # Generate a trajectory from an initial to a final joint configuration
+            initial = self.scara.get_joint_states(rads=True)
+            final = self.scara.i_kin(target_position)
+
+            jt = [
+                initial,
+                final 
+                ]
+
+            trajectory = self.scara.traj_gen(jt, trj_time=['a'], pva=0, tr_type="q", plot=False)
+        
+        with self.assertRaises(IndexError):
+
+            joint_angles = [90, 0]
+            self.scara.f_kin(joint_angles)
+
+            # Target position of the end-effector
+            target_position = [0.96592583, 1.67303261, 0, 0, 0, 1.30899694]
+
+            # Generate a trajectory from an initial to a final joint configuration
+            initial = self.scara.get_joint_states(rads=True)
+            final = self.scara.i_kin(target_position)
+
+            jt = [
+                initial,
+                final 
+                ]
+
+            trajectory = self.scara.traj_gen(jt, trj_time=[1,2], pva=0, tr_type="q", plot=False)
 
 
 if __name__ == '__main__':

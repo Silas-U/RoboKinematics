@@ -61,7 +61,7 @@ scara.set_joint_limit(
     ]
 )
 
-trj_time = [5]
+trj_t = [5]
 
 try:
    
@@ -74,7 +74,7 @@ try:
         target_1,
     ]
 
-    trajectory = scara.traj_gen(jq, trj_time, 0, plot=False)
+    trajectory = scara.traj_gen(jq, trj_time=trj_t, pva=0, tr_type="q", plot=False)
 
     for i in range(scara.get_num_of_joints()):
 

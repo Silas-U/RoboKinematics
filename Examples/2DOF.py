@@ -3,7 +3,7 @@ Author: Silas Udofia
 Date: 2024-08-02
 Description: This script performs kinematics analysis for a 2DOF robot.
 
-GitHub: https://github.com/Silas-U/Robot-Kinematics-lib/tree/main
+GitHub: "https://github.com/Silas-U/RoboKinematics/tree/main"
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -55,4 +55,4 @@ jt = [
        final 
     ]
 
-trajectory = robot.traj_gen(jt, trj_time=[1], pva=2, plot=True)
+trajectory = robot.traj_gen(jt, trj_time=[1], pva=2, tr_type="q", plot=True)

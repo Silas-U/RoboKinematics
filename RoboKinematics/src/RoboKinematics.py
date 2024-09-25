@@ -64,13 +64,12 @@ class CreateKinematicModel:
         self.__final_accel = 0.0
         self.__init_time = 0.0
 
-
-    def validate_keys(self, data):
+    @staticmethod
+    def validate_keys(data):
         allowed_keys = ['frame_name', 'joint_type', 'link_length', 'twist', 'offset', 'theta']
         if not all(key in allowed_keys for key in data):
             raise KeyError(f"Dictionary contains invalid keys. Allowed keys are: {allowed_keys}")
         return data
-    
 
     def get_dh_table(self):
         dh_params_list = []
@@ -79,8 +78,7 @@ class CreateKinematicModel:
                 dh_params_list.append(items)
         dh_table = np.array(np.split(np.array(dh_params_list), len(self.__args)))
         return dh_table
-    
-    
+
     @staticmethod
     def clamp(value, min_value, max_value):
         return max(min_value, min(value, max_value))
@@ -93,7 +91,6 @@ class CreateKinematicModel:
         return joint_t
 
     def set_joints(self, joint_vars, rads=False):
-        clamped_values = []
         try:
             for item in joint_vars:
                 if type(item) not in [int, float, np.int64, np.float64]:
@@ -108,10 +105,12 @@ class CreateKinematicModel:
                         if jt[i] == 'r':
                             joint_lims_rads.append([(lims[i][0]/180)*m.pi, (lims[i][1]/180)*m.pi])
                         elif jt[i] == 'p':
-                            joint_lims_rads.append([lims[i][0],lims[i][1]])
-                    clamped_values = np.array([self.clamp(joint_vars[i], joint_lims_rads[i][0], joint_lims_rads[i][1])  for i in range(len(self.__args))])
+                            joint_lims_rads.append([lims[i][0], lims[i][1]])
+                    clamped_values = np.array([self.clamp(joint_vars[i], joint_lims_rads[i][0], joint_lims_rads[i][1])
+                                               for i in range(len(self.__args))])
                 else:
-                    clamped_values = np.array([self.clamp(joint_vars[i], lims[i][0],lims[i][1])  for i in range(len(self.__args))])
+                    clamped_values = np.array([self.clamp(joint_vars[i], lims[i][0], lims[i][1])
+                                               for i in range(len(self.__args))])
             else:
                 clamped_values = np.array(joint_vars)
                 
@@ -131,10 +130,12 @@ class CreateKinematicModel:
             self.__joint_type_info = joint_type_arr
 
             if len(clamped_values) > self.__num_of_joints:
-                raise IndexError(f"Invalid input: the joint angles provided does not match the number of joints in the robot model.\n" 
+                raise IndexError(f"Invalid input: the joint angles provided does not match the number of joints in the "
+                                 f"robot model.\n" 
                                  f"Expected {self.__num_of_joints} but received {len(joint_vars)}.")
             elif len(clamped_values) < self.__num_of_joints:
-                raise IndexError(f"Invalid input: the joint angles provided does not match the number of joints in the robot model.\n" 
+                raise IndexError(f"Invalid input: the joint angles provided does not match the number of joints in the "
+                                 f"robot model.\n" 
                                  f"Expected {self.__num_of_joints} but received {len(joint_vars)}.")
             for i in range(self.__num_of_joints):
                 if dh_param_g_list[i][1] == "r":
@@ -147,16 +148,14 @@ class CreateKinematicModel:
         except ValueError as e:
             print(f"Error: {e}")
 
-
     def get_dh_params(self):
         return self.__dh_param_grouped_list
-    
 
     def f_kin(self, qn, rads=False):
         try:
             dh_params = self.set_joints(qn, rads)
 
-            all_row1, all_row2, all_row3, all_row4 = [],[],[],[]
+            all_row1, all_row2, all_row3, all_row4 = [], [], [], []
             
             if len(dh_params) == 0:
                 raise TypeError(
@@ -177,38 +176,34 @@ class CreateKinematicModel:
 
                 htm = [[m.cos(self.__theta), -m.sin(self.__theta) * m.cos(self.__link_twist),
                         m.sin(self.__theta) * m.sin(self.__link_twist), self.__link_length * m.cos(self.__theta)],
-                        [m.sin(self.__theta), m.cos(self.__theta) * m.cos(self.__link_twist),
+                       [m.sin(self.__theta), m.cos(self.__theta) * m.cos(self.__link_twist),
                         -m.cos(self.__theta) * m.sin(self.__link_twist), self.__link_length * m.sin(self.__theta)],
-                        [0.0, m.sin(self.__link_twist), m.cos(self.__link_twist), self.__joint_offset],
-                        [0.0, 0.0, 0.0, 1.0]]
+                       [0.0, m.sin(self.__link_twist), m.cos(self.__link_twist), self.__joint_offset],
+                       [0.0, 0.0, 0.0, 1.0]]
 
                 all_row1.append(htm[0])
                 all_row2.append(htm[1])
                 all_row3.append(htm[2])
                 all_row4.append(htm[3])
                 
-            transformation_mtrxs  = [(all_row1[i] ,all_row2[i],all_row3[i], all_row4[i]) for i in range(self.__n_links)]
+            transformation_mtrxs = [(all_row1[i], all_row2[i], all_row3[i], all_row4[i]) for i in range(self.__n_links)]
             self.__homogeneous_t_matrix_ = transformation_mtrxs
             return transformation_mtrxs
         except ValueError as e:
             print(f"Error: {e}")
 
-
     def get_homogeneous_t_matrixes(self):
         print(np.array(self.__homogeneous_t_matrix_))
-
 
     @staticmethod
     def mul(matrix_a, matrix_b):
         result = [[sum(a * b for a, b in zip(A_row, B_col)) for B_col in zip(*matrix_b)] for A_row in matrix_a]
         return result
-    
 
     @staticmethod
     def format(x):
         f = ['{:.3f}'.format(float(item)) for item in x]
         return f
-    
 
     def get_transforms(self, stop_index=0, real=False):
         h_t_matrix = self.__homogeneous_t_matrix_
@@ -219,7 +214,8 @@ class CreateKinematicModel:
                 raise IndexError(f"{self.__robot_name} has only {self.__n_links} "
                                  f"joints, try values from 1 - {self.__n_links}")
             if len(h_t_matrix) == 0:
-                raise IndexError(f"no fk calculations were implemented:cannot generate fk transforms for {self.__robot_name}")
+                raise IndexError(f"no fk calculations were implemented:cannot generate fk transforms "
+                                 f"for {self.__robot_name}")
 
             new = [h_t_matrix[i] for i in range(stop_index)]
             result = reduce(np.dot, np.array(new))
@@ -229,22 +225,19 @@ class CreateKinematicModel:
         except ValueError as e:
             print(f"Error: {e}")
 
-
     def get_tcp(self):
         t_matrix = self.get_transforms(self.__n_links)
         displacement_vector = [t_matrix[i][3] for i in range(3)]
         return displacement_vector
-    
 
     def get_j_origin(self, index):
         t_matrix = self.get_transforms(index)
         displacement_vector = [t_matrix[i][3] for i in range(3)]
         return displacement_vector
-    
 
     def get_r_matrix(self, index):
         r_matrix = []
-        t_matrix = self.get_transforms(index,real=True)
+        t_matrix = self.get_transforms(index, real=True)
         try:
             for i in range(3):
                 for j in range(3):
@@ -255,7 +248,6 @@ class CreateKinematicModel:
         except ValueError as e:
             print(f"{e}")
 
-
     def set_joint_limit(self, join_limits):
         self.__joint_limits = join_limits
         try:
@@ -265,7 +257,6 @@ class CreateKinematicModel:
         except ValueError as e:
             print(f"Error: {e}")
         return self.__joint_limits
-    
 
     def get_joint_limits(self):
         return self.__joint_limits
@@ -288,7 +279,6 @@ class CreateKinematicModel:
         skewd[2][0] = yb_s
         skewd[1][0] = zb_s
         return skewd
-    
 
     @staticmethod
     def mul_mat_vec(mat, vec):
@@ -300,7 +290,6 @@ class CreateKinematicModel:
         res = [a[i:i + chunk_size3] for i in range(0, len(a), chunk_size3)]
         b = [reduce(lambda ai, bi: ai + bi, res[i]) for i in range(len(res))]
         return b
-    
 
     def jacobian(self):
         o_n = self.get_j_origin(self.__num_of_joints)
@@ -317,8 +306,8 @@ class CreateKinematicModel:
             elif self.__joint_type_info[i] == "r":
                 zi = np.matmul(self.get_r_matrix(i), z_axis_vec)
                 dt = np.matmul(self.skew(zi),
-                                      [round(float(o_n[r]) - float(self.get_j_origin(i)[r]), 5) for r in
-                                       range(len(o_n))])
+                               [round(float(o_n[r]) - float(self.get_j_origin(i)[r]), 5) for r in
+                                range(len(o_n))])
                 jv.append(dt)
                 jw.append(zi)
             elif self.__joint_type_info[i] == "p":
@@ -332,7 +321,6 @@ class CreateKinematicModel:
         self.__jacobian = jac
         return jac
 
-
     def get_joint_states(self, rads=False):
         joint_state = []
         for i in range(len(self.get_dh_params())):
@@ -344,7 +332,6 @@ class CreateKinematicModel:
             elif self.get_dh_params()[i][1] == "p":
                 joint_state.append(self.get_dh_params()[i][4])
         return joint_state
-
 
     # checks for singular configurations
     def singular_configs_check(self):
@@ -362,7 +349,6 @@ class CreateKinematicModel:
         elif not sing:
             print("No singularities found *** \n")
 
-
     def lin_ang_velocity(self, joint_vels):
         if len(joint_vels) != self.__num_of_joints:
             raise ValueError(f"input index out of range : max n joint is {self.__num_of_joints}")
@@ -372,7 +358,6 @@ class CreateKinematicModel:
                     raise TypeError("input must be of type integer, float or numpy.ndarray")
         eff_velocity = np.matmul(np.array(self.jacobian()), np.array(joint_vels))
         return eff_velocity
-    
 
     def joint_vels(self, end_eff_vels):
         if len(end_eff_vels) != 6:
@@ -385,7 +370,6 @@ class CreateKinematicModel:
         jvel = np.linalg.pinv(np.array(self.jacobian()))
         result = np.matmul(jvel, np.array(end_eff_vels))
         return result
-    
 
     def SE3(self, T, deg=False, merge_res=False):
         try:
@@ -408,9 +392,8 @@ class CreateKinematicModel:
                 return np.array([position, euler_angles])
         except ValueError as e:
             print(f"Error: {e}")
-            
 
-    def i_kin(self, target_position, mask=[1,1,1,1,1,1], tol=1e-6, it_max=100, _damp=1e-2, euler_in_deg=False):
+    def i_kin(self, target_position, mask=[1, 1, 1, 1, 1, 1], tol=1e-6, it_max=100, _damp=1e-2, euler_in_deg=False):
         try:
             if type(target_position) is not np.ndarray:
                 for item in target_position:
@@ -447,7 +430,7 @@ class CreateKinematicModel:
                 p_desired = SE3[0]
 
                 if euler_in_deg:
-                    r_desired = np.array([(r / 180) * m.pi for r in SE3[1]]) #Convert to rads
+                    r_desired = np.array([(r / 180) * m.pi for r in SE3[1]])  # Convert to rads
                 else:
                     r_desired = np.array(SE3[1])
 
@@ -513,7 +496,6 @@ class CreateKinematicModel:
         except ValueError as e:
             print(f"Error: {e}")
 
-
     @staticmethod
     def cubic_trajectory(t0, tf, q, v0, vf, t):
         q0, qf = q[0], q[1]
@@ -530,9 +512,9 @@ class CreateKinematicModel:
 
         return pva
     
-#-------------------------------------------------------------
-    
-    def quintic_trajectory(self, t0, tf, q, v0, vf, a0, af, t):
+# -------------------------------------------------------------
+    @staticmethod
+    def quintic_trajectory(t0, tf, q, v0, vf, a0, af, t):
         """
         t0: Initial time
         tf: Final time
@@ -566,8 +548,7 @@ class CreateKinematicModel:
 
         return pva
     
-#------------------------------------------------------------------
-
+# ------------------------------------------------------------------
 
     def ptraj(self, initial, final, tq, time_steps, pva):
         try:
@@ -581,16 +562,19 @@ class CreateKinematicModel:
                     if type(item) not in [int, float]:
                         raise TypeError("input must be of type integer, float or numpy.ndarray")
 
-            if len(initial) > self.__num_of_joints or  len(initial) < self.__num_of_joints or len(initial) == 0:
+            if len(initial) > self.__num_of_joints or len(initial) < self.__num_of_joints or len(initial) == 0:
                 raise IndexError("index out of range")
 
             if len(final) > self.__num_of_joints or len(final) < self.__num_of_joints or len(final) == 0:
                 raise IndexError("index out of range")
+            
+            if type(pva) is not int:
+                raise TypeError("pva must be of type int: [0-2]")
 
             if pva > 2 or pva < 0:
                 pva = 0
 
-            self.pva = pva # position velocity and acceleration
+            self.pva = pva  # position velocity and acceleration
 
             t0 = self.__init_time    # Start time
             tf = tq     # End time
@@ -602,16 +586,16 @@ class CreateKinematicModel:
             q = [[initial[i], final[i]] for i in range(self.__num_of_joints)]
    
             if self.__tr_type == "q":
-                trajectory = [[self.quintic_trajectory(t0, tf, q[i], v0, vf, a0, af, t)[pva] for t in time_steps] for i in
-                            range(self.__num_of_joints)]
+                trajectory = [[self.quintic_trajectory(t0, tf, q[i], v0, vf, a0, af, t)[pva] for t in time_steps]
+                              for i in
+                              range(self.__num_of_joints)]
             else: 
                 trajectory = [[self.cubic_trajectory(t0, tf, q[i], v0, vf, t)[pva] for t in time_steps] for i in
-                            range(self.__num_of_joints)]
+                              range(self.__num_of_joints)]
             
             return trajectory
         except ValueError as e:
             print(f"Error: {e}")
-
 
     def plot(self, trajectory, time_steps):
 
@@ -665,14 +649,25 @@ class CreateKinematicModel:
 
         plt.show()
 
+    def traj_gen(self, tr_lst, pva, tr_type, trj_time, plot=False):
 
-    def traj_gen(self, tr_lst, trj_time, pva, tr_type, plot=False ):
+        if type(tr_lst) not in [np.ndarray, list]:
+            raise TypeError("way-points must be of type list or numpy.ndarray")
 
         self.__tr_type = tr_type
 
+        if type(trj_time) not in [np.ndarray, list]:
+            raise TypeError("trj_time must be of type list or numpy.ndarray")
+        else:
+            for item in trj_time:
+                if type(item) not in [int, float]:
+                    raise TypeError("input must be of type integer or float")
+                if item == 0:
+                    raise TypeError(f"t = {item} might cause a division by {item}, try other values other than {item}")
+
         lst = np.array(tr_lst)
         time_steps = [np.linspace(0, t, 100) for t in trj_time]
-        trjlst = [[lst[i-1],lst[i]] for i in range(1,len(lst))]
+        trjlst = [[lst[i-1], lst[i]] for i in range(1, len(lst))]
 
         if len(trjlst) < len(trj_time):
             raise IndexError(f"Cannot generate trajectory : " 
@@ -686,23 +681,21 @@ class CreateKinematicModel:
        
         if plot:
             for i in range(len(trajectory)):
-                self.plot(trajectory[i],time_steps[i])
+                self.plot(trajectory[i], time_steps[i])
         return trajectory
-    
 
     def get_num_of_joints(self):
         return self.__num_of_joints
-    
-    
+
     def velocity(self, init, final):
         if type(init) not in [int, float] or type(final) not in [int, float]:
-                raise TypeError("input must be of type integer or float")
+            raise TypeError("input must be of type integer or float")
         self.__init_vel = init
         self.__final_vel = final
 
     def accel(self, init, final):
         if type(init) not in [int, float] or type(final) not in [int, float]:
-                raise TypeError("input must be of type integer or float")
+            raise TypeError("input must be of type integer or float")
         self.__init_accel = init
         self.__final_accel = final
 
