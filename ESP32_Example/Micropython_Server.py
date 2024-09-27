@@ -43,8 +43,6 @@ try:
 
         dat.append(received)
         
-        #print(dat)
-        
         i+=1
         # Echo back the received data
         client_socket.send(f"Success: {i}")
