@@ -31,7 +31,7 @@ Joint 2     0               0.14    0           0
 Joint 3     0               0.17    0           π/2
 Joint 4     0               0       0          -π/2
 Joint 5     0               0       0           π/2
-Joint 6     0               0       0           0
+Joint 6     0               0       0.02           0
 """
 
 robot = CreateKinematicModel(
@@ -48,8 +48,8 @@ robot = CreateKinematicModel(
 for i in range(0, 91, 1):
     system('clear')
     robot.f_kin([i, 90, -90, i, 45, i])
-    print(robot.get_transforms(6, real=True),'\n')
-    print(robot.jacobian())
-    print(robot.get_joint_states(),'\n')
+    print(robot.get_transforms(6, real=True), '\n')
+    print(robot.jacobian(), '\n')
+    print(robot.get_joint_states(), '\n')
     robot.singular_configs_check()
     sleep(0.02)
