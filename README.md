@@ -3,14 +3,14 @@
 
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/roboticstoolbox-python.svg)
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Version](https://img.shields.io/badge/version-1.0.2-blue)
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
 
 
 <table style="border:0px">
 <tr style="border:0px">
 <td style="border:0px">
-<img src="./assets/limg/RKLogo.webp" width="500"></td>
+<img src="https://github.com/Silas-U/RoboKinematics/blob/main/assets/limg/RKLogo.webp?raw=true" width="500"></td>
 <td style="border:0px">
 
  RoboKinematics is a Python package designed to perform kinematic analysis for n-degree-of-freedom serial (open-loop) robot manipulators. This package supports both forward and inverse kinematics, trajectory generation, and Jacobian computation.
@@ -31,7 +31,7 @@
 
 ## Installation
 
-To install RoboKinematics, you will need Python >= 3.6
+To install RoboKinematics, you will need Python >= 3.7
 
 To download the latest version of python, visit the [official python page](https://www.python.org/downloads/).
 
@@ -216,9 +216,7 @@ The `traj_gen()` method generates a complete trajectory between multiple waypoin
 - **`tr_lst`**: A list of waypoints, where each waypoint is a list of joint positions. For example, [q0, q1, q2, ..., qn] where q0 is the starting point and qn is the final point.
 
 - **`trj_time`**: A list of time intervals for each segment of the trajectory. For example, `[1, 2]` specifies that it will take 1 second to move from the first waypoint to the second, and 2 seconds to move from the second to the third.
-
 - **`pva`**: A flag indicating whether to generate a trajectory for **position** (`pva = 0`), **velocity** (`pva = 1`), or **acceleration** (`pva = 2`).
-
 - **`plot`**: A boolean (`True/False`). If `True`, the generated trajectory is plotted.
 
 - **`tr_type`**:
@@ -226,30 +224,17 @@ The `traj_gen()` method generates a complete trajectory between multiple waypoin
     "q": represents a quintic polynomial trajectory (5th-degree), ensuring smooth position, velocity, and acceleration transitions.
     You may also support a cubic trajectory by passing a different value, like "c" for cubic.
 
-
 #### **Returns**:
 - **`trajectory`**: A list of generated trajectories for each joint over time. Each element in the list corresponds to a segment of the full trajectory between two waypoints.
 
 #### **Usage Example**:
 
 ```python
-
+# Define waypoints (joint configurations) and corresponding time intervals
 from RoboKinematics import CreateKinematicModel
 
-"""
-The Denavit–Hartenberg parameters for Puma560  robot is shown below.
-
-Kinematics  theta [rad]     a [m]   d [m]   alpha [rad]
-Joint 1     0               0       0.6718      π/2
-Joint 2     0               0.4318    0           0
-Joint 3     0               0.0203  0.15        π/2
-Joint 4     0               0       0.4318      -π/2
-Joint 5     0               0       0           π/2
-Joint 6     0               0       0           0
-"""
-
-# Creates a kinematic model of the Puma560 robot
-Puma560 = CreateKinematicModel(
+# Creates a kinematic model of the 6-axis robot
+robot = CreateKinematicModel(
      [        
       { 'frame_name':'frame0','joint_type':'r','link_length':0.0,'twist':90.0,'offset':0.0,'theta':0.0 },
       { 'frame_name':'frame1','joint_type':'r','link_length':0.4318,'twist':0.0,'offset':0.0,'theta':00 },
@@ -258,16 +243,16 @@ Puma560 = CreateKinematicModel(
       { 'frame_name':'frame4','joint_type':'r','link_length':0.0,'twist':-90.0,'offset':0.0,'theta':0.0 },
       { 'frame_name':'frame5','joint_type':'r','link_length':0.0,'twist': 0.0,'offset':0.0,'theta':0.0 }
      ],
-     robot_name="Puma560")
+     robot_name="B1_37")
 
 # Set the time interval, in this case, 5 seconds
-trj_time = [5]
+trj_t = [5]
 
-Puma560.f_kin([10, 20, 30, 40, 50, 60])
+robot.f_kin([10, 20, 30, 40, 50, 60])
 
-home = Puma560.get_joint_states(rads=True)
+home = robot.get_joint_states(rads=True)
 
-target = Puma560.i_kin([0.26453836, -0.06334258,  0.45908105, -0.35924867, -0.7797434,  1.07086644])
+target = robot.i_kin([0.26453836, -0.06334258,  0.45908105, -0.35924867, -0.7797434,  1.07086644])
 
 # Define waypoints (joint configurations)
 waypoints = [
@@ -275,8 +260,8 @@ waypoints = [
     target
 ]
 
-# Generate a trajectory for position (pva=0) and plot the results
-trajectory = Puma560.traj_gen(waypoints, trj_time, pva=2, tr_type="q", plot=True)
+# Generate a trajectory for position (pva=0) and plot the resultsV
+trajectory = robot.traj_gen(waypoints, trj_time=trj_t, pva=0, tr_type="q", plot=True)
 ```
 
 #### **Notes**:
@@ -284,17 +269,23 @@ trajectory = Puma560.traj_gen(waypoints, trj_time, pva=2, tr_type="q", plot=True
 - The `pva` parameter allows you to specify whether you want the trajectory for position, velocity, or acceleration.
 - **Example Plot**: The method can plot trajectories showing the robot joint positions (or velocities/accelerations) over time for each segment.
 
+<!-- ![RoboKinematics Example](./images/2dof_Fig1.png)
+
+![RoboKinematics Example](./images/2dof_Fig_1_velocity.png)
+
+![RoboKinematics Example](./images/2dof_fig1_accel.png) -->
 
 <table style="border:0px">
 <tr style="border:0px">
 <td style="border:0px">
-<img src="./assets/plots/Figure_1_puma_pos.png" width="500">
+<img src="https://github.com/Silas-U/RoboKinematics/blob/main/assets/plots/Figure_1_puma_pos.png?raw=true" width="500">
+
 </td>
 <td style="border:0px">
-<img src="./assets/plots/Figure_1_puma_vel.png" width="500"></td>
+<img src="https://github.com/Silas-U/RoboKinematics/blob/main/assets/plots/Figure_1_puma_vel.png?raw=true" width="500"></td>
 </td>
 <td style="border:0px">
-<img src="./assets/plots/Figure_1_puma_accel.png" width="500">
+<img src="https://github.com/Silas-U/RoboKinematics/blob/main/assets/plots/Figure_1_puma_accel.png?raw=true" width="500">
 </td>
 </tr>
 </table>
@@ -306,13 +297,9 @@ This project is licensed under the Apache License, Version 2.0 - see the [LICENS
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request on [GitHub](https://github.com/Silas-U/RoboKinematics/tree/main)
-
 ## Author
 
 **Silas Udofia (Silas-U)**
-
-
-
 
 
 

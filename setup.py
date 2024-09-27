@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="RoboKinematics",
-    version="1.0.1",
+    version="1.0.2",
     author="Silas Udofia (Silas-U)",
     author_email="silasudofia469@gmail.com",
     description="A Python library for robotics research and education",
@@ -16,16 +16,21 @@ setup(
         "Bug Tracker": "https://github.com/Silas-U/RoboKinematics/issues",
     },
     classifiers=[
-        "Programming Language :: Python :: 3",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
+         # Specify the Python versions you support here.
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
     packages=find_packages(),
-    python_requires='>=3.6',
+    python_requires='>=3.7',
     install_requires=[  
-        "numpy",
+        "numpy>=1.17.4",
+        "matplotlib>=3.1",
         "scipy",
-        "matplotlib"
     ],
     include_package_data=True,
     license="Apache Version 2.0",
