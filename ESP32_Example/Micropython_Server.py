@@ -3,8 +3,8 @@ import math
 import json
 
 # Configure the ESP32 as an access point or connect to a Wi-Fi network.
-ssid = 'silasudofia469@gmail.com'
-password = 'web2web3'
+ssid = 'your_username'
+password = 'wifi-password'
 
 import network
 sta_if = network.WLAN(network.STA_IF)
