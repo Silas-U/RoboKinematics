@@ -5,8 +5,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="RoboKinematics",
-    version="0.0.2",
-    author="Silas Udofia",
+    version="1.0.1",
+    author="Silas Udofia (Silas-U)",
     author_email="silasudofia469@gmail.com",
     description="A Python library for robotics research and education",
     long_description=long_description,

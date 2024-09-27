@@ -94,7 +94,7 @@ class CreateKinematicModel:
         try:
             for item in joint_vars:
                 if type(item) not in [int, float, np.int64, np.float64]:
-                    raise TypeError("input must be of type integer, float or numpy.ndarray")
+                    raise TypeError("Joint_vars must be of type integer, float or numpy.ndarray")
                 
             if self.__joint_lim_enable:
                 lims = self.get_joint_limits()
@@ -131,11 +131,11 @@ class CreateKinematicModel:
 
             if len(clamped_values) > self.__num_of_joints:
                 raise IndexError(f"Invalid input: the joint angles provided does not match the number of joints in the "
-                                 f"robot model.\n" 
+                                 f"{self.__robot_name} model.\n" 
                                  f"Expected {self.__num_of_joints} but received {len(joint_vars)}.")
             elif len(clamped_values) < self.__num_of_joints:
                 raise IndexError(f"Invalid input: the joint angles provided does not match the number of joints in the "
-                                 f"robot model.\n" 
+                                 f"{self.__robot_name} model.\n" 
                                  f"Expected {self.__num_of_joints} but received {len(joint_vars)}.")
             for i in range(self.__num_of_joints):
                 if dh_param_g_list[i][1] == "r":
@@ -159,7 +159,7 @@ class CreateKinematicModel:
             
             if len(dh_params) == 0:
                 raise TypeError(
-                    f"Could not calculate fk for {self.__robot_name}, expected {self.__robot_name} joint params")
+                    f"Invalid values provided for {self.__robot_name}, expected {self.__robot_name} joint params")
             for col_index in range(len(dh_params)):
                 self.__link_length = float(dh_params[col_index][2])
                 self.__joint_offset = float(dh_params[col_index][4])
@@ -209,12 +209,12 @@ class CreateKinematicModel:
         h_t_matrix = self.__homogeneous_t_matrix_
         try:
             if stop_index <= 0:
-                raise IndexError(f"valid inputs range from 1 - {self.__n_links}")
+                raise IndexError(f"error: stop_index range from 1 - {self.__n_links} for {self.__robot_name}")
             elif stop_index > self.__n_links:
-                raise IndexError(f"{self.__robot_name} has only {self.__n_links} "
-                                 f"joints, try values from 1 - {self.__n_links}")
+                raise IndexError(f"expected {self.__n_links} max, but {stop_index} was provided"
+                                 f",try values from 1 - {self.__n_links}")
             if len(h_t_matrix) == 0:
-                raise IndexError(f"no fk calculations were implemented:cannot generate fk transforms "
+                raise IndexError(f"error: no initial values for fk analysis"
                                  f"for {self.__robot_name}")
 
             new = [h_t_matrix[i] for i in range(stop_index)]
@@ -351,7 +351,7 @@ class CreateKinematicModel:
 
     def lin_ang_velocity(self, joint_vels):
         if len(joint_vels) != self.__num_of_joints:
-            raise ValueError(f"input index out of range : max n joint is {self.__num_of_joints}")
+            raise ValueError(f"input index out of range : max num of joints is {self.__num_of_joints}")
         elif type(joint_vels) is not np.ndarray:
             for item in joint_vels:
                 if type(item) not in [int, float]:
@@ -671,10 +671,10 @@ class CreateKinematicModel:
 
         if len(trjlst) < len(trj_time):
             raise IndexError(f"Cannot generate trajectory : " 
-                             f"trajectory time > waypoints")
+                             f"invalid time interval for segments")
         if len(trjlst) > len(trj_time):
             raise IndexError(f"Cannot generate trajectory : " 
-                             f"trajectory time < waypoints")
+                             f"invalid time interval for segments")
         
         trajectory = [self.ptraj(trjlst[i][0], trjlst[i][1], trj_time[i], time_steps[i], pva) 
                       for i in range(len(trjlst))]

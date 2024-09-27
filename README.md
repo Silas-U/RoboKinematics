@@ -105,7 +105,7 @@ Convergence achieved in iteration <0> : CONV error 0.000007
 [0.7853981633974483, 0.5235987755982988]
 ```
 Output in degrees:
-To convert the output to deg, we use the numpy.degrees function:
+To convert the output to deg, use the numpy.degrees function:
 
 ```python
 print(np.degrees(joint_angles))
@@ -210,7 +210,7 @@ This is the main class which encapsulates all the functionalities for kinematic 
 #### **`traj_gen(tr_lst, trj_time, pva, tr_type, plot=False )`**
 
 #### **Description**:
-The `traj_gen()` method generates a complete trajectory between multiple waypoints (positions) over a specified time for each segment. It allows you to define cubic trajectories for position, velocity, or acceleration, and optionally plot the results.
+The `traj_gen()` method generates a complete trajectory between multiple waypoints (positions) over a specified time for each segment. It allows you to define trajectories for position, velocity, or acceleration, and optionally plot the results.
 
 #### **Parameters**:
 - **`tr_lst`**: A list of waypoints, where each waypoint is a list of joint positions. For example, [q0, q1, q2, ..., qn] where q0 is the starting point and qn is the final point.
@@ -275,7 +275,7 @@ waypoints = [
     target
 ]
 
-# Generate a cubic trajectory for position (pva=0) and plot the results
+# Generate a trajectory for position (pva=0) and plot the results
 trajectory = Puma560.traj_gen(waypoints, trj_time, pva=2, tr_type="q", plot=True)
 ```
 

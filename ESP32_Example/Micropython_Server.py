@@ -39,9 +39,9 @@ try:
         str_data = data.decode('utf-8')
         
         # Deserialize the JSON-encoded message
-        received_list = json.loads(str_data)
+        received = json.loads(str_data)
 
-        dat.append(received_list)
+        dat.append(received)
         
         #print(dat)
         
